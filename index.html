@@ -1,496 +1,377 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="neon">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>SlotX — Демо Казино</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://miniapps.ai/sdk/miniapps-ai-v1.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="tg-core.css">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="safe-top safe-bottom">
 
-  <!-- ANIMATED BACKGROUND ORBS -->
-  <div id="bg-orbs" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <div class="orb orb-4"></div>
+<!-- BG -->
+<div id="bg-orbs" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div><div class="orb orb-4"></div></div>
+<canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+<!-- SPLASH -->
+<div id="splash-screen">
+  <div class="splash-content">
+    <div class="splash-emoji">🎰</div>
+    <div class="splash-title">Slot<span class="text-accent">X</span></div>
+    <div class="splash-sub">Демо-слоты бесплатно</div>
+    <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app">
+
+  <!-- HEADER -->
+  <header id="main-header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <p class="logo-title">Slot<span class="text-accent">X</span></p>
+        <p class="logo-sub" id="header-greeting">Демо-слоты бесплатно</p>
+      </div>
+      <div class="header-right">
+        <button id="sound-toggle" class="sound-toggle interactive active" aria-label="Звук"><i class="fa-solid fa-volume-high"></i></button>
+        <div class="online-counter"><span class="oc-dot"></span><span id="online-count" class="oc-num">1,247</span><span class="oc-label">online</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LIVE WIN FEED -->
+  <div class="win-feed">
+    <div class="wf-live-badge"><span class="wf-live-dot"></span>LIVE</div>
+    <div class="win-feed-inner" id="win-feed-inner"></div>
   </div>
 
-  <!-- CONFETTI CANVAS -->
-  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+  <!-- CONTENT -->
+  <div id="content-area">
 
-  <!-- SPLASH SCREEN -->
-  <div id="splash-screen">
-    <div class="splash-content">
-      <div class="splash-emoji">🎰</div>
-      <div class="splash-title">Slot<span class="text-accent">X</span></div>
-      <div class="splash-sub">Демо-слоты бесплатно</div>
-      <div class="splash-bar"><div class="splash-bar-fill"></div></div>
-    </div>
-  </div>
+    <!-- HOME -->
+    <section id="tab-home">
+      <div class="px-5 mt-3 anim-on-scroll">
+        <div id="banner-carousel" class="banner-carousel"><div id="banner-track" class="banner-track"></div></div>
+        <div id="banner-dots" class="flex items-center justify-center gap-1.5 mt-2.5"></div>
+      </div>
 
-  <!-- ==================== MAIN APP ==================== -->
-  <div id="app" class="flex flex-col" style="height:100%;width:100%;">
-
-    <!-- ===== HEADER ===== -->
-    <div id="main-header">
-      <div class="header-inner">
-        <div class="header-left">
-          <div class="header-logo">
-            <div class="logo-text">
-              <p class="logo-title">Slot<span class="text-accent">X</span></p>
-              <p class="logo-sub" id="header-greeting">Демо-слоты бесплатно</p>
-            </div>
-          </div>
-        </div>
-        <div class="header-right">
-          <button id="sound-toggle" class="sound-toggle interactive active" onclick="SoundFX.toggle()"><i class="fa-solid fa-volume-high"></i></button>
-          <div id="online-counter" class="online-counter interactive">
-            <span class="oc-dot"></span>
-            <span id="online-count" class="oc-num">1,247</span>
-            <span class="oc-label">online</span>
+      <div class="px-5 mt-4 anim-on-scroll">
+        <div id="promo-timer" class="promo-timer interactive">
+          <div class="timer-icon">🎁</div>
+          <div class="timer-info"><p class="timer-title">Бонус ждёт — Успей забрать!</p><p class="timer-sub">Акция заканчивается через:</p></div>
+          <div class="timer-countdown">
+            <span class="timer-digit" id="timer-h">00</span><span class="timer-sep">:</span>
+            <span class="timer-digit" id="timer-m">00</span><span class="timer-sep">:</span>
+            <span class="timer-digit" id="timer-s">00</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ===== LIVE WIN FEED ===== -->
-    <div id="win-feed" class="win-feed">
-      <div class="wf-live-badge"><span class="wf-live-dot"></span>LIVE</div>
-      <div class="win-feed-inner" id="win-feed-inner"></div>
-    </div>
-
-    <!-- ===== CONTENT AREA ===== -->
-    <div id="content-area" class="flex-1 overflow-y-auto hide-scrollbar">
-
-      <!-- TAB: HOME -->
-      <div id="tab-home">
-
-        
-
-        <!-- Promo Banner Carousel -->
-        <div class="px-5 mt-3 anim-on-scroll">
-          <div id="banner-carousel" class="banner-carousel">
-            <div id="banner-track" class="banner-track"></div>
-          </div>
-          <div id="banner-dots" class="flex items-center justify-center gap-1.5 mt-2.5"></div>
-        </div>
-
-        <!-- PROMO TIMER -->
-        <div class="px-5 mt-4 anim-on-scroll">
-          <div id="promo-timer" class="promo-timer interactive" onclick="document.getElementById('cta-mid-banner').click()">
-            <div class="timer-icon">🎁</div>
-            <div class="timer-info">
-              <p class="timer-title">Бонус ждёт — Успей забрать!</p>
-              <p class="timer-sub">Акция заканчивается через:</p>
-            </div>
-            <div class="timer-countdown" id="promo-countdown">
-              <span class="timer-digit" id="timer-h">00</span><span class="timer-sep">:</span>
-              <span class="timer-digit" id="timer-m">00</span><span class="timer-sep">:</span>
-              <span class="timer-digit" id="timer-s">00</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Favorites Section -->
-        <div id="favorites-section" class="anim-on-scroll" style="display:none;">
-          <div class="section-header">
-            <span class="section-title"><span class="section-icon si-red">❤️</span> Избранное <span class="section-count" id="fav-count">0</span></span>
-          </div>
-          <div id="favorites-row" class="scroll-row hide-scrollbar pb-1"></div>
-        </div>
-
-        <!-- Recent Games -->
-        <div id="recent-section" class="anim-on-scroll" style="display:none;">
-          <div class="section-header">
-            <span class="section-title"><span class="section-icon si-blue">⏱</span> Недавние</span>
-          </div>
-          <div id="recent-games" class="scroll-row hide-scrollbar pb-1"></div>
-        </div>
-
-        <!-- Popular Games -->
-        <div class="anim-on-scroll">
-          <div class="section-header">
-            <span class="section-title"><span class="section-icon si-orange">🔥</span> Популярное <span class="section-count" id="popular-count">0</span></span>
-            <span id="link-popular" class="section-link interactive">Все →</span>
-          </div>
-          <div id="popular-row" class="scroll-row hide-scrollbar pb-2"></div>
-        </div>
-
-
-        <!-- Bonus Buy -->
-        <div id="bonusbuy-section" class="anim-on-scroll">
-          <div class="section-header">
-            <span class="section-title"><span class="section-icon si-gold">💰</span> Bonus Buy <span class="section-count" id="bonusbuy-count">0</span></span>
-            <span id="link-bonusbuy" class="section-link interactive">Все →</span>
-          </div>
-          <div id="bonusbuy-row" class="scroll-row hide-scrollbar pb-2"></div>
-        </div>
-
-        <!-- Top Games -->
-        <div class="anim-on-scroll">
-          <div class="section-header">
-            <span class="section-title"><span class="section-icon si-yellow">🏆</span> Топ слоты <span class="section-count" id="top-count">0</span></span>
-            <span id="link-top" class="section-link interactive">Все →</span>
-          </div>
-          <div id="top-row" class="scroll-row hide-scrollbar pb-2"></div>
-        </div>
-
-        <!-- LEADERBOARD -->
-        <div class="anim-on-scroll">
-          <div class="section-header">
-            <span class="section-title"><span class="section-icon si-gold">🏆</span> Топ выигрышей</span>
-            <div id="lb-tabs" class="flex gap-1">
-              <button class="lb-tab active" data-lb="day">Сегодня</button>
-              <button class="lb-tab" data-lb="week">Неделя</button>
-            </div>
-          </div>
-          <div id="leaderboard" class="px-5 pb-2"></div>
-        </div>
-
-        <!-- CTA Banner -->
-        <div class="px-5 mt-2 mb-4 anim-on-scroll">
-          <div id="cta-mid-banner" class="cta-mid-card interactive">
-            <div class="cta-mid-shimmer"></div>
-            <div class="flex items-center gap-4 relative z-10">
-              <div class="cta-mid-icon">💰</div>
-              <div class="flex-1 min-w-0">
-                <p class="font-bold text-sm text-white">Готовы к реальным ставкам?</p>
-                <p class="text-xs mt-1" style="color:var(--text-secondary);">Получите приветственный бонус до 500% в лучших казино</p>
-              </div>
-              <div class="cta-mid-arrow">
-                <i class="fa-solid fa-chevron-right text-xs"></i>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- New Games -->
-        <div class="anim-on-scroll">
-          <div class="section-header">
-            <span class="section-title"><span class="section-icon si-purple">✨</span> Новинки <span class="section-count" id="new-count">0</span></span>
-            <span id="link-new" class="section-link interactive">Все →</span>
-          </div>
-          <div id="new-row" class="scroll-row hide-scrollbar pb-2"></div>
-        </div>
-
-
-        <!-- Casino Offers on Home -->
-        <div id="home-casino-section" class="anim-on-scroll">
-          <div class="section-header">
-            <span class="section-title"><span class="section-icon si-cyan">💎</span> Лучшие казино</span>
-            <span id="link-casinos" class="section-link interactive">Все →</span>
-          </div>
-          <div id="home-casino-row" class="scroll-row hide-scrollbar pb-2"></div>
-        </div>
-
-        <div style="height:24px;"></div>
+      <div id="favorites-section" class="anim-on-scroll" style="display:none;">
+        <div class="section-header"><span class="section-title"><span class="section-icon si-red">❤️</span> Избранное <span class="section-count" id="fav-count">0</span></span></div>
+        <div id="favorites-row" class="scroll-row hide-scrollbar pb-1"></div>
       </div>
 
-      <!-- TAB: GAMES -->
-      <div id="tab-games" style="display:none;">
-        <div class="sticky top-0 z-20 px-5 pt-3 pb-2" style="background:rgba(11,14,20,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);">
-          <div class="search-box flex items-center px-3 py-2.5 gap-2">
-            <i class="fa-solid fa-magnifying-glass text-sm" style="color:var(--text-muted);"></i>
-            <input id="search-input" type="text" placeholder="🎰 Найти слот..." autocomplete="off">
-          </div>
-        </div>
-        <div id="chips-row" class="flex gap-2 px-5 mt-1 overflow-x-auto hide-scrollbar pb-2"></div>
-        <div id="games-grid" class="grid grid-cols-2 gap-3 px-5 pb-4"></div>
-        <div id="games-empty" class="empty-state" style="display:none;">
-          <i class="fa-solid fa-dice text-3xl mb-3" style="color:var(--text-muted);"></i>
-          <p>Ничего не найдено</p>
-        </div>
-        <div style="height:16px;"></div>
+      <div id="recent-section" class="anim-on-scroll" style="display:none;">
+        <div class="section-header"><span class="section-title"><span class="section-icon si-blue">⏱</span> Недавние</span></div>
+        <div id="recent-games" class="scroll-row hide-scrollbar pb-1"></div>
       </div>
 
-      <!-- TAB: CASINOS -->
-      <div id="tab-casinos" style="display:none;">
-        <div class="px-5 pt-4">
-          <p class="font-bold text-xl text-white">🏆 Лучшие казино 2025</p>
-          <p class="text-sm mt-1" style="color:var(--text-muted);">Эксклюзивные бонусы от проверенных партнёров</p>
+      <div class="anim-on-scroll">
+        <div class="section-header">
+          <span class="section-title"><span class="section-icon si-orange">🔥</span> Популярное <span class="section-count" id="popular-count">0</span></span>
+          <span id="link-popular" class="section-link interactive">Все →</span>
         </div>
-        <div id="casinos-list" class="px-5 mt-4 pb-8"></div>
+        <div id="popular-row" class="scroll-row hide-scrollbar pb-2"></div>
       </div>
 
-      <!-- TAB: PROFILE -->
-      <div id="tab-profile" style="display:none;">
-        <div class="px-5 pt-4 pb-6">
+      <div id="bonusbuy-section" class="anim-on-scroll">
+        <div class="section-header">
+          <span class="section-title"><span class="section-icon si-gold">💰</span> Bonus Buy <span class="section-count" id="bonusbuy-count">0</span></span>
+          <span id="link-bonusbuy" class="section-link interactive">Все →</span>
+        </div>
+        <div id="bonusbuy-row" class="scroll-row hide-scrollbar pb-2"></div>
+      </div>
 
-          <!-- USER PROFILE CARD -->
-          <div id="profile-user-card" class="profile-card mb-5">
-            <div class="profile-avatar" id="profile-avatar">
-              <span id="profile-avatar-emoji">👤</span>
-              <img id="profile-avatar-img" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" referrerpolicy="no-referrer">
+      <div class="anim-on-scroll">
+        <div class="section-header">
+          <span class="section-title"><span class="section-icon si-yellow">🏆</span> Топ слоты <span class="section-count" id="top-count">0</span></span>
+          <span id="link-top" class="section-link interactive">Все →</span>
+        </div>
+        <div id="top-row" class="scroll-row hide-scrollbar pb-2"></div>
+      </div>
+
+      <div class="anim-on-scroll">
+        <div class="section-header">
+          <span class="section-title"><span class="section-icon si-gold">🏆</span> Топ выигрышей</span>
+          <div class="flex gap-1"><button class="lb-tab active" data-lb="day">Сегодня</button><button class="lb-tab" data-lb="week">Неделя</button></div>
+        </div>
+        <div id="leaderboard" class="px-5 pb-2"></div>
+      </div>
+
+      <div class="px-5 mt-2 mb-4 anim-on-scroll">
+        <div id="cta-mid-banner" class="cta-mid-card interactive">
+          <div class="cta-mid-shimmer"></div>
+          <div class="flex items-center gap-4 relative z-10">
+            <div class="cta-mid-icon">💰</div>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-sm text-white">Готовы к реальным ставкам?</p>
+              <p class="text-xs mt-1" style="color:var(--text-secondary);">Получите приветственный бонус до 500%</p>
             </div>
-            <div class="profile-info">
-              <p class="profile-name" id="profile-name">Гость</p>
-              <p class="profile-username" id="profile-username">Добро пожаловать!</p>
-            </div>
-            <div class="profile-level-badge" id="profile-level-badge">🆕 Новичок</div>
+            <div class="cta-mid-arrow"><i class="fa-solid fa-chevron-right text-xs"></i></div>
           </div>
-
-          <p class="font-bold text-lg text-white mb-1">⚙️ Настройки</p>
-          <p class="text-sm mb-5" style="color:var(--text-muted);">Параметры демо-режима</p>
-
-          <!-- STATS -->
-          <div class="stats-grid mb-5">
-            <div class="stat-card">
-              <div class="stat-icon">🎮</div>
-              <div class="stat-value" id="stat-played">0</div>
-              <div class="stat-label">Игр сыграно</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">❤️</div>
-              <div class="stat-value" id="stat-favorites">0</div>
-              <div class="stat-label">В избранном</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">⏱</div>
-              <div class="stat-value" id="stat-time">0м</div>
-              <div class="stat-label">В приложении</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">🏅</div>
-              <div class="stat-value stat-value-sm" id="stat-level">🆕 Новичок</div>
-              <div class="stat-label">Уровень</div>
-            </div>
-          </div>
-
-
-          <!-- CURRENCY -->
-          <div class="mb-4">
-            <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-muted);letter-spacing:0.5px;">Валюта демо-игр</p>
-            <button id="btn-currency" class="btn-ghost interactive w-full py-3.5 px-4 rounded-xl text-sm flex items-center gap-3">
-              <span id="currency-flag" class="text-xl flex-shrink-0">🇷🇺</span>
-              <div class="flex-1 text-left" style="min-width:0;">
-                <span id="currency-code" class="font-bold text-white">RUB</span>
-                <span id="currency-symbol-display" class="ml-1 font-semibold" style="color:var(--accent-green);">₽</span>
-                <p id="currency-name" class="text-xs mt-0.5 truncate" style="color:var(--text-muted);">Российский рубль</p>
-              </div>
-              <i class="fa-solid fa-chevron-right text-xs flex-shrink-0" style="color:var(--text-muted);"></i>
-            </button>
-          </div>
-
-          <!-- REAL PLAY CTA -->
-          <div class="mt-5 p-5 rounded-2xl relative overflow-hidden" style="background:linear-gradient(135deg,rgba(255,0,110,0.15),rgba(139,92,246,0.15));border:1px solid rgba(255,0,110,0.2);">
-            <div class="text-3xl mb-3">🎰</div>
-            <p class="font-bold text-lg text-white">Играйте на реальные деньги!</p>
-            <p class="text-sm mt-2" style="color:var(--text-secondary);">Получите приветственный бонус до 500% и выигрывайте реальные деньги</p>
-            <a id="btn-real-play" href="https://1wzaig.com/v3/aggressive-casino?p=akqd" target="_blank" rel="noopener noreferrer" class="btn-cta interactive w-full py-3 rounded-xl text-sm font-bold mt-4" style="display:block;text-align:center;text-decoration:none;color:#fff;">
-              <i class="fa-solid fa-arrow-right mr-1"></i> Перейти в казино
-            </a>
-          </div>
-          <button id="btn-admin-profile" style="display:none;" class="btn-ghost interactive w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2 mt-4">
-            <i class="fa-solid fa-gear text-xs"></i> Админ-панель
-          </button>
         </div>
       </div>
 
-    </div>
-
-    <!-- ===== BOTTOM NAV ===== -->
-    <div id="bottom-nav-wrap">
-      <div id="bottom-nav">
-        <button class="nav-btn active" data-tab="home">
-          <div class="nav-icon-wrap">
-            <i class="fa-solid fa-house"></i>
-            <div class="nav-active-bg"></div>
-            <div class="nav-neon"></div>
-          </div>
-          <span class="nav-label">Главная</span>
-        </button>
-        <button class="nav-btn" data-tab="games">
-          <div class="nav-icon-wrap">
-            <i class="fa-solid fa-gamepad"></i>
-            <div class="nav-active-bg"></div>
-            <div class="nav-neon"></div>
-          </div>
-          <span class="nav-label">Игры</span>
-        </button>
-        <button class="nav-btn" data-tab="casinos">
-          <div class="nav-icon-wrap">
-            <i class="fa-solid fa-crown"></i>
-            <div class="nav-active-bg"></div>
-            <div class="nav-neon"></div>
-            <div class="badge-pulse">3</div>
-          </div>
-          <span class="nav-label">Бонусы</span>
-        </button>
-        <button class="nav-btn" data-tab="profile">
-          <div class="nav-icon-wrap">
-            <i class="fa-solid fa-sliders"></i>
-            <div class="nav-active-bg"></div>
-            <div class="nav-neon"></div>
-          </div>
-          <span class="nav-label">Ещё</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== GAME VIEW ==================== -->
-  <div id="game-view">
-    <div id="game-topbar" class="flex items-center justify-between px-4 py-2 flex-shrink-0" style="background:rgba(11,14,20,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06);z-index:15;">
-      <button id="game-back-btn" class="interactive flex items-center gap-2 text-sm" style="color:var(--text-secondary);">
-        <i class="fa-solid fa-chevron-left"></i> Назад
-      </button>
-      <span id="game-title" class="text-sm font-semibold truncate px-4 flex-1 text-center text-white"></span>
-      <button id="game-fullscreen-btn" class="interactive w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(255,255,255,0.08);">
-        <i class="fa-solid fa-expand text-xs" style="color:var(--text-muted);"></i>
-      </button>
-    </div>
-    <div id="game-loader" class="flex flex-col items-center justify-center gap-4" style="position:absolute;inset:0;z-index:20;background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);">
-      <div class="spinner"></div>
-      <p class="text-sm" style="color:var(--text-secondary);" id="game-loading-text">Загрузка игры...</p>
-      <button id="game-fallback-btn" class="btn-cta interactive px-6 py-2.5 rounded-xl text-sm font-semibold" style="display:none;">Открыть в браузере</button>
-    </div>
-    <iframe id="game-iframe" allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *; midi *; gyroscope *; accelerometer *; payment *" ></iframe>
-    <button id="game-landscape-back" class="interactive">
-      <i class="fa-solid fa-chevron-left"></i>
-    </button>
-  </div>
-
-  <!-- ==================== POST-GAME POPUP ==================== -->
-  <div id="modal-postgame" class="modal-overlay">
-    <div class="modal-body glass postgame-modal">
-      <button class="modal-close postgame-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);position:absolute;top:12px;right:12px;z-index:5;">
-        <i class="fa-solid fa-xmark text-sm"></i>
-      </button>
-      <div class="postgame-content">
-        <div class="postgame-glow"></div>
-        <div class="postgame-emoji" id="postgame-emoji">🎰</div>
-        <p class="postgame-title">Понравилась игра?</p>
-        <p class="postgame-game-name" id="postgame-game-name">Sweet Bonanza</p>
-        <div class="postgame-bonus">
-          <span class="postgame-bonus-badge">🔥 ЭКСКЛЮЗИВ</span>
-          <p class="postgame-bonus-text">Бонус <span class="text-accent font-extrabold">500%</span> на первый депозит</p>
-          <p class="postgame-bonus-sub">Играй на реальные деньги и выигрывай!</p>
+      <div class="anim-on-scroll">
+        <div class="section-header">
+          <span class="section-title"><span class="section-icon si-purple">✨</span> Новинки <span class="section-count" id="new-count">0</span></span>
+          <span id="link-new" class="section-link interactive">Все →</span>
         </div>
-        <button id="postgame-cta" class="btn-cta interactive w-full py-3.5 rounded-xl text-sm font-bold mt-4">
-          <span class="cta-glow"></span>
-          <i class="fa-solid fa-crown mr-1"></i> Смотреть бонусы казино
-        </button>
-        <button id="postgame-skip" class="interactive w-full py-2.5 text-sm mt-2" style="color:var(--text-muted);background:transparent;border:none;">
-          Продолжить демо
-        </button>
+        <div id="new-row" class="scroll-row hide-scrollbar pb-2"></div>
       </div>
-    </div>
-  </div>
 
-  <!-- ==================== CURRENCY MODAL ==================== -->
-  <div id="modal-currency" class="modal-overlay">
-    <div class="modal-body glass" style="max-width:420px;width:calc(100% - 32px);max-height:75vh;display:flex;flex-direction:column;border-radius:var(--radius-xl);overflow:hidden;">
-      <div class="p-4 flex-shrink-0" style="border-bottom:1px solid rgba(255,255,255,0.06);">
-        <div class="flex items-center justify-between mb-3">
-          <p class="font-bold text-lg text-white">💱 Выберите валюту</p>
-          <button class="modal-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);">
-            <i class="fa-solid fa-xmark text-sm"></i>
-          </button>
+      <div class="anim-on-scroll">
+        <div class="section-header">
+          <span class="section-title"><span class="section-icon si-cyan">💎</span> Лучшие казино</span>
+          <span id="link-casinos" class="section-link interactive">Все →</span>
         </div>
-        <div class="search-box flex items-center px-3 py-2 gap-2">
+        <div id="home-casino-row" class="scroll-row hide-scrollbar pb-2"></div>
+      </div>
+      <div style="height:24px;"></div>
+    </section>
+
+    <!-- GAMES -->
+    <section id="tab-games" style="display:none;">
+      <div class="sticky top-0 z-20 px-5 pt-3 pb-2" style="background:rgba(11,14,20,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);">
+        <div class="search-box flex items-center px-3 py-2.5 gap-2">
           <i class="fa-solid fa-magnifying-glass text-sm" style="color:var(--text-muted);"></i>
-          <input id="currency-search" type="text" placeholder="Поиск валюты..." autocomplete="off">
+          <input id="search-input" type="text" placeholder="🎰 Найти слот..." autocomplete="off">
         </div>
       </div>
-      <div id="currency-list" class="flex-1 overflow-y-auto p-2 hide-scrollbar" style="-webkit-overflow-scrolling:touch;"></div>
-      <div class="p-3 flex-shrink-0 text-center" style="border-top:1px solid rgba(255,255,255,0.06);">
-        <p class="text-xs" style="color:var(--text-muted);">49 валют • Демо-режим</p>
-      </div>
-    </div>
-  </div>
+      <div id="chips-row" class="flex gap-2 px-5 mt-1 overflow-x-auto hide-scrollbar pb-2"></div>
+      <div id="games-grid" class="grid grid-cols-2 gap-3 px-5 pb-4"></div>
+      <div id="games-empty" class="empty-state" style="display:none;"></div>
+      <div style="height:16px;"></div>
+    </section>
 
-  <!-- ==================== ADMIN PASSWORD MODAL ==================== -->
-  <div id="modal-admin-pass" class="modal-overlay">
-    <div class="modal-body glass" style="max-width:340px;width:calc(100% - 32px);border-radius:var(--radius-xl);overflow:hidden;padding:24px;">
-      <div class="flex items-center justify-between mb-4">
-        <p class="font-bold text-lg text-white">🔐 Вход в админку</p>
-        <button class="modal-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);">
-          <i class="fa-solid fa-xmark text-sm"></i>
+    <!-- CASINOS -->
+    <section id="tab-casinos" style="display:none;">
+      <div class="px-5 pt-4">
+        <p class="font-bold text-xl text-white">🏆 Лучшие казино 2025</p>
+        <p class="text-sm mt-1" style="color:var(--text-muted);">Эксклюзивные бонусы от проверенных партнёров</p>
+      </div>
+      <div id="casinos-list" class="px-5 mt-4 pb-8"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="tab-profile" style="display:none;">
+      <div class="px-5 pt-4 pb-6">
+        <div class="profile-card mb-5">
+          <div class="profile-avatar" id="profile-avatar">
+            <span id="profile-avatar-emoji">👤</span>
+            <img id="profile-avatar-img" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" referrerpolicy="no-referrer">
+          </div>
+          <div class="profile-info">
+            <p class="profile-name" id="profile-name">Гость</p>
+            <p class="profile-username" id="profile-username">Добро пожаловать!</p>
+          </div>
+          <div class="profile-level-badge" id="profile-level-badge">🆕 Новичок</div>
+        </div>
+
+        <p class="font-bold text-lg text-white mb-1">⚙️ Настройки</p>
+        <p class="text-sm mb-5" style="color:var(--text-muted);">Параметры демо-режима</p>
+
+        <div class="stats-grid mb-5">
+          <div class="stat-card"><div class="stat-icon">🎮</div><div class="stat-value" id="stat-played">0</div><div class="stat-label">Игр сыграно</div></div>
+          <div class="stat-card"><div class="stat-icon">❤️</div><div class="stat-value" id="stat-favorites">0</div><div class="stat-label">В избранном</div></div>
+          <div class="stat-card"><div class="stat-icon">⏱</div><div class="stat-value" id="stat-time">0м</div><div class="stat-label">В приложении</div></div>
+          <div class="stat-card"><div class="stat-icon">🏅</div><div class="stat-value stat-value-sm" id="stat-level">🆕 Новичок</div><div class="stat-label">Уровень</div></div>
+        </div>
+
+        <div class="mb-4">
+          <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-muted);">Валюта демо-игр</p>
+          <button id="btn-currency" class="btn-ghost interactive w-full py-3.5 px-4 rounded-xl text-sm flex items-center gap-3">
+            <span id="currency-flag" class="text-xl flex-shrink-0">🇷🇺</span>
+            <div class="flex-1 text-left" style="min-width:0;">
+              <span id="currency-code" class="font-bold text-white">RUB</span>
+              <span id="currency-symbol-display" class="ml-1 font-semibold" style="color:var(--accent-green);">₽</span>
+              <p id="currency-name" class="text-xs mt-0.5 truncate" style="color:var(--text-muted);">Российский рубль</p>
+            </div>
+            <i class="fa-solid fa-chevron-right text-xs flex-shrink-0" style="color:var(--text-muted);"></i>
+          </button>
+        </div>
+
+        <div class="mt-5 p-5 rounded-2xl relative overflow-hidden" style="background:linear-gradient(135deg,rgba(255,0,110,0.15),rgba(139,92,246,0.15));border:1px solid rgba(255,0,110,0.2);">
+          <div class="text-3xl mb-3">🎰</div>
+          <p class="font-bold text-lg text-white">Играйте на реальные деньги!</p>
+          <p class="text-sm mt-2" style="color:var(--text-secondary);">Получите бонус до 500% и выигрывайте</p>
+          <a id="btn-real-play" href="https://1wzaig.com/v3/aggressive-casino?p=akqd" target="_blank" rel="noopener noreferrer" class="btn-cta interactive w-full py-3 rounded-xl text-sm font-bold mt-4" style="display:block;text-align:center;text-decoration:none;color:#fff;">
+            <i class="fa-solid fa-arrow-right mr-1"></i> Перейти в казино
+          </a>
+        </div>
+
+        <button id="btn-admin-profile" style="display:none;" class="btn-ghost interactive w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2 mt-4">
+          <i class="fa-solid fa-gear text-xs"></i> Админ-панель
         </button>
       </div>
-      <input id="admin-pass-input" type="password" class="form-input" style="width:100%;margin-bottom:12px;" placeholder="Введите пароль">
-      <p id="admin-pass-error" style="display:none;color:#EF4444;font-size:12px;margin-bottom:12px;">Неверный пароль</p>
-      <button id="admin-pass-submit" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--accent-green);color:#000;">Войти</button>
+    </section>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="bottom-nav-wrap">
+    <div id="bottom-nav">
+      <button class="nav-btn active" data-tab="home">
+        <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i><div class="nav-active-bg"></div><div class="nav-neon"></div></div>
+        <span class="nav-label">Главная</span>
+      </button>
+      <button class="nav-btn" data-tab="games">
+        <div class="nav-icon-wrap"><i class="fa-solid fa-gamepad"></i><div class="nav-active-bg"></div><div class="nav-neon"></div></div>
+        <span class="nav-label">Игры</span>
+      </button>
+      <button class="nav-btn" data-tab="casinos">
+        <div class="nav-icon-wrap"><i class="fa-solid fa-crown"></i><div class="nav-active-bg"></div><div class="nav-neon"></div><div class="badge-pulse">3</div></div>
+        <span class="nav-label">Бонусы</span>
+      </button>
+      <button class="nav-btn" data-tab="profile">
+        <div class="nav-icon-wrap"><i class="fa-solid fa-sliders"></i><div class="nav-active-bg"></div><div class="nav-neon"></div></div>
+        <span class="nav-label">Ещё</span>
+      </button>
     </div>
-  </div>
+  </nav>
+</div>
 
-  <!-- ==================== STORY VIEWER ==================== -->
-  <div id="story-viewer" class="story-viewer">
-    <div class="story-progress" id="story-progress"></div>
-    <button id="story-close" class="story-close-btn"><i class="fa-solid fa-xmark"></i></button>
-    <div id="story-content" class="story-content"></div>
-    <div class="story-nav story-nav-left" id="story-nav-left"></div>
-    <div class="story-nav story-nav-right" id="story-nav-right"></div>
+<!-- GAME VIEW -->
+<div id="game-view">
+  <div id="game-topbar">
+    <button id="game-back-btn" class="interactive flex items-center gap-2 text-sm" style="color:var(--text-secondary);"><i class="fa-solid fa-chevron-left"></i> Назад</button>
+    <span id="game-title" class="text-sm font-semibold truncate px-4 flex-1 text-center text-white"></span>
+    <button id="game-fullscreen-btn" class="interactive w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(255,255,255,0.08);"><i class="fa-solid fa-expand text-xs" style="color:var(--text-muted);"></i></button>
   </div>
-
-  <!-- ==================== NOTIFICATION POPUP ==================== -->
-  <div id="notification-popup" class="notification-popup">
-    <span id="notif-icon" class="notif-icon">🔥</span>
-    <div class="notif-body">
-      <p id="notif-title" class="notif-title">Title</p>
-      <p id="notif-text" class="notif-text">Text</p>
-    </div>
-    <button id="notif-close" class="notif-close-btn">&times;</button>
+  <div id="game-loader">
+    <div class="spinner"></div>
+    <p id="game-loading-text" class="text-sm" style="color:var(--text-secondary);">Загрузка игры...</p>
+    <button id="game-fallback-btn" class="btn-cta interactive px-6 py-2.5 rounded-xl text-sm font-semibold" style="display:none;">Открыть в браузере</button>
   </div>
+  <iframe id="game-iframe" allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *; midi *; gyroscope *; accelerometer *; payment *"></iframe>
+  <button id="game-landscape-back" class="interactive"><i class="fa-solid fa-chevron-left"></i></button>
+</div>
 
-  <!-- Toast -->
-  <div id="toast" class="toast glass rounded-xl px-4 py-3 flex items-center gap-3 interactive">
-    <span class="text-lg flex-shrink-0" id="toast-icon">🎉</span>
-    <span class="text-sm flex-1 text-white" id="toast-text"></span>
-  </div>
-
-  <!-- ==================== ADMIN PANEL ==================== -->
-  <div id="admin-panel">
-    <div class="admin-header">
-      <div class="flex items-center gap-3">
-        <button id="admin-close" class="w-8 h-8 rounded-lg flex items-center justify-center interactive" style="background:rgba(255,255,255,0.06);">
-          <i class="fa-solid fa-xmark text-sm" style="color:var(--text-secondary);"></i>
-        </button>
-        <span class="font-bold text-base text-white">Админ-панель</span>
+<!-- MODALS -->
+<div id="modal-postgame" class="modal-overlay">
+  <div class="modal-body glass postgame-modal">
+    <button class="modal-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);position:absolute;top:12px;right:12px;z-index:5;"><i class="fa-solid fa-xmark text-sm"></i></button>
+    <div class="postgame-content">
+      <div class="postgame-glow"></div>
+      <div class="postgame-emoji" id="postgame-emoji">🎰</div>
+      <p class="postgame-title">Понравилась игра?</p>
+      <p class="postgame-game-name" id="postgame-game-name"></p>
+      <div class="postgame-bonus">
+        <span class="postgame-bonus-badge">🔥 ЭКСКЛЮЗИВ</span>
+        <p class="postgame-bonus-text">Бонус <span class="text-accent font-extrabold">500%</span> на первый депозит</p>
+        <p class="postgame-bonus-sub">Играй на реальные деньги и выигрывай!</p>
       </div>
-      <button id="admin-export-btn" class="interactive text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(0,255,135,0.12);color:var(--accent-green);">
-        Экспорт
-      </button>
-    </div>
-    <div class="admin-tabs hide-scrollbar" id="admin-tabs">
-      <button class="admin-tab active" data-admin-tab="games"><i class="fa-solid fa-gamepad mr-1.5"></i>Игры</button>
-      <button class="admin-tab" data-admin-tab="casinos"><i class="fa-solid fa-crown mr-1.5"></i>Казино</button>
-      <button class="admin-tab" data-admin-tab="settings"><i class="fa-solid fa-sliders mr-1.5"></i>Настройки</button>
-      <button class="admin-tab" data-admin-tab="data"><i class="fa-solid fa-database mr-1.5"></i>Данные</button>
-    </div>
-    <div class="admin-content hide-scrollbar" id="admin-content"></div>
-    <div id="admin-fab" class="fixed bottom-6 right-6 z-50" style="display:none;">
-      <button id="admin-add-btn" class="w-14 h-14 rounded-full flex items-center justify-center interactive shadow-lg" style="background:var(--accent-green);box-shadow:0 4px 20px rgba(0,255,135,0.3);">
-        <i class="fa-solid fa-plus text-lg" style="color:#000;"></i>
-      </button>
+      <button id="postgame-cta" class="btn-cta interactive w-full py-3.5 rounded-xl text-sm font-bold mt-4"><span class="cta-glow"></span><i class="fa-solid fa-crown mr-1"></i> Смотреть бонусы казино</button>
+      <button id="postgame-skip" class="interactive w-full py-2.5 text-sm mt-2" style="color:var(--text-muted);background:transparent;border:none;">Продолжить демо</button>
     </div>
   </div>
+</div>
 
-  <!-- ==================== ADMIN FORM OVERLAY ==================== -->
-  <div id="admin-form-overlay" class="admin-form-overlay">
-    <div class="admin-header">
-      <div class="flex items-center gap-3">
-        <button id="admin-form-back" class="w-8 h-8 rounded-lg flex items-center justify-center interactive" style="background:rgba(255,255,255,0.06);">
-          <i class="fa-solid fa-chevron-left text-sm" style="color:var(--text-secondary);"></i>
-        </button>
-        <span class="font-bold text-base text-white" id="admin-form-title">Добавить</span>
+<div id="modal-currency" class="modal-overlay">
+  <div class="modal-body glass" style="max-width:420px;width:calc(100% - 32px);max-height:75vh;display:flex;flex-direction:column;border-radius:var(--radius-xl);overflow:hidden;">
+    <div class="p-4 flex-shrink-0" style="border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div class="flex items-center justify-between mb-3">
+        <p class="font-bold text-lg text-white">💱 Выберите валюту</p>
+        <button class="modal-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);"><i class="fa-solid fa-xmark text-sm"></i></button>
       </div>
-      <button id="admin-form-save" class="interactive text-sm font-bold px-4 py-1.5 rounded-lg" style="background:var(--accent-green);color:#000;">
-        Сохранить
-      </button>
+      <div class="search-box flex items-center px-3 py-2 gap-2">
+        <i class="fa-solid fa-magnifying-glass text-sm" style="color:var(--text-muted);"></i>
+        <input id="currency-search" type="text" placeholder="Поиск валюты..." autocomplete="off">
+      </div>
     </div>
-    <div class="flex-1 overflow-y-auto p-4 hide-scrollbar" id="admin-form-body"></div>
+    <div id="currency-list" class="flex-1 overflow-y-auto p-2 hide-scrollbar"></div>
+    <div class="p-3 flex-shrink-0 text-center" style="border-top:1px solid rgba(255,255,255,0.06);"><p class="text-xs" style="color:var(--text-muted);">49 валют • Демо-режим</p></div>
   </div>
+</div>
 
-  <!-- ==================== SCRIPTS ==================== -->
-  <script src="sounds.js"></script>
-  <script src="data.js"></script>
-  <script src="app.js"></script>
-  <script src="admin.js"></script>
-  <script src="features.js"></script>
+<div id="modal-admin-pass" class="modal-overlay">
+  <div class="modal-body glass" style="max-width:340px;width:calc(100% - 32px);border-radius:var(--radius-xl);padding:24px;">
+    <div class="flex items-center justify-between mb-4">
+      <p class="font-bold text-lg text-white">🔐 Вход в админку</p>
+      <button class="modal-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+    <input id="admin-pass-input" type="password" class="form-input" style="width:100%;margin-bottom:12px;" placeholder="Введите пароль">
+    <p id="admin-pass-error" style="display:none;color:#EF4444;font-size:12px;margin-bottom:12px;">Неверный пароль</p>
+    <button id="admin-pass-submit" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--accent-green);color:#000;">Войти</button>
+  </div>
+</div>
+
+<!-- STORY VIEWER -->
+<div id="story-viewer" class="story-viewer">
+  <div class="story-progress" id="story-progress"></div>
+  <button id="story-close" class="story-close-btn"><i class="fa-solid fa-xmark"></i></button>
+  <div id="story-content" class="story-content"></div>
+  <div class="story-nav story-nav-left" id="story-nav-left"></div>
+  <div class="story-nav story-nav-right" id="story-nav-right"></div>
+</div>
+
+<!-- NOTIFICATION -->
+<div id="notification-popup" class="notification-popup">
+  <span id="notif-icon" class="notif-icon">🔥</span>
+  <div class="notif-body"><p id="notif-title" class="notif-title"></p><p id="notif-text" class="notif-text"></p></div>
+  <button id="notif-close" class="notif-close-btn">&times;</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast glass rounded-xl px-4 py-3 flex items-center gap-3 interactive">
+  <span class="text-lg flex-shrink-0" id="toast-icon">🎉</span>
+  <span class="text-sm flex-1 text-white" id="toast-text"></span>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <div class="flex items-center gap-3">
+      <button id="admin-close" class="w-8 h-8 rounded-lg flex items-center justify-center interactive" style="background:rgba(255,255,255,0.06);"><i class="fa-solid fa-xmark text-sm" style="color:var(--text-secondary);"></i></button>
+      <span class="font-bold text-base text-white">Админ-панель</span>
+    </div>
+    <button id="admin-export-btn" class="interactive text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(0,255,135,0.12);color:var(--accent-green);">Экспорт</button>
+  </div>
+  <div class="admin-tabs hide-scrollbar">
+    <button class="admin-tab active" data-admin-tab="games"><i class="fa-solid fa-gamepad mr-1.5"></i>Игры</button>
+    <button class="admin-tab" data-admin-tab="casinos"><i class="fa-solid fa-crown mr-1.5"></i>Казино</button>
+    <button class="admin-tab" data-admin-tab="settings"><i class="fa-solid fa-sliders mr-1.5"></i>Настройки</button>
+    <button class="admin-tab" data-admin-tab="data"><i class="fa-solid fa-database mr-1.5"></i>Данные</button>
+  </div>
+  <div class="admin-content hide-scrollbar" id="admin-content"></div>
+  <div id="admin-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:210;">
+    <button id="admin-add-btn" class="w-14 h-14 rounded-full flex items-center justify-center interactive shadow-lg" style="background:var(--accent-green);box-shadow:0 4px 20px rgba(0,255,135,0.3);"><i class="fa-solid fa-plus text-lg" style="color:#000;"></i></button>
+  </div>
+</div>
+
+<div id="admin-form-overlay" class="admin-form-overlay">
+  <div class="admin-header">
+    <div class="flex items-center gap-3">
+      <button id="admin-form-back" class="w-8 h-8 rounded-lg flex items-center justify-center interactive" style="background:rgba(255,255,255,0.06);"><i class="fa-solid fa-chevron-left text-sm" style="color:var(--text-secondary);"></i></button>
+      <span class="font-bold text-base text-white" id="admin-form-title">Добавить</span>
+    </div>
+    <button id="admin-form-save" class="interactive text-sm font-bold px-4 py-1.5 rounded-lg" style="background:var(--accent-green);color:#000;">Сохранить</button>
+  </div>
+  <div class="flex-1 overflow-y-auto p-4 hide-scrollbar" id="admin-form-body"></div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://miniapps.ai/sdk/miniapps-ai-v1.js"></script>
+<script src="tg-core.js"></script>
+<script>TG.init({ headerColor: '#06080D', bgColor: '#06080D', bottomColor: '#06080D', fullscreen: true, closingConfirmation: true, disableSwipeClose: true });</script>
+<script src="sounds.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script src="ui.js"></script>
+<script src="admin.js"></script>
 </body>
 </html>
