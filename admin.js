@@ -16,12 +16,14 @@
   /* ---- Open / Close ---- */
   window.openAdminPanel = function() {
     elPanel.classList.add('open');
+    if (window.updateBackButton) window.updateBackButton();
     activeAdminTab = 'games';
     setAdminTab('games');
   };
 
   document.getElementById('admin-close').addEventListener('click', function() {
     elPanel.classList.remove('open');
+    if (window.updateBackButton) window.updateBackButton();
     if (window.appRefresh) window.appRefresh();
   });
 
@@ -191,6 +193,7 @@
     bindImageUploader('af-image');
     bindToggles();
     elFormOverlay.classList.add('open');
+    if (window.updateBackButton) window.updateBackButton();
   }
 
   function saveGameForm() {
@@ -246,6 +249,7 @@
     bindImageUploader('af-bimage');
     bindToggles();
     elFormOverlay.classList.add('open');
+    if (window.updateBackButton) window.updateBackButton();
   }
 
   function saveCasinoForm() {
@@ -278,16 +282,18 @@
     var s = DataStore.getSettings();
     var cur = DataStore.getCurrency();
     var html = '';
-    html += formGroup('Название приложения', '<input class="form-input" id="af-appname" value="' + esc(s.appName || 'SlotHub') + '">');
+    html += formGroup('Название приложения', '<input class="form-input" id="af-appname" value="' + esc(s.appName || 'SlotX') + '">');
     html += formGroup('Валюта демо-игр', '<div class="form-input" style="display:flex;align-items:center;gap:8px;cursor:default;">' + cur.flag + ' <span style="font-weight:600;">' + esc(cur.code) + '</span> <span style="color:var(--text-muted);">' + esc(cur.symbol) + ' — ' + esc(cur.name) + '</span></div>');
     html += '<p style="font-size:11px;color:var(--text-muted);margin-top:-8px;margin-bottom:16px;">Меняется во вкладке «Ещё» → Валюта</p>';
     html += formGroup('Шаблон URL демо-игр', '<input class="form-input" id="af-urltemplate" value="' + esc(s.demoUrlTemplate || '') + '" placeholder="https://...{symbol}...">');
     html += '<p style="font-size:11px;color:var(--text-muted);margin-top:-8px;margin-bottom:16px;">Плейсхолдеры: <code>{symbol}</code>, <code>{lang}</code>, <code>{currency}</code></p>';
+    html += formGroup('Шаблон URL картинок игр', '<input class="form-input" id="af-imgtemplate" value="' + esc(s.gameImageUrlTemplate || '') + '" placeholder="https://...{symbol}...">');
+    html += '<p style="font-size:11px;color:var(--text-muted);margin-top:-8px;margin-bottom:16px;">Автоматически подставляет картинку по символу. Плейсхолдер: <code>{symbol}</code></p>';
     html += '<button id="admin-save-settings" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--accent-green);color:#000;margin-top:8px;">Сохранить настройки</button>';
 
     elAdminContent.innerHTML = html;
     document.getElementById('admin-save-settings').addEventListener('click', function() {
-      DataStore.updateSettings({ appName: val('af-appname'), demoUrlTemplate: val('af-urltemplate') });
+      DataStore.updateSettings({ appName: val('af-appname'), demoUrlTemplate: val('af-urltemplate'), gameImageUrlTemplate: val('af-imgtemplate') });
       alert('Настройки сохранены!');
     });
   }
