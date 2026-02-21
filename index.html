@@ -260,16 +260,6 @@
             </div>
           </div>
 
-          <!-- THEME -->
-          <div class="mb-5">
-            <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-muted);letter-spacing:0.5px;">🌙 Тема оформления</p>
-            <div id="theme-options" class="theme-grid">
-              <button class="theme-btn active" data-theme="neon"><span class="theme-preview neon-preview"></span>Неон</button>
-              <button class="theme-btn" data-theme="purple"><span class="theme-preview purple-preview"></span>Фиолет</button>
-              <button class="theme-btn" data-theme="gold"><span class="theme-preview gold-preview"></span>Золото</button>
-              <button class="theme-btn" data-theme="red"><span class="theme-preview red-preview"></span>Красная</button>
-            </div>
-          </div>
 
           <!-- CURRENCY -->
           <div class="mb-4">
@@ -358,7 +348,7 @@
       <p class="text-sm" style="color:var(--text-secondary);" id="game-loading-text">Загрузка игры...</p>
       <button id="game-fallback-btn" class="btn-cta interactive px-6 py-2.5 rounded-xl text-sm font-semibold" style="display:none;">Открыть в браузере</button>
     </div>
-    <iframe id="game-iframe" allow="autoplay; fullscreen; encrypted-media"></iframe>
+    <iframe id="game-iframe" allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *; midi *; gyroscope *; accelerometer *; payment *" ></iframe>
     <button id="game-landscape-back" class="interactive">
       <i class="fa-solid fa-chevron-left"></i>
     </button>
