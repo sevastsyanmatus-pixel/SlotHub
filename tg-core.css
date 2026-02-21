@@ -1,0 +1,278 @@
+/* ============================================
+   TG Core CSS v1.0
+   Base layer for Telegram Mini Apps
+   ============================================ */
+
+/* === RESET === */
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* === BODY === */
+body {
+  background: var(--tg-bg, #1a1a2e);
+  color: var(--tg-text, #ffffff);
+  font-family: -apple-system, 'SF Pro Text', system-ui, 'Helvetica Neue', Roboto, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-overflow-scrolling: touch;
+  user-select: none;
+  -webkit-user-select: none;
+  overscroll-behavior: none;
+}
+
+/* === SAFE AREA CLASSES === */
+.safe-top {
+  padding-top: var(--tg-content-safe-top, var(--tg-safe-top, env(safe-area-inset-top, 0px)));
+}
+.safe-bottom {
+  padding-bottom: var(--tg-safe-bottom, env(safe-area-inset-bottom, 0px));
+}
+.safe-left {
+  padding-left: var(--tg-content-safe-left, var(--tg-safe-left, env(safe-area-inset-left, 0px)));
+}
+.safe-right {
+  padding-right: var(--tg-content-safe-right, var(--tg-safe-right, env(safe-area-inset-right, 0px)));
+}
+.safe-all {
+  padding-top: var(--tg-content-safe-top, var(--tg-safe-top, env(safe-area-inset-top, 0px)));
+  padding-bottom: var(--tg-safe-bottom, env(safe-area-inset-bottom, 0px));
+  padding-left: var(--tg-content-safe-left, var(--tg-safe-left, env(safe-area-inset-left, 0px)));
+  padding-right: var(--tg-content-safe-right, var(--tg-safe-right, env(safe-area-inset-right, 0px)));
+}
+
+/* === SCROLLBAR HIDE === */
+.tg-no-scrollbar::-webkit-scrollbar { display: none; }
+.tg-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* === TG SECTIONS === */
+.tg-section {
+  background: var(--tg-section-bg, rgba(255,255,255,0.04));
+  margin: 8px 0;
+}
+.tg-section-rounded {
+  background: var(--tg-section-bg, rgba(255,255,255,0.04));
+  border-radius: 12px;
+  margin: 8px 16px;
+  overflow: hidden;
+}
+.tg-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--tg-hint, #999);
+  padding: 8px 16px 6px;
+}
+
+/* === TG CELLS === */
+.tg-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  min-height: 48px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.tg-cell:active {
+  background: rgba(128,128,128,0.1);
+}
+.tg-cell + .tg-cell::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; left: 52px;
+  height: 0.5px;
+  background: rgba(128,128,128,0.2);
+}
+.tg-cell-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.tg-cell-content { flex: 1; min-width: 0; }
+.tg-cell-title { font-size: 15px; font-weight: 400; color: var(--tg-text, #fff); }
+.tg-cell-subtitle { font-size: 13px; color: var(--tg-hint, #999); margin-top: 2px; }
+.tg-cell-value { font-size: 15px; color: var(--tg-hint, #999); flex-shrink: 0; }
+.tg-cell-arrow {
+  width: 16px; height: 16px; flex-shrink: 0; opacity: 0.3;
+  display: flex; align-items: center; justify-content: center;
+}
+.tg-cell-arrow::after {
+  content: '';
+  width: 8px; height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+/* === TG BUTTONS === */
+.tg-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; padding: 14px; border: none;
+  font-size: 15px; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.tg-btn:active { transform: scale(0.97); opacity: 0.85; }
+.tg-btn[disabled] { opacity: 0.4; pointer-events: none; }
+
+.tg-btn-primary {
+  background: var(--tg-button, #5eadff);
+  color: var(--tg-button-text, #fff);
+}
+.tg-btn-secondary {
+  background: var(--tg-secondary-bg, rgba(255,255,255,0.06));
+  color: var(--tg-text, #fff);
+}
+.tg-btn-destructive {
+  background: rgba(255,59,48,0.1);
+  color: var(--tg-destructive, #ff3b30);
+}
+.tg-btn-plain {
+  background: transparent;
+  color: var(--tg-link, #5eadff);
+}
+
+/* Platform border-radius */
+[data-platform="ios"] .tg-btn { border-radius: 12px; }
+[data-platform="android"] .tg-btn { border-radius: 8px; }
+[data-platform="desktop"] .tg-btn, [data-platform="browser"] .tg-btn { border-radius: 10px; }
+
+/* === TG CHIPS === */
+.tg-chips {
+  display: flex; gap: 8px;
+  overflow-x: auto;
+  padding: 0 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.tg-chips::-webkit-scrollbar { display: none; }
+.tg-chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 16px;
+  font-size: 14px; font-weight: 500;
+  background: rgba(128,128,128,0.12);
+  color: var(--tg-text, #fff);
+  border: none; cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.15s ease;
+}
+.tg-chip:active { transform: scale(0.95); }
+.tg-chip.active {
+  background: var(--tg-button, #5eadff);
+  color: var(--tg-button-text, #fff);
+}
+
+/* === TG INPUT === */
+.tg-input {
+  width: 100%; padding: 12px 16px;
+  border: none; outline: none;
+  font-size: 16px; font-family: inherit;
+  background: var(--tg-secondary-bg, rgba(255,255,255,0.06));
+  color: var(--tg-text, #fff);
+  border-radius: 10px;
+}
+.tg-input::placeholder { color: var(--tg-hint, #999); }
+
+/* === TG BADGE === */
+.tg-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 6px;
+  border-radius: 10px; font-size: 12px; font-weight: 700;
+  background: var(--tg-destructive, #ff3b30); color: #fff;
+}
+
+/* === BOTTOM SHEET === */
+.tg-sheet-overlay {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  transition: background 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.tg-sheet-overlay.active {
+  background: rgba(0,0,0,0.4);
+  pointer-events: auto;
+}
+.tg-sheet {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 901;
+  background: var(--tg-bg, #1a1a2e);
+  border-radius: 14px 14px 0 0;
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 90vh; overflow-y: auto;
+  padding-bottom: var(--tg-safe-bottom, env(safe-area-inset-bottom, 0px));
+}
+.tg-sheet-overlay.active .tg-sheet {
+  transform: translateY(0);
+}
+.tg-sheet-handle {
+  width: 36px; height: 5px;
+  border-radius: 3px;
+  background: rgba(128,128,128,0.3);
+  margin: 8px auto 4px;
+}
+
+/* === SKELETON SHIMMER === */
+.tg-skeleton {
+  background: linear-gradient(90deg,
+    rgba(128,128,128,0.06) 25%,
+    rgba(128,128,128,0.12) 50%,
+    rgba(128,128,128,0.06) 75%);
+  background-size: 200% 100%;
+  animation: tg-shimmer 1.5s ease infinite;
+  border-radius: 8px;
+}
+@keyframes tg-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* === ANIMATIONS === */
+.tg-fade-in {
+  animation: tg-fade-in 0.25s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes tg-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tg-slide-up {
+  animation: tg-slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes tg-slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* === PLATFORM-SPECIFIC === */
+[data-platform="ios"] .tg-cell:active { background: rgba(128,128,128,0.15); }
+[data-platform="android"] .tg-cell:active { background: rgba(128,128,128,0.08); }
+
+/* Prevent iOS zoom on input focus */
+html.tg-app input, html.tg-app select, html.tg-app textarea {
+  font-size: 16px !important;
+}
+
+/* === TEXT HELPERS === */
+.tg-text { color: var(--tg-text, #fff); }
+.tg-hint { color: var(--tg-hint, #999); }
+.tg-link { color: var(--tg-link, #5eadff); }
+.tg-destructive { color: var(--tg-destructive, #ff3b30); }
+.tg-accent { color: var(--tg-accent, #5eadff); }
+
+/* === SPACING HELPERS === */
+.tg-gap-4 { gap: 4px; }
+.tg-gap-8 { gap: 8px; }
+.tg-gap-12 { gap: 12px; }
+.tg-gap-16 { gap: 16px; }
+.tg-p-12 { padding: 12px; }
+.tg-p-16 { padding: 16px; }
+.tg-px-16 { padding-left: 16px; padding-right: 16px; }
+.tg-mt-8 { margin-top: 8px; }
+.tg-mb-8 { margin-bottom: 8px; }
