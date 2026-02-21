@@ -1,26 +1,216 @@
 /* ============================================
-   MAIN CASINO APP — Affiliate Demo Casino v4
+   MAIN CASINO APP — Affiliate Demo Casino v5
+   Full Telegram Mini App Native Adaptation
    ============================================ */
 document.addEventListener('DOMContentLoaded', function() {
 
-  /* ---- Telegram API ---- */
+  /* ---- Telegram WebApp API — Full Adaptation ---- */
   var tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
-  if (tg) {
-    try { tg.expand(); } catch(e) {}
-    try { tg.ready(); } catch(e) {}
-    try { tg.setHeaderColor('#0B0E14'); } catch(e) {}
-    try { tg.setBackgroundColor('#0B0E14'); } catch(e) {}
-    try { tg.enableClosingConfirmation(); } catch(e) {}
-    try { tg.isVerticalSwipesEnabled = false; } catch(e) {}
-    try { tg.MainButton.hide(); } catch(e) {}
+  var isTg = !!tg;
+
+  /* ============================================
+     TG BACK BUTTON — NAVIGATION STACK
+     Central state machine for BackButton visibility.
+     Priority (highest first):
+       1. Admin form overlay open
+       2. Admin panel open
+       3. Currency/Postgame modal open
+       4. Story viewer open
+       5. Game view open
+       6. Non-home tab active
+       7. Home tab → BackButton hidden
+     ============================================ */
+  function updateBackButton() {
+    if (!tg) return;
+    var shouldShow = false;
+
+    var adminForm = document.getElementById('admin-form-overlay');
+    var adminPanel = document.getElementById('admin-panel');
+    var storyViewer = document.getElementById('story-viewer');
+    var gameView = document.getElementById('game-view');
+    var modalCurrency = document.getElementById('modal-currency');
+    var modalPostgame = document.getElementById('modal-postgame');
+    var modalAdminPass = document.getElementById('modal-admin-pass');
+
+    if (modalAdminPass && modalAdminPass.classList.contains('active')) shouldShow = true;
+    else if (adminForm && adminForm.classList.contains('open')) shouldShow = true;
+    else if (adminPanel && adminPanel.classList.contains('open')) shouldShow = true;
+    else if (modalCurrency && modalCurrency.classList.contains('active')) shouldShow = true;
+    else if (modalPostgame && modalPostgame.classList.contains('active')) shouldShow = true;
+    else if (storyViewer && storyViewer.style.display === 'flex') shouldShow = true;
+    else if (gameView && gameView.style.display === 'flex') shouldShow = true;
+    else if (activeTab !== 'home') shouldShow = true;
+
     try {
-      tg.BackButton.onClick(function() { closeGame(); });
-      tg.onEvent('backButtonClicked', function() { closeGame(); });
+      if (shouldShow) tg.BackButton.show();
+      else tg.BackButton.hide();
     } catch(e) {}
   }
 
+  /* Expose globally for admin.js / features.js */
+  window.updateBackButton = updateBackButton;
+
+  function updateTgSafeAreas() {
+    if (!tg) return;
+    var root = document.documentElement;
+    var safeTop = 0, safeBottom = 0, contentTop = 0;
+    try { if (tg.safeAreaInset) { safeTop = tg.safeAreaInset.top || 0; safeBottom = tg.safeAreaInset.bottom || 0; } } catch(e) {}
+    try { if (tg.contentSafeAreaInset) { contentTop = tg.contentSafeAreaInset.top || 0; } } catch(e) {}
+    root.style.setProperty('--tg-safe-top', safeTop + 'px');
+    root.style.setProperty('--tg-safe-bottom', safeBottom + 'px');
+    root.style.setProperty('--tg-header-height', contentTop + 'px');
+    try { if (tg.viewportStableHeight) root.style.setProperty('--tg-viewport-height', tg.viewportStableHeight + 'px'); } catch(e) {}
+  }
+
+  if (tg) {
+    document.documentElement.classList.add('tg-app');
+    try { tg.ready(); } catch(e) {}
+    try { tg.expand(); } catch(e) {}
+    try { tg.setHeaderColor('#06080D'); } catch(e) {}
+    try { tg.setBackgroundColor('#06080D'); } catch(e) {}
+    try { tg.enableClosingConfirmation(); } catch(e) {}
+    try { tg.disableVerticalSwipes(); } catch(e) {}
+    try { tg.isVerticalSwipesEnabled = false; } catch(e) {}
+    try { tg.MainButton.hide(); } catch(e) {}
+
+    /* Request fullscreen with retry */
+    function tryFullscreen() {
+      try { tg.requestFullscreen(); } catch(e) {}
+    }
+    tryFullscreen();
+    setTimeout(tryFullscreen, 500);
+    setTimeout(tryFullscreen, 1500);
+
+    updateTgSafeAreas();
+
+    try {
+      tg.onEvent('viewportChanged', function() {
+        updateTgSafeAreas();
+        try { tg.requestFullscreen(); } catch(e2) {}
+      });
+      tg.onEvent('themeChanged', function() {
+        try { tg.setHeaderColor('#06080D'); } catch(e) {}
+        try { tg.setBackgroundColor('#06080D'); } catch(e) {}
+      });
+      try {
+        tg.onEvent('fullscreenChanged', function() {
+          updateTgSafeAreas();
+        });
+      } catch(e) {}
+
+      /* === CENTRAL BACK BUTTON HANDLER === */
+      tg.onEvent('backButtonClicked', function() {
+        var adminForm = document.getElementById('admin-form-overlay');
+        var adminPanel = document.getElementById('admin-panel');
+        var storyViewer = document.getElementById('story-viewer');
+        var gameView = document.getElementById('game-view');
+        var modalCurrency = document.getElementById('modal-currency');
+        var modalPostgame = document.getElementById('modal-postgame');
+        var modalAdminPass = document.getElementById('modal-admin-pass');
+
+        /* Priority chain — most nested first */
+        if (modalAdminPass && modalAdminPass.classList.contains('active')) {
+          hideModal(modalAdminPass);
+        } else if (adminForm && adminForm.classList.contains('open')) {
+          /* Close admin form → stay in admin panel */
+          adminForm.classList.remove('open');
+          updateBackButton();
+        } else if (modalCurrency && modalCurrency.classList.contains('active')) {
+          hideModal(modalCurrency);
+        } else if (modalPostgame && modalPostgame.classList.contains('active')) {
+          hideModal(modalPostgame);
+        } else if (adminPanel && adminPanel.classList.contains('open')) {
+          /* Close admin panel → back to app */
+          adminPanel.classList.remove('open');
+          if (window.appRefresh) window.appRefresh();
+          updateBackButton();
+        } else if (storyViewer && storyViewer.style.display === 'flex') {
+          document.getElementById('story-close').click();
+        } else if (gameView && gameView.style.display === 'flex') {
+          closeGame();
+        } else if (activeTab !== 'home') {
+          /* Non-home tab → go back to home */
+          switchTab('home');
+        } else {
+          /* Already at home → hide back button (nothing to go back to) */
+          updateBackButton();
+        }
+      });
+    } catch(e) {}
+  }
+
+  /* Legacy compatibility */
+  window.setTgBackButton = function(show) {
+    /* Deprecated — now use updateBackButton() which auto-detects state */
+    updateBackButton();
+  };
+
+  /* ---- TG User Data ---- */
+  var tgUser = null;
+  var userName = 'Гость';
+  var userFirstName = '';
+  var userPhoto = '';
+
+  function initTgUser() {
+    if (tg) {
+      try {
+        var u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+        if (u) {
+          tgUser = u;
+          userFirstName = u.first_name || '';
+          userName = userFirstName + (u.last_name ? ' ' + u.last_name : '');
+          userPhoto = u.photo_url || '';
+        }
+      } catch(e) {}
+    }
+    updateUserUI();
+  }
+
+  function updateUserUI() {
+    var greeting = $('header-greeting');
+    if (greeting) {
+      if (userFirstName) {
+        var hour = new Date().getHours();
+        var timeGreet = hour < 6 ? '🌙 Доброй ночи' : hour < 12 ? '☀️ Доброе утро' : hour < 18 ? '👋 Добрый день' : '🌆 Добрый вечер';
+        greeting.textContent = timeGreet + ', ' + userFirstName + '!';
+      } else {
+        greeting.textContent = 'Демо-слоты бесплатно';
+      }
+    }
+
+    var nameEl = $('profile-name');
+    var usernameEl = $('profile-username');
+    var avatarEmoji = $('profile-avatar-emoji');
+    var avatarImg = $('profile-avatar-img');
+
+    if (nameEl) nameEl.textContent = userName || 'Гость';
+    if (usernameEl) {
+      if (tgUser && tgUser.username) {
+        usernameEl.textContent = '@' + tgUser.username;
+      } else if (tgUser) {
+        usernameEl.textContent = 'Telegram ID: ' + tgUser.id;
+      } else {
+        usernameEl.textContent = 'Добро пожаловать в SlotX!';
+      }
+    }
+    if (userPhoto && avatarImg) {
+      avatarImg.src = userPhoto;
+      avatarImg.style.display = '';
+      avatarImg.onerror = function() { this.style.display = 'none'; };
+      if (avatarEmoji) avatarEmoji.style.display = 'none';
+    }
+  }
+
+  window.getUserName = function() { return userName; };
+  window.getUserFirstName = function() { return userFirstName; };
+  window.getTgUser = function() { return tgUser; };
+
   function haptic(style) {
     try { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred(style || 'medium'); } catch(e) {}
+  }
+
+  function playSound(type) {
+    try { if (window.SoundFX) SoundFX.play(type); } catch(e) {}
   }
 
   /* ---- State ---- */
@@ -35,6 +225,13 @@ document.addEventListener('DOMContentLoaded', function() {
   var toastTimer = null;
   var gameCloseCount = 0;
   var timerInterval = null;
+
+  /* ---- Admin Auth ---- */
+  var ADMIN_PASS = 'slotx2025';
+  var isAdminAuthed = false;
+  var logoTapCount = 0;
+  var logoTapTimer = null;
+  (function() { try { if (sessionStorage.getItem('sh_admin') === '1') isAdminAuthed = true; } catch(e) {} })();
 
   /* ---- DOM ---- */
   var $ = function(id) { return document.getElementById(id); };
@@ -103,17 +300,12 @@ document.addEventListener('DOMContentLoaded', function() {
     haptic('heavy');
     var link = url || (DataStore.casinos.length > 0 ? DataStore.casinos[0].url : '');
     if (!link) return;
-
-    // Telegram WebApp — most reliable in TG context
     if (tg) {
       try { tg.openLink(link, { try_instant_view: false }); return; } catch(e) {}
     }
-
-    // Standard browser: simple window.open
     window.open(link, '_blank');
   }
 
-  /* Helper: create real <a> tag for affiliate links */
   function makeAffiliateLink(url, content, className) {
     var a = document.createElement('a');
     a.href = url || '#';
@@ -134,9 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var splash = $('splash-screen');
     if (!splash) return;
     splash.classList.add('hide');
-    setTimeout(function() {
-      splash.style.display = 'none';
-    }, 700);
+    setTimeout(function() { splash.style.display = 'none'; }, 700);
   }
 
   /* ============================================
@@ -196,7 +386,6 @@ document.addEventListener('DOMContentLoaded', function() {
       p.rotation += p.rotSpeed;
       p.life -= p.decay;
       if (p.life <= 0) { confettiParticles.splice(i, 1); continue; }
-
       confettiCtx.save();
       confettiCtx.globalAlpha = p.life;
       confettiCtx.translate(p.x, p.y);
@@ -213,8 +402,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     requestAnimationFrame(animateConfetti);
   }
-
-  /* Jackpot removed */
 
   /* ============================================
      ONLINE COUNTER
@@ -272,6 +459,7 @@ document.addEventListener('DOMContentLoaded', function() {
      ============================================ */
   function switchTab(name) {
     haptic('light');
+    playSound('tab');
     activeTab = name;
     elTabHome.style.display = name === 'home' ? '' : 'none';
     elTabGames.style.display = name === 'games' ? '' : 'none';
@@ -288,6 +476,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (name === 'profile') renderProfile();
     if (name === 'casinos') renderCasinos();
     if (name === 'games') renderGamesGrid();
+
+    /* Update TG BackButton — show on non-home tabs */
+    updateBackButton();
   }
 
   /* ============================================
@@ -382,7 +573,10 @@ document.addEventListener('DOMContentLoaded', function() {
       img.src = imgUrl;
       img.loading = 'lazy';
       img.setAttribute('referrerpolicy', 'no-referrer');
-      img.onerror = function() { this.style.display = 'none'; addEmojiIcon(el, game); };
+      img.onerror = function() {
+        this.style.display = 'none';
+        addEmojiIcon(el, game);
+      };
       el.appendChild(img);
     } else {
       addEmojiIcon(el, game);
@@ -408,6 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
     heart.addEventListener('click', function(e) {
       e.stopPropagation();
       haptic('light');
+      playSound('favorite');
       var isFav = DataStore.toggleFavorite(game.id);
       heart.classList.toggle('active', isFav);
       heart.innerHTML = '<i class="fa-' + (isFav ? 'solid' : 'regular') + ' fa-heart"></i>';
@@ -418,6 +613,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showToast('❤️', escHtml(game.name) + ' добавлено в избранное');
         var rect = heart.getBoundingClientRect();
         fireConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        playSound('confetti');
       }
       renderFavorites();
       updateSectionCounts();
@@ -453,14 +649,13 @@ document.addEventListener('DOMContentLoaded', function() {
       '<span class="card-online"><span class="online-dot"></span>' + online + '</span></div>';
     el.appendChild(info);
 
-    el.addEventListener('click', function() { haptic('heavy'); openGame(game); });
+    el.addEventListener('click', function() { haptic('heavy'); playSound('click'); openGame(game); });
     return el;
   }
 
   function buildGridCard(game, delay) {
     var el = document.createElement('div');
     el.className = 'game-card grid-card-animated';
-    /* height set by CSS aspect-ratio */
     el.style.background = game.gradient || GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
     if (delay) el.style.animationDelay = delay + 'ms';
 
@@ -471,7 +666,6 @@ document.addEventListener('DOMContentLoaded', function() {
     el.appendChild(ov);
 
     buildHeart(game, el);
-
 
     var info = document.createElement('div');
     info.className = 'card-info';
@@ -490,7 +684,7 @@ document.addEventListener('DOMContentLoaded', function() {
     play.innerHTML = '<i class="fa-solid fa-play"></i>';
     el.appendChild(play);
 
-    el.addEventListener('click', function() { haptic('heavy'); openGame(game); });
+    el.addEventListener('click', function() { haptic('heavy'); playSound('click'); openGame(game); });
     return el;
   }
 
@@ -521,7 +715,7 @@ document.addEventListener('DOMContentLoaded', function() {
     nm.textContent = game.name;
     el.appendChild(nm);
 
-    el.addEventListener('click', function() { haptic('heavy'); openGame(game); });
+    el.addEventListener('click', function() { haptic('heavy'); playSound('click'); openGame(game); });
     return el;
   }
 
@@ -554,7 +748,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (window.slotHub && window.slotHub.renderStoriesBanners) window.slotHub.renderStoriesBanners();
       return;
     }
-    /* Fallback banner rendering from casinos if stories mode not active */
     var casinos = DataStore.getActiveCasinos();
     elBannerTrack.innerHTML = '';
     elBannerDots.innerHTML = '';
@@ -640,27 +833,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (casinoCount > 1) {
         currentBannerIndex = (currentBannerIndex + 1) % casinoCount;
         updateBannerPosition();
-        updateBannerPosition();
       }
     }, 5000);
   }
-
-  // Swipe support
-  (function() {
-    var startX = 0, isDragging = false;
-    var carousel = $('banner-carousel');
-    carousel.addEventListener('touchstart', function(e) {
-      startX = e.touches[0].clientX; isDragging = true;
-    }, { passive: true });
-    carousel.addEventListener('touchend', function(e) {
-      if (!isDragging) return; isDragging = false;
-      var dx = e.changedTouches[0].clientX - startX;
-      if (Math.abs(dx) > 40) {
-        if (dx < 0) goToBanner(currentBannerIndex + 1);
-        else goToBanner(currentBannerIndex - 1);
-      }
-    }, { passive: true });
-  })();
 
   /* ============================================
      RENDER — HOME
@@ -672,28 +847,23 @@ document.addEventListener('DOMContentLoaded', function() {
     renderFavorites();
     updateSectionCounts();
 
-    // Popular
     elPopularRow.innerHTML = '';
     var popularGames = games.filter(function(g) { return g.tag === 'popular'; }).slice(0, 8);
     for (var i = 0; i < popularGames.length; i++) {
       elPopularRow.appendChild(buildRowCard(popularGames[i], 200, 112, i * 60));
     }
 
-
-    // Top
     elTopRow.innerHTML = '';
     var topGames = games.filter(function(g) { return g.tag === 'top'; }).slice(0, 8);
     for (var j = 0; j < topGames.length; j++) {
       elTopRow.appendChild(buildRowCard(topGames[j], 200, 112, j * 60));
     }
 
-    // New
     elNewRow.innerHTML = '';
     var newGames = games.filter(function(g) { return g.tag === 'new'; }).slice(0, 8);
     for (var k = 0; k < newGames.length; k++) {
       elNewRow.appendChild(buildRowCard(newGames[k], 200, 112, k * 60));
     }
-
 
     renderHomeCasinos();
     renderRecent();
@@ -859,6 +1029,10 @@ document.addEventListener('DOMContentLoaded', function() {
      ============================================ */
   function renderProfile() {
     if (window.slotHub && window.slotHub.updateStats) window.slotHub.updateStats();
+    updateUserUI();
+    var levelEl = $('profile-level-badge');
+    var statLevel = $('stat-level');
+    if (levelEl && statLevel) levelEl.textContent = statLevel.textContent;
     var cur = DataStore.getCurrency();
     $('currency-flag').textContent = cur.flag;
     $('currency-code').textContent = cur.code;
@@ -950,6 +1124,7 @@ document.addEventListener('DOMContentLoaded', function() {
      GAME VIEW
      ============================================ */
   function openGame(game) {
+    playSound('open-game');
     var url = DataStore.getGameUrl(game);
     currentGameUrl = url;
     currentGameObj = game;
@@ -972,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }, 15000);
 
-    if (tg) try { tg.BackButton.show(); } catch(e) {}
+    updateBackButton();
 
     try {
       if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(function() {});
@@ -983,13 +1158,14 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function closeGame() {
+    playSound('close-game');
     elGameIframe.src = '';
     elGameIframe.onload = null;
     if (gameLoadTimeout) { clearTimeout(gameLoadTimeout); gameLoadTimeout = null; }
 
     elGameView.style.display = 'none';
     elApp.style.display = 'flex';
-    if (tg) try { tg.BackButton.hide(); } catch(e) {}
+    updateBackButton();
 
     try {
       if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
@@ -1010,6 +1186,10 @@ document.addEventListener('DOMContentLoaded', function() {
   function showPostgamePopup(game) {
     $('postgame-emoji').textContent = game.icon || '🎰';
     $('postgame-game-name').textContent = game.name;
+    var ptTitle = document.querySelector('.postgame-title');
+    if (ptTitle && userFirstName) {
+      ptTitle.textContent = userFirstName + ', понравилась игра?';
+    }
     showModal(elModalPostgame);
   }
 
@@ -1018,26 +1198,66 @@ document.addEventListener('DOMContentLoaded', function() {
      ============================================ */
   function showModal(el) {
     haptic('medium');
+    playSound('click');
     el.style.display = 'flex';
     requestAnimationFrame(function() {
       requestAnimationFrame(function() { el.classList.add('active'); });
     });
+    updateBackButton();
   }
 
   function hideModal(el) {
     el.classList.remove('active');
-    setTimeout(function() { el.style.display = 'none'; }, 350);
+    setTimeout(function() {
+      el.style.display = 'none';
+      updateBackButton();
+    }, 350);
   }
 
   /* ============================================
      TOAST
      ============================================ */
   function showToast(icon, text) {
+    playSound('notification');
     if (toastTimer) clearTimeout(toastTimer);
     elToastIcon.textContent = icon || '🎉';
     elToastText.textContent = text;
     elToast.classList.add('show');
     toastTimer = setTimeout(function() { elToast.classList.remove('show'); }, 4000);
+  }
+
+  /* ---- Admin Auth Functions ---- */
+  function tryOpenAdmin() {
+    if (isAdminAuthed) { window.openAdminPanel(); showAdminBtn(); return; }
+    showAdminPassModal();
+  }
+
+  function showAdminBtn() {
+    var btn = $('btn-admin-profile');
+    if (btn) btn.style.display = '';
+  }
+
+  function showAdminPassModal() {
+    var modal = $('modal-admin-pass');
+    $('admin-pass-input').value = '';
+    $('admin-pass-error').style.display = 'none';
+    showModal(modal);
+    setTimeout(function() { $('admin-pass-input').focus(); }, 400);
+  }
+
+  function submitAdminPass() {
+    var val = $('admin-pass-input').value.trim();
+    if (val === ADMIN_PASS) {
+      isAdminAuthed = true;
+      try { sessionStorage.setItem('sh_admin', '1'); } catch(e) {}
+      hideModal($('modal-admin-pass'));
+      showAdminBtn();
+      window.openAdminPanel();
+    } else {
+      $('admin-pass-error').style.display = '';
+      haptic('heavy');
+      $('admin-pass-input').value = '';
+    }
   }
 
   /* ============================================
@@ -1079,10 +1299,31 @@ document.addEventListener('DOMContentLoaded', function() {
   $('currency-search').addEventListener('input', function() { renderCurrencyList(this.value); });
 
   // Admin
-  // admin button removed from header
-  $('btn-admin-profile').addEventListener('click', function() { haptic('medium'); window.openAdminPanel(); });
+  $('btn-admin-profile').addEventListener('click', function() { haptic('medium'); tryOpenAdmin(); });
 
-  // Game controls
+  // Secret admin entry: 5 taps on logo
+  (function() {
+    var logoEl = document.querySelector('.header-logo');
+    if (logoEl) {
+      logoEl.style.cursor = 'pointer';
+      logoEl.addEventListener('click', function() {
+        logoTapCount++;
+        if (logoTapTimer) clearTimeout(logoTapTimer);
+        logoTapTimer = setTimeout(function() { logoTapCount = 0; }, 2000);
+        if (logoTapCount >= 5) {
+          logoTapCount = 0;
+          tryOpenAdmin();
+        }
+      });
+    }
+  })();
+
+  // Admin password modal
+  $('admin-pass-submit').addEventListener('click', submitAdminPass);
+  $('admin-pass-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitAdminPass(); });
+  $('modal-admin-pass').addEventListener('click', function(e) { if (e.target === $('modal-admin-pass')) hideModal($('modal-admin-pass')); });
+
+  // Game controls (still needed for non-TG browsers)
   elGameBackBtn.addEventListener('click', closeGame);
   elGameLandscapeBack.addEventListener('click', closeGame);
   elGameFallbackBtn.addEventListener('click', function() { if (currentGameUrl) window.open(currentGameUrl, '_blank'); });
@@ -1093,7 +1334,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch(e) {}
   });
 
-  // Modal closes
+  // Modal closes (X buttons — still visible for non-TG)
   var closeBtns = document.querySelectorAll('.modal-close');
   for (var ci = 0; ci < closeBtns.length; ci++) {
     (function(btn) {
@@ -1126,6 +1367,8 @@ document.addEventListener('DOMContentLoaded', function() {
      INIT
      ============================================ */
   async function init() {
+    if (window.SoundFX) SoundFX.init();
+
     await DataStore.init();
 
     var casinoCount = DataStore.getActiveCasinos().length;
@@ -1140,12 +1383,23 @@ document.addEventListener('DOMContentLoaded', function() {
     initOnlineCounter();
     initScrollAnimations();
 
-    // Hide modals initially
     elModalCurrency.style.display = 'none';
     elModalPostgame.style.display = 'none';
+    $('modal-admin-pass').style.display = 'none';
 
-    // Hide splash after load
+    initTgUser();
+
+    if (isAdminAuthed) showAdminBtn();
+
+    if (userFirstName) {
+      var splashSub = document.querySelector('.splash-sub');
+      if (splashSub) splashSub.textContent = 'Привет, ' + userFirstName + '! 👋';
+    }
+
     setTimeout(hideSplash, 1800);
+
+    /* Initial BackButton state */
+    updateBackButton();
   }
 
   window.appRefresh = function() {
@@ -1161,7 +1415,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   /* Expose API for features.js */
   window.slotHub = {
-    openGame: openGame, openAffiliate: openAffiliate, makeAffiliateLink: makeAffiliateLink, haptic: haptic,
+    openGame: openGame, openAffiliate: openAffiliate, makeAffiliateLink: makeAffiliateLink, haptic: haptic, playSound: playSound,
     switchTab: switchTab, showModal: showModal, hideModal: hideModal,
     fireConfetti: fireConfetti, buildRowCard: buildRowCard,
     renderFavorites: renderFavorites, updateSectionCounts: updateSectionCounts,
