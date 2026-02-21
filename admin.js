@@ -148,9 +148,11 @@
     });
     bindListBtn(delSel, function(id) {
       var label = type === 'game' ? 'игру' : 'казино';
-      if (!confirm('Удалить ' + label + '?')) return;
-      if (type === 'game') { DataStore.deleteGame(id); renderAdminGames(); }
-      else if (type === 'casino') { DataStore.deleteCasino(id); renderAdminCasinos(); }
+      TG.confirm('Удалить ' + label + '?').then(function(ok) {
+        if (!ok) return;
+        if (type === 'game') { DataStore.deleteGame(id); renderAdminGames(); }
+        else if (type === 'casino') { DataStore.deleteCasino(id); renderAdminCasinos(); }
+      })
     });
   }
 
@@ -204,7 +206,7 @@
       order: parseInt(val('af-order')) || 0, gradient: val('af-gradient'),
       active: isToggleOn('af-active')
     };
-    if (!data.name) { alert('Введите название'); return; }
+    if (!data.name) { TG.alert('Введите название'); return; }
     if (editingItem) DataStore.updateGame(editingItem.id, data);
     else DataStore.addGame(data);
     elFormOverlay.classList.remove('open');
@@ -266,8 +268,8 @@
     if (!data.bannerTitle) data.bannerTitle = data.bonus || data.name;
     if (!data.bannerSubtitle) data.bannerSubtitle = data.name;
 
-    if (!data.name) { alert('Введите название'); return; }
-    if (!data.url) { alert('Введите ссылку'); return; }
+    if (!data.name) { TG.alert('Введите название'); return; }
+    if (!data.url) { TG.alert('Введите ссылку'); return; }
     if (editingItem) DataStore.updateCasino(editingItem.id, data);
     else DataStore.addCasino(data);
     elFormOverlay.classList.remove('open');
@@ -294,7 +296,7 @@
     elAdminContent.innerHTML = html;
     document.getElementById('admin-save-settings').addEventListener('click', function() {
       DataStore.updateSettings({ appName: val('af-appname'), demoUrlTemplate: val('af-urltemplate'), gameImageUrlTemplate: val('af-imgtemplate') });
-      alert('Настройки сохранены!');
+      TG.alert('Настройки сохранены!');
     });
   }
 
@@ -329,24 +331,25 @@
     document.getElementById('admin-copy-btn').addEventListener('click', function() {
       var area = document.getElementById('admin-export-area');
       area.select();
-      try { navigator.clipboard.writeText(area.value); alert('Скопировано!'); }
-      catch(e) { document.execCommand('copy'); alert('Скопировано!'); }
+      try { navigator.clipboard.writeText(area.value); TG.alert('Скопировано!'); }
+      catch(e) { document.execCommand('copy'); TG.alert('Скопировано!'); }
     });
 
     document.getElementById('admin-import-btn').addEventListener('click', async function() {
       var json = document.getElementById('admin-import-area').value.trim();
-      if (!json) { alert('Вставьте JSON'); return; }
+      if (!json) { TG.alert('Вставьте JSON'); return; }
       var ok = await DataStore.importConfig(json);
-      if (ok) { alert('Импортировано!'); renderAdminData(); }
-      else alert('Ошибка: неверный JSON');
+      if (ok) { TG.alert('Импортировано!'); renderAdminData(); }
+      else TG.alert('Ошибка: неверный JSON');
     });
 
     document.getElementById('admin-reset-btn').addEventListener('click', async function() {
-      if (confirm('Точно сбросить ВСЕ данные?')) {
+      TG.confirm('Точно сбросить ВСЕ данные?').then(async function(ok) {
+        if (!ok) return;
         await DataStore.resetToDefaults();
-        alert('Сброшено!');
+        TG.alert('Сброшено!');
         renderAdminData();
-      }
+      })
     });
   }
 
