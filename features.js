@@ -224,6 +224,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var viewer = document.getElementById('story-viewer');
     if (!viewer) return;
     viewer.style.display = 'flex';
+    if (window.updateBackButton) window.updateBackButton();
     requestAnimationFrame(function() {
       requestAnimationFrame(function() { viewer.classList.add('active'); });
     });
@@ -234,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var viewer = document.getElementById('story-viewer');
     if (!viewer) return;
     viewer.classList.remove('active');
+    if (window.updateBackButton) window.updateBackButton();
     if (storyAutoTimer) clearTimeout(storyAutoTimer);
     if (storyProgressInterval) clearInterval(storyProgressInterval);
     setTimeout(function() { viewer.style.display = 'none'; }, 300);
@@ -434,6 +436,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     el = document.getElementById('stat-level');
     if (el) el.textContent = getLevel(stats.played);
+
+    /* Update profile level badge */
+    var lvlBadge = document.getElementById('profile-level-badge');
+    if (lvlBadge) lvlBadge.textContent = getLevel(stats.played);
   }
 
   /* ============================================
@@ -452,12 +458,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var names = ['Kate***', 'Max***', 'Алек***', 'Анна***', 'Стас***', 'Дима***', 'Лена***'];
     var gName = games.length > 0 ? games[Math.floor(Math.random() * games.length)].name : 'Sweet Bonanza';
 
+    var uName = (window.getUserFirstName && window.getUserFirstName()) || '';
+    var hey = uName ? (uName + ', ') : '';
+
     notifQueue = [
-      { icon: '🔥', title: 'Новый слот добавлен!', text: 'Попробуйте ' + gName + ' прямо сейчас!' },
-      { icon: '⏰', title: 'Бонус истекает!', text: 'Успейте забрать 500% бонус — осталось 2 часа!' },
+      { icon: '🔥', title: 'Новый слот добавлен!', text: hey + 'попробуйте ' + gName + ' прямо сейчас!' },
+      { icon: '⏰', title: 'Бонус истекает!', text: hey + 'успейте забрать 500% бонус — осталось 2 часа!' },
       { icon: '🏆', title: 'Мега-выигрыш!', text: names[Math.floor(Math.random() * names.length)] + ' выиграл 450,000 ' + cur.symbol + '!' },
-      { icon: '💎', title: 'VIP-предложение', text: 'Эксклюзивный кэшбэк 15% ждёт вас!' },
-      { icon: '🎁', title: 'Фриспины без депозита', text: '100 бесплатных вращений — активируйте!' },
+      { icon: '💎', title: 'VIP-предложение', text: hey + 'эксклюзивный кэшбэк 15% ждёт вас!' },
+      { icon: '🎁', title: hey + 'фриспины без депозита!', text: '100 бесплатных вращений — активируйте!' },
       { icon: '⚡', title: 'Турнир начался!', text: 'Призовой фонд 1,000,000 ' + cur.symbol + '!' }
     ];
 
@@ -477,6 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function showNotifPopup(icon, title, text) {
     var el = document.getElementById('notification-popup');
     if (!el) return;
+    if (SH && SH.playSound) SH.playSound('notification');
     document.getElementById('notif-icon').textContent = icon;
     document.getElementById('notif-title').textContent = title;
     document.getElementById('notif-text').textContent = text;
