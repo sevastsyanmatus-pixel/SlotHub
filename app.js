@@ -56,6 +56,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var safeTop = 0, safeBottom = 0, contentTop = 0;
     try { if (tg.safeAreaInset) { safeTop = tg.safeAreaInset.top || 0; safeBottom = tg.safeAreaInset.bottom || 0; } } catch(e) {}
     try { if (tg.contentSafeAreaInset) { contentTop = tg.contentSafeAreaInset.top || 0; } } catch(e) {}
+    /* Clamp values to reasonable range to prevent overflow in fullscreen */
+    safeTop = Math.min(safeTop, 60);
+    safeBottom = Math.min(safeBottom, 40);
+    contentTop = Math.min(contentTop, 60);
     root.style.setProperty('--tg-safe-top', safeTop + 'px');
     root.style.setProperty('--tg-safe-bottom', safeBottom + 'px');
     root.style.setProperty('--tg-header-height', contentTop + 'px');
@@ -73,13 +77,17 @@ document.addEventListener('DOMContentLoaded', function() {
     try { tg.isVerticalSwipesEnabled = false; } catch(e) {}
     try { tg.MainButton.hide(); } catch(e) {}
 
-    /* Request fullscreen with retry */
+    /*/* Request fullscreen with retry */
     function tryFullscreen() {
       try { tg.requestFullscreen(); } catch(e) {}
     }
     tryFullscreen();
     setTimeout(tryFullscreen, 500);
     setTimeout(tryFullscreen, 1500);
+
+    /* Re-check safe areas after fullscreen settles */
+    setTimeout(updateTgSafeAreas, 600);
+    setTimeout(updateTgSafeAreas, 2000);
 
     updateTgSafeAreas();
 
