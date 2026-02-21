@@ -2,8 +2,8 @@
 <html lang="ru" data-theme="neon">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SlotHub — Демо Казино</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>SlotX — Демо Казино</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://miniapps.ai/sdk/miniapps-ai-v1.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -26,7 +26,7 @@
   <div id="splash-screen">
     <div class="splash-content">
       <div class="splash-emoji">🎰</div>
-      <div class="splash-title">Slot<span class="text-accent">Hub</span></div>
+      <div class="splash-title">Slot<span class="text-accent">X</span></div>
       <div class="splash-sub">Демо-слоты бесплатно</div>
       <div class="splash-bar"><div class="splash-bar-fill"></div></div>
     </div>
@@ -41,12 +41,13 @@
         <div class="header-left">
           <div class="header-logo">
             <div class="logo-text">
-              <p class="logo-title">Slot<span class="text-accent">Hub</span></p>
-              <p class="logo-sub">Демо-слоты бесплатно</p>
+              <p class="logo-title">Slot<span class="text-accent">X</span></p>
+              <p class="logo-sub" id="header-greeting">Демо-слоты бесплатно</p>
             </div>
           </div>
         </div>
         <div class="header-right">
+          <button id="sound-toggle" class="sound-toggle interactive active" onclick="SoundFX.toggle()"><i class="fa-solid fa-volume-high"></i></button>
           <div id="online-counter" class="online-counter interactive">
             <span class="oc-dot"></span>
             <span id="online-count" class="oc-num">1,247</span>
@@ -218,7 +219,21 @@
       <!-- TAB: PROFILE -->
       <div id="tab-profile" style="display:none;">
         <div class="px-5 pt-4 pb-6">
-          <p class="font-bold text-xl text-white mb-1">⚙️ Настройки</p>
+
+          <!-- USER PROFILE CARD -->
+          <div id="profile-user-card" class="profile-card mb-5">
+            <div class="profile-avatar" id="profile-avatar">
+              <span id="profile-avatar-emoji">👤</span>
+              <img id="profile-avatar-img" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" referrerpolicy="no-referrer">
+            </div>
+            <div class="profile-info">
+              <p class="profile-name" id="profile-name">Гость</p>
+              <p class="profile-username" id="profile-username">Добро пожаловать!</p>
+            </div>
+            <div class="profile-level-badge" id="profile-level-badge">🆕 Новичок</div>
+          </div>
+
+          <p class="font-bold text-lg text-white mb-1">⚙️ Настройки</p>
           <p class="text-sm mb-5" style="color:var(--text-muted);">Параметры демо-режима</p>
 
           <!-- STATS -->
@@ -279,7 +294,7 @@
               <i class="fa-solid fa-arrow-right mr-1"></i> Перейти в казино
             </a>
           </div>
-          <button id="btn-admin-profile" class="btn-ghost interactive w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2 mt-4">
+          <button id="btn-admin-profile" style="display:none;" class="btn-ghost interactive w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2 mt-4">
             <i class="fa-solid fa-gear text-xs"></i> Админ-панель
           </button>
         </div>
@@ -398,6 +413,21 @@
     </div>
   </div>
 
+  <!-- ==================== ADMIN PASSWORD MODAL ==================== -->
+  <div id="modal-admin-pass" class="modal-overlay">
+    <div class="modal-body glass" style="max-width:340px;width:calc(100% - 32px);border-radius:var(--radius-xl);overflow:hidden;padding:24px;">
+      <div class="flex items-center justify-between mb-4">
+        <p class="font-bold text-lg text-white">🔐 Вход в админку</p>
+        <button class="modal-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+      <input id="admin-pass-input" type="password" class="form-input" style="width:100%;margin-bottom:12px;" placeholder="Введите пароль">
+      <p id="admin-pass-error" style="display:none;color:#EF4444;font-size:12px;margin-bottom:12px;">Неверный пароль</p>
+      <button id="admin-pass-submit" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--accent-green);color:#000;">Войти</button>
+    </div>
+  </div>
+
   <!-- ==================== STORY VIEWER ==================== -->
   <div id="story-viewer" class="story-viewer">
     <div class="story-progress" id="story-progress"></div>
@@ -467,6 +497,7 @@
   </div>
 
   <!-- ==================== SCRIPTS ==================== -->
+  <script src="sounds.js"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
   <script src="admin.js"></script>
