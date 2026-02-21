@@ -157,10 +157,11 @@ var DEFAULT_CASINOS = [
 ];
 
 var DEFAULT_SETTINGS = {
-  appName: 'SlotHub',
+  appName: 'SlotX',
   currencyCode: 'RUB',
   demoUrlTemplate: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol={symbol}&jurisdiction=99&lang={lang}&cur={currency}&stylename=generic',
-  dataVersion: 16
+  gameImageUrlTemplate: '',
+  dataVersion: 20
 };
 
 /* ============================================
@@ -235,8 +236,7 @@ var Storage = {
 };
 
 /* ============================================
-   DATA STORE — No more separate banners!
-   Casinos = single source for banner carousel + bonus tab
+   DATA STORE
    ============================================ */
 var DataStore = {
   games: [],
@@ -258,7 +258,6 @@ var DataStore = {
       this.games = JSON.parse(JSON.stringify(DEFAULT_GAMES));
       this.casinos = JSON.parse(JSON.stringify(DEFAULT_CASINOS));
       this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-      /* Clean up old banner storage */
       await Storage.remove('banners');
     } else {
       this.games = savedGames || JSON.parse(JSON.stringify(DEFAULT_GAMES));
@@ -268,6 +267,7 @@ var DataStore = {
 
     if (!this.settings.currencyCode) this.settings.currencyCode = 'RUB';
     if (!this.settings.demoUrlTemplate) this.settings.demoUrlTemplate = DEFAULT_SETTINGS.demoUrlTemplate;
+    if (this.settings.gameImageUrlTemplate === undefined) this.settings.gameImageUrlTemplate = '';
 
     /* Sync icons and new fields for games */
     for (var i = 0; i < this.games.length; i++) {
@@ -357,7 +357,7 @@ var DataStore = {
   },
   deleteGame: function(id) { this.games = this.games.filter(function(g) { return g.id !== id; }); this.save(); },
 
-  /* ---- Casinos CRUD (unified with banners) ---- */
+  /* ---- Casinos CRUD ---- */
   getActiveCasinos: function() {
     return this.casinos.filter(function(c) { return c.active; }).sort(function(a, b) { return a.order - b.order; });
   },
@@ -398,7 +398,17 @@ var DataStore = {
     return template.replace('{symbol}', game.symbol).replace('{lang}', cur.lang).replace('{currency}', cur.code);
   },
 
-  getGameImageUrl: function(game) { return game.image || ''; },
+  /* ---- Game Image URL ---- */
+  getGameImageUrl: function(game) {
+    /* 1. Manual image set in admin → highest priority */
+    if (game.image) return game.image;
+    /* 2. Auto-generate from symbol + template (if configured) */
+    if (game.symbol && this.settings.gameImageUrlTemplate) {
+      return this.settings.gameImageUrlTemplate.replace('{symbol}', game.symbol);
+    }
+    /* 3. No image — card will show emoji icon */
+    return '';
+  },
 
   /* ---- Export / Import ---- */
   exportConfig: function() {
