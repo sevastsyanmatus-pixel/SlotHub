@@ -1,8 +1,6 @@
 /**
- * TG Core v2.4 — Full ARTHOLST pattern
- * All 5 fullscreen protection levels implemented
- * 3-level safe area protection with fallbacks
- * Anti-swipe, aggressive retry, device detection
+ * TG Core v2.5 — Full ARTHOLST pattern
+ * Fixed: increased safe area top buffer, disabled debug, reduced retries
  */
 var TG = (function() {
   'use strict';
@@ -12,8 +10,8 @@ var TG = (function() {
   var handlingBack = false;
   var mainBtnCb = null;
 
-  /* Debug mode — set to true to see safe area overlay */
-  var DEBUG_SAFE_AREA = true;
+  /* Debug mode — OFF for production */
+  var DEBUG_SAFE_AREA = false;
 
   /* ========================================
      LAZY DETECTION
@@ -133,81 +131,56 @@ var TG = (function() {
   }
 
   /* ========================================
-     ANTI-SWIPE & FULLSCREEN (ARTHOLST PATTERN — ALL 5 LEVELS)
+     ANTI-SWIPE & FULLSCREEN (ARTHOLST PATTERN)
      ======================================== */
   function _preventTelegramCollapse(options) {
     if (!_tgWebApp) return;
 
-    /* =============================================
-       LEVEL 1: Immediate calls (tg-core.js load time, ~50-100ms after head inline)
-       ============================================= */
+    /* LEVEL 1: Immediate */
     _tgFullAction();
-
-    /* CSS classes */
     document.documentElement.classList.add('tg-fullscreen');
-
-    /* Viewport height CSS variable */
     _updateViewportHeight();
 
-    /* =============================================
-       LEVEL 2: Delayed requestFullscreen (TG may not be ready immediately)
-       ============================================= */
+    /* LEVEL 2: Delayed */
     setTimeout(_tgRequestFullscreen, 300);
     setTimeout(_tgRequestFullscreen, 1000);
 
-    /* =============================================
-       LEVEL 3: viewportChanged — ALWAYS re-expand
-       Telegram can shrink viewport at any time (keyboard, chat switch, etc.)
-       ============================================= */
+    /* LEVEL 3: viewportChanged */
     try {
       _tgWebApp.onEvent('viewportChanged', function(e) {
         _tgExpand();
-        /* If viewport is not yet stable — call again */
-        if (e && !e.isStateStable) {
-          _tgExpand();
-        }
+        if (e && !e.isStateStable) _tgExpand();
         _tgRequestFullscreen();
         document.documentElement.classList.add('tg-fullscreen');
         _updateViewportHeight();
         _applyScreenClasses();
-        /* Re-apply safe areas after viewport settles */
         setTimeout(_applySafeArea, 100);
       });
     } catch(e) {}
 
-    /* =============================================
-       LEVEL 4: fullscreenChanged — re-secure when fullscreen toggles
-       ============================================= */
+    /* LEVEL 4: fullscreenChanged */
     try {
       _tgWebApp.onEvent('fullscreenChanged', function() {
-        /* Re-disable swipes (TG may reset them) */
         try { if (_tgWebApp.disableVerticalSwipes) _tgWebApp.disableVerticalSwipes(); } catch(e) {}
         document.documentElement.classList.add('tg-fullscreen');
-        /* If exited fullscreen somehow — try to get back */
         if (!_tgWebApp.isFullscreen) {
           setTimeout(_tgRequestFullscreen, 100);
           setTimeout(_tgRequestFullscreen, 500);
         }
-        /* Delay to let TG settle safe areas */
         setTimeout(_applySafeArea, 50);
-        setTimeout(_applySafeArea, 200);
-        setTimeout(_applySafeArea, 500);
+        setTimeout(_applySafeArea, 300);
         _updateViewportHeight();
         _applyScreenClasses();
       });
     } catch(e) {}
 
-    /* =============================================
-       LEVEL 5: Safe area change events
-       ============================================= */
+    /* LEVEL 5: Safe area change events */
     try {
       _tgWebApp.onEvent('safeAreaChanged', function() { _applySafeArea(); });
       _tgWebApp.onEvent('contentSafeAreaChanged', function() { _applySafeArea(); });
     } catch(e) {}
 
-    /* =============================================
-       ANTI-SWIPE: Block "pull down to close" gesture
-       ============================================= */
+    /* ANTI-SWIPE */
     var startY = 0;
     document.addEventListener('touchstart', function(e) {
       startY = e.touches[0].clientY;
@@ -216,46 +189,28 @@ var TG = (function() {
     document.addEventListener('touchmove', function(e) {
       var currentY = e.touches[0].clientY;
       var deltaY = currentY - startY;
-
-      /* Only block downward swipe */
       if (deltaY < 5) return;
-
-      /* Find scrollable parent */
       var scrollable = null;
       var el = e.target;
       while (el && el !== document.body && el !== document.documentElement) {
-        if (el.scrollHeight > el.clientHeight) {
-          scrollable = el;
-          break;
-        }
+        if (el.scrollHeight > el.clientHeight) { scrollable = el; break; }
         el = el.parentElement;
       }
-
-      var scrollTop = scrollable
-        ? scrollable.scrollTop
-        : (window.pageYOffset || 0);
-
-      /* If at top and pulling down — BLOCK */
-      if (scrollTop <= 1 && deltaY > 5) {
-        e.preventDefault();
-      }
+      var scrollTop = scrollable ? scrollable.scrollTop : (window.pageYOffset || 0);
+      if (scrollTop <= 1 && deltaY > 5) e.preventDefault();
     }, { passive: false });
 
-    /* =============================================
-       RETRY: expand + fullscreen every 400ms for first 6 seconds (15 times)
-       ============================================= */
+    /* RETRY: reduced — 8 times over 4 seconds (less CPU) */
     var retryCount = 0;
     var retryInterval = setInterval(function() {
       retryCount++;
       _tgFullAction();
       _applySafeArea();
       _updateViewportHeight();
-      if (retryCount >= 15) clearInterval(retryInterval);
-    }, 400);
+      if (retryCount >= 8) clearInterval(retryInterval);
+    }, 500);
 
-    /* =============================================
-       VISIBILITY: Re-expand when returning to app
-       ============================================= */
+    /* VISIBILITY: Re-expand */
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
         _tgFullAction();
@@ -264,33 +219,22 @@ var TG = (function() {
       }
     });
 
-    /* =============================================
-       FOCUS: Re-expand on window focus
-       ============================================= */
-    window.addEventListener('focus', function() {
-      _tgFullAction();
-    });
+    /* FOCUS */
+    window.addEventListener('focus', function() { _tgFullAction(); });
 
-    /* =============================================
-       FIRST TOUCH: Some TG versions need gesture for fullscreen
-       ============================================= */
+    /* FIRST TOUCH */
     var _firstTouch = function() {
       _tgFullAction();
       document.removeEventListener('touchstart', _firstTouch);
     };
     document.addEventListener('touchstart', _firstTouch, { passive: true });
 
-    /* =============================================
-       INSURANCE: Apply safe areas multiple times with delays
-       (Telegram API can be slow to provide correct values)
-       ============================================= */
+    /* Safe areas with delays */
     _applySafeArea();
-    setTimeout(_applySafeArea, 100);
-    setTimeout(_applySafeArea, 300);
-    setTimeout(_applySafeArea, 600);
-    setTimeout(_applySafeArea, 1000);
-    setTimeout(_applySafeArea, 2000);
-    setTimeout(_applySafeArea, 4000);
+    setTimeout(_applySafeArea, 150);
+    setTimeout(_applySafeArea, 500);
+    setTimeout(_applySafeArea, 1500);
+    setTimeout(_applySafeArea, 3000);
   }
 
   function _updateViewportHeight() {
@@ -302,7 +246,7 @@ var TG = (function() {
   }
 
   /* ========================================
-     SAFE AREA — 3-LEVEL ARTHOLST PROTECTION
+     SAFE AREA — FIXED: More generous top offset
      ======================================== */
   function _applySafeArea() {
     var root = document.documentElement;
@@ -313,9 +257,6 @@ var TG = (function() {
       var csa = _tgWebApp.contentSafeAreaInset || {};
       var isFullscreen = !!_tgWebApp.isFullscreen;
 
-      /* ============================
-         LAYER 1: DEVICE INSET (notch, Dynamic Island, status bar)
-         ============================ */
       var deviceTop = sa.top || 0;
       var deviceBottom = sa.bottom || 0;
       var deviceLeft = sa.left || 0;
@@ -326,9 +267,6 @@ var TG = (function() {
       root.style.setProperty('--tg-safe-left', deviceLeft + 'px');
       root.style.setProperty('--tg-safe-right', deviceRight + 'px');
 
-      /* ============================
-         LAYER 2: CONTENT SAFE AREA (below Telegram buttons: back, dots, close)
-         ============================ */
       var contentTop = csa.top || 0;
       var contentBottom = csa.bottom || 0;
 
@@ -337,43 +275,31 @@ var TG = (function() {
       root.style.setProperty('--tg-content-safe-right', (csa.right || 0) + 'px');
 
       /* ============================
-         LAYER 3: FALLBACKS FOR FULLSCREEN
-         In fullscreen mode, TG buttons (back, close, dots) are drawn
-         ON TOP of our content. contentSafeAreaInset.top may be 0
-         on some devices even in fullscreen — this is a Telegram API bug.
-         We guarantee a minimum safe offset.
+         FIXED: More generous top offset
+         In fullscreen, Telegram draws close/back/dots buttons.
+         Previous: used contentTop directly → too small.
+         Now: add 20px buffer above content safe area.
          ============================ */
       var finalTop = contentTop;
 
       if (isFullscreen) {
-        /* Minimum: deviceTop (notch) + 12px buffer
-           OR 44px (minimum height of TG overlay buttons)
-           Whichever is larger */
-        var minFullscreenTop = Math.max(deviceTop + 12, 44);
-        finalTop = Math.max(contentTop, minFullscreenTop);
+        /* contentTop + 20px buffer for TG overlay buttons */
+        var buffered = contentTop + 20;
+        /* Also ensure at least deviceTop + 24 */
+        var minFromDevice = deviceTop + 24;
+        /* And absolute minimum 64px */
+        finalTop = Math.max(buffered, minFromDevice, 64);
       } else if (contentTop === 0 && deviceTop === 0) {
-        /* NOT fullscreen, API gave no data at all.
-           Estimate native Telegram header height */
         var isIOS = api.isIOS || /iPad|iPhone|iPod/.test(navigator.userAgent || '');
         finalTop = isIOS ? 56 : 48;
       } else if (contentTop === 0 && deviceTop > 0) {
-        /* Has device inset but no content inset —
-           TG header is likely present but API didn't report it.
-           Use safe default */
-        finalTop = Math.max(deviceTop + 12, 48);
+        finalTop = Math.max(deviceTop + 20, 52);
       }
 
-      /* ============================
-         FINAL: Set CSS variables
-         ============================ */
       root.style.setProperty('--tg-content-safe-top', finalTop + 'px');
-
-      /* Combined top offset — used by all UI elements */
       root.style.setProperty('--top-offset', finalTop + 'px');
 
-      /* ============================
-         DETECT DEVICE FEATURES from safe area
-         ============================ */
+      /* Detect device features */
       var body = document.body;
       if (deviceTop >= 55) {
         body.classList.add('has-dynamic-island');
@@ -383,15 +309,11 @@ var TG = (function() {
         body.classList.remove('has-dynamic-island');
       }
 
-      /* ============================
-         DEBUG OVERLAY (only if enabled)
-         ============================ */
+      /* Debug overlay */
       if (DEBUG_SAFE_AREA) {
         _updateDebugOverlay({
-          deviceTop: deviceTop,
-          deviceBottom: deviceBottom,
-          contentTopRaw: csa.top || 0,
-          contentTop: finalTop,
+          deviceTop: deviceTop, deviceBottom: deviceBottom,
+          contentTopRaw: csa.top || 0, contentTop: finalTop,
           isFullscreen: isFullscreen,
           viewportH: _tgWebApp.viewportHeight || 0,
           stableH: _tgWebApp.viewportStableHeight || 0,
@@ -401,16 +323,12 @@ var TG = (function() {
       }
 
     } catch(e) {
-      /* Ultimate fallback — 54px is safe for most devices */
-      root.style.setProperty('--tg-content-safe-top', '54px');
-      root.style.setProperty('--top-offset', '54px');
-      console.error('[TG SafeArea] Error:', e);
+      root.style.setProperty('--tg-content-safe-top', '72px');
+      root.style.setProperty('--top-offset', '72px');
     }
   }
 
-  /* ========================================
-     DEBUG OVERLAY — shows safe area values on screen
-     ======================================== */
+  /* Debug overlay */
   function _updateDebugOverlay(data) {
     var el = document.getElementById('tg-debug-overlay');
     if (!el) {
@@ -435,7 +353,7 @@ var TG = (function() {
   }
 
   /* ========================================
-     DEVICE DETECTION (Enhanced)
+     DEVICE DETECTION
      ======================================== */
   api._detectDevice = function() {
     var ua = navigator.userAgent || '';
@@ -459,38 +377,26 @@ var TG = (function() {
     var root = document.documentElement;
     var body = document.body;
     root.setAttribute('data-platform', p);
-
-    /* Platform class */
     body.classList.add('device-' + p);
 
-    /* Screen size classes */
     _applyScreenClasses();
 
-    /* Pixel ratio */
     var dpr = window.devicePixelRatio || 1;
     if (dpr >= 2) body.classList.add('is-retina');
     root.style.setProperty('--dpr', String(dpr));
 
-    /* Tablet detection */
     var w = window.innerWidth;
     var h = window.innerHeight;
     if (Math.min(w, h) >= 600) body.classList.add('is-tablet');
 
-    /* iOS specific */
     if (p === 'ios') {
-      /* iPhone SE — small screen */
       if (w <= 375 && h <= 667) body.classList.add('is-iphone-se');
-      /* Notch detection via screen height (before safe area data arrives) */
       if (h >= 812 && w <= 430) body.classList.add('has-notch');
     }
-
-    /* Android specific */
     if (p === 'android') {
-      /* Detect Android small bar phones */
       if (h >= 700 && w <= 400) body.classList.add('android-tall');
     }
 
-    /* Listen for resize and orientation */
     window.addEventListener('resize', function() {
       _applyScreenClasses();
       root.style.setProperty('--screen-w', window.innerWidth + 'px');
@@ -506,41 +412,32 @@ var TG = (function() {
     }
   };
 
-  /* Screen size classes — runs on resize */
   function _applyScreenClasses() {
     var body = document.body;
     var root = document.documentElement;
     var w = window.innerWidth;
     var h = window.innerHeight;
 
-    /* Remove old width classes */
     body.classList.remove('screen-xs', 'screen-sm', 'screen-md', 'screen-lg', 'screen-xl', 'screen-xxl');
-    /* Remove old height classes */
     body.classList.remove('screen-short', 'screen-medium', 'screen-tall');
-    /* Remove tablet */
     body.classList.remove('is-tablet');
 
-    /* Width breakpoints */
-    if (w <= 360)      body.classList.add('screen-xs');   /* iPhone SE, Galaxy S small */
-    else if (w <= 389) body.classList.add('screen-sm');   /* iPhone 12 mini, Pixel 5 */
-    else if (w <= 413) body.classList.add('screen-md');   /* iPhone 14, Pixel 7 */
-    else if (w <= 479) body.classList.add('screen-lg');   /* iPhone Plus/Max, Galaxy S Ultra */
-    else if (w <= 767) body.classList.add('screen-xl');   /* Large phones landscape, small tablets */
-    else               body.classList.add('screen-xxl');  /* Tablets, desktop */
+    if (w <= 360)      body.classList.add('screen-xs');
+    else if (w <= 389) body.classList.add('screen-sm');
+    else if (w <= 413) body.classList.add('screen-md');
+    else if (w <= 479) body.classList.add('screen-lg');
+    else if (w <= 767) body.classList.add('screen-xl');
+    else               body.classList.add('screen-xxl');
 
-    /* Height breakpoints */
-    if (h <= 667)      body.classList.add('screen-short');   /* iPhone SE, short phones */
-    else if (h <= 811) body.classList.add('screen-medium');  /* iPhone 12 mini, older iPhones */
-    else               body.classList.add('screen-tall');    /* Modern tall phones */
+    if (h <= 667)      body.classList.add('screen-short');
+    else if (h <= 811) body.classList.add('screen-medium');
+    else               body.classList.add('screen-tall');
 
-    /* Tablet (re-check on resize) */
     if (Math.min(w, h) >= 600) body.classList.add('is-tablet');
 
-    /* CSS custom properties */
     root.style.setProperty('--screen-w', w + 'px');
     root.style.setProperty('--screen-h', h + 'px');
 
-    /* Dynamic columns for game grid */
     var cols = 2;
     if (w >= 1200) cols = 5;
     else if (w >= 900) cols = 4;
@@ -598,7 +495,7 @@ var TG = (function() {
       handlingBack = true;
       var cb = backStack.pop();
       _syncBackBtn();
-      try { cb(); } catch (e) { console.error('[TG] Back handler error:', e); }
+      try { cb(); } catch (e) {}
       handlingBack = false;
     }
   }
