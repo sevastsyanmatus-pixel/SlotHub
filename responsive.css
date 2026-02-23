@@ -26,17 +26,17 @@
 /* ============================================
    SCREEN-XS — ≤360px (iPhone SE, Galaxy S mini, old Androids)
    ============================================ */
-.screen-xs .logo-title { font-size: 20px; }
-.screen-xs .logo-sub { font-size: 9px; }
-.screen-xs .header-inner { height: 48px; }
-.screen-xs .online-counter { padding: 4px 10px; font-size: 10px; }
-.screen-xs .oc-num { font-size: 10px; }
-.screen-xs .sound-toggle { width: 32px; height: 32px; font-size: 12px; }
+.screen-xs .logo-title { font-size: 18px; }
+.screen-xs .logo-sub { font-size: 7px; }
+.screen-xs .header-inner { height: 38px; }
+/* online counter moved to win feed */
+
+/* sound toggle moved to profile */
 
 .screen-xs .banner-slide { height: 130px; }
 .screen-xs .banner-title { font-size: 14px; }
 .screen-xs .banner-subtitle { font-size: 10px; }
-.screen-xs .banner-deco { font-size: 32px; right: 6px; opacity: 0.35; }
+.screen-xs .banner-deco { font-size: 40px; right: 8px; }
 .screen-xs .banner-slide-content { padding: 10px 12px; max-width: 70%; }
 .screen-xs .banner-badge { font-size: 8px; padding: 2px 6px; }
 .screen-xs .banner-cta { font-size: 10px; padding: 4px 10px; }
@@ -59,7 +59,7 @@
 .screen-xs .card-play i { font-size: 8px; }
 .screen-xs .card-heart { width: 24px; height: 24px; min-width: 28px; min-height: 28px; }
 .screen-xs .card-info { padding: 5px 8px; }
-.screen-xs .card-emoji { font-size: 28px; }
+.screen-xs .card-emoji { font-size: 36px; }
 
 .screen-xs .chip { font-size: 12px; padding: 7px 14px; min-height: 36px; }
 .screen-xs #games-grid { gap: 8px; padding: 0 16px; }
@@ -88,7 +88,7 @@
    ============================================ */
 .screen-sm .banner-slide { height: 140px; }
 .screen-sm .banner-title { font-size: 15px; }
-.screen-sm .banner-deco { font-size: 36px; }
+.screen-sm .banner-deco { font-size: 44px; }
 .screen-sm .banner-slide-content { max-width: 72%; }
 
 .screen-sm .section-title { font-size: 15px; }
@@ -105,13 +105,13 @@
    ============================================ */
 .screen-lg .banner-slide { height: 160px; }
 .screen-lg .banner-title { font-size: 19px; }
-.screen-lg .banner-deco { font-size: 48px; }
+.screen-lg .banner-deco { font-size: 60px; }
 .screen-lg .banner-slide-content { max-width: 68%; }
 
 .screen-lg .section-title { font-size: 18px; }
 .screen-lg .section-icon { width: 34px; height: 34px; font-size: 20px; }
 
-.screen-lg .card-emoji { font-size: 38px; }
+.screen-lg .card-emoji { font-size: 52px; }
 .screen-lg .card-name { font-size: 12px; }
 .screen-lg .card-play { width: 34px; height: 34px; }
 .screen-lg .card-info { padding: 8px 12px; }
@@ -127,7 +127,7 @@
    ============================================ */
 .screen-xl .banner-slide { height: 170px; }
 .screen-xl .banner-title { font-size: 20px; }
-.screen-xl .banner-deco { font-size: 52px; }
+.screen-xl .banner-deco { font-size: 64px; }
 
 .screen-xl .section-title { font-size: 18px; }
 .screen-xl .scroll-row { gap: 14px; }
@@ -149,7 +149,7 @@
 .screen-xxl .banner-carousel { max-width: 720px; margin: 0 auto; }
 .screen-xxl .banner-slide { height: 200px; }
 .screen-xxl .banner-title { font-size: 24px; }
-.screen-xxl .banner-deco { font-size: 60px; }
+.screen-xxl .banner-deco { font-size: 72px; }
 
 .screen-xxl .section-header { max-width: 900px; margin-left: auto; margin-right: auto; padding: 0 24px; }
 .screen-xxl .section-title { font-size: 20px; }
@@ -184,7 +184,7 @@
    ============================================ */
 .screen-short .banner-slide { height: 120px; }
 .screen-short .banner-title { font-size: 14px; }
-.screen-short .banner-deco { font-size: 30px; }
+.screen-short .banner-deco { font-size: 36px; }
 .screen-short .banner-slide-content { padding: 10px 12px; }
 
 .screen-short .section-header { margin-top: 14px; margin-bottom: 8px; }
@@ -221,8 +221,8 @@
 
 /* iPhone SE specific */
 .is-iphone-se .banner-slide { height: 115px; }
-.is-iphone-se .logo-title { font-size: 18px; }
-.is-iphone-se .header-inner { height: 44px; }
+.is-iphone-se .logo-title { font-size: 17px; }
+.is-iphone-se .header-inner { height: 36px; }
 .is-iphone-se .section-header { margin-top: 14px; margin-bottom: 8px; }
 .is-iphone-se .win-feed { height: 34px; }
 .is-iphone-se .wf-chip { font-size: 10px; padding: 3px 8px; }
@@ -258,12 +258,11 @@
 }
 .device-desktop .game-card:hover,
 .device-browser .game-card:hover {
-  transform: scale(1.03);
-  box-shadow: 0 8px 32px rgba(0,255,135,0.12);
+  opacity: 0.9;
 }
 .device-desktop .chip:hover,
 .device-browser .chip:hover {
-  background: rgba(255,255,255,0.06);
+  background: rgba(46,16,101,0.08);
 }
 .device-desktop .card-heart:hover,
 .device-browser .card-heart:hover {
