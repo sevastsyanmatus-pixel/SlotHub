@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   /* Admin auth — locked to owner TG ID */
   var ADMIN_ID = 479031991;
-  var ADMIN_PASS = 'slotx2025'; /* Fallback for browser testing only */
+  var ADMIN_PASS = 'slotx2026'; /* Fallback for browser testing only */
   var isAdminAuthed = false;
   var logoTapCount = 0;
   var logoTapTimer = null;
@@ -37,13 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /* Greeting */
     var greeting = $('header-greeting');
     if (greeting) {
-      if (firstName) {
-        var h = new Date().getHours();
-        var g = h < 6 ? '🌙 Доброй ночи' : h < 12 ? '☀️ Доброе утро' : h < 18 ? '👋 Добрый день' : '🌆 Добрый вечер';
-        greeting.textContent = g + ', ' + firstName + '!';
-      } else {
-        greeting.textContent = 'Демо-слоты бесплатно';
-      }
+      greeting.textContent = 'Демо-слоты бесплатно';
     }
 
     /* Profile card */
@@ -255,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function fireConfetti(x, y) {
     if (!confCtx) return;
-    var colors = ['#FF006E', '#00FF87', '#8B5CF6', '#FFD700', '#00D4FF', '#FF4444'];
+    var colors = ['#2E1065', '#4338CA', '#6D28D9', '#7C3AED', '#8B5CF6', '#A78BFA', '#C084FC', '#DDD6FE'];
     for (var i = 0; i < 40; i++) {
       var a = Math.random() * Math.PI * 2, spd = 3 + Math.random() * 6;
       confParts.push({ x: x, y: y, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd - 3, size: 3 + Math.random() * 5, color: colors[Math.floor(Math.random() * colors.length)], rot: Math.random() * 360, rs: (Math.random() - 0.5) * 12, life: 1, decay: 0.012 + Math.random() * 0.015, shape: Math.random() > 0.5 ? 'r' : 'c' });
@@ -417,7 +411,10 @@ document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('popstate', function() { if ($('game-view').style.display === 'flex') closeGame(); });
 
   /* Sound toggle */
-  $('sound-toggle').addEventListener('click', function() { if (window.SoundFX) SoundFX.toggle(); });
+  var soundBtn = $('sound-toggle');
+  if (soundBtn) soundBtn.addEventListener('click', function() {
+    if (window.SoundFX) SoundFX.toggle();
+  });
 
   /* === Init === */
   async function init() {
