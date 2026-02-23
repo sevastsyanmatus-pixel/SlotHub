@@ -1,8 +1,8 @@
 /**
- * TG Core v2.3 — ARTHOLST pattern with 3-level safe area protection
- * Direct _tgWebApp access, anti-swipe, aggressive fullscreen
- * Enhanced device detection for all screen sizes
- * DEBUG: Temporary overlay to diagnose safe area issues
+ * TG Core v2.4 — Full ARTHOLST pattern
+ * All 5 fullscreen protection levels implemented
+ * 3-level safe area protection with fallbacks
+ * Anti-swipe, aggressive retry, device detection
  */
 var TG = (function() {
   'use strict';
@@ -13,7 +13,7 @@ var TG = (function() {
   var mainBtnCb = null;
 
   /* Debug mode — set to true to see safe area overlay */
-  var DEBUG_SAFE_AREA = true;
+  var DEBUG_SAFE_AREA = false;
 
   /* ========================================
      LAZY DETECTION
@@ -116,36 +116,78 @@ var TG = (function() {
   };
 
   /* ========================================
-     ANTI-SWIPE & FULLSCREEN (ARTHOLST)
+     CORE HELPERS — expand + fullscreen + disable swipes
+     ======================================== */
+  function _tgExpand() {
+    try { _tgWebApp.expand(); } catch(e) {}
+    try { if (_tgWebApp.disableVerticalSwipes) _tgWebApp.disableVerticalSwipes(); } catch(e) {}
+  }
+
+  function _tgRequestFullscreen() {
+    try { if (_tgWebApp.requestFullscreen) _tgWebApp.requestFullscreen(); } catch(e) {}
+  }
+
+  function _tgFullAction() {
+    _tgExpand();
+    _tgRequestFullscreen();
+  }
+
+  /* ========================================
+     ANTI-SWIPE & FULLSCREEN (ARTHOLST PATTERN — ALL 5 LEVELS)
      ======================================== */
   function _preventTelegramCollapse(options) {
     if (!_tgWebApp) return;
 
-    /* 1. Expand + disable swipes + fullscreen */
-    try { _tgWebApp.expand(); } catch(e) {}
-    try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
-    try { _tgWebApp.requestFullscreen(); } catch(e) {}
+    /* =============================================
+       LEVEL 1: Immediate calls (tg-core.js load time, ~50-100ms after head inline)
+       ============================================= */
+    _tgFullAction();
 
-    /* 2. CSS classes */
+    /* CSS classes */
     document.documentElement.classList.add('tg-fullscreen');
 
-    /* 3. Viewport height CSS variable */
+    /* Viewport height CSS variable */
     _updateViewportHeight();
 
-    /* 4. Listen viewport changes */
+    /* =============================================
+       LEVEL 2: Delayed requestFullscreen (TG may not be ready immediately)
+       ============================================= */
+    setTimeout(_tgRequestFullscreen, 300);
+    setTimeout(_tgRequestFullscreen, 1000);
+
+    /* =============================================
+       LEVEL 3: viewportChanged — ALWAYS re-expand
+       Telegram can shrink viewport at any time (keyboard, chat switch, etc.)
+       ============================================= */
     try {
-      _tgWebApp.onEvent('viewportChanged', function() {
-        try { _tgWebApp.expand(); } catch(e) {}
-        try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
+      _tgWebApp.onEvent('viewportChanged', function(e) {
+        _tgExpand();
+        /* If viewport is not yet stable — call again */
+        if (e && !e.isStateStable) {
+          _tgExpand();
+        }
+        _tgRequestFullscreen();
+        document.documentElement.classList.add('tg-fullscreen');
         _updateViewportHeight();
         _applyScreenClasses();
+        /* Re-apply safe areas after viewport settles */
+        setTimeout(_applySafeArea, 100);
       });
     } catch(e) {}
 
-    /* 5. Fullscreen change event */
+    /* =============================================
+       LEVEL 4: fullscreenChanged — re-secure when fullscreen toggles
+       ============================================= */
     try {
       _tgWebApp.onEvent('fullscreenChanged', function() {
-        document.documentElement.classList.toggle('tg-fullscreen', !!_tgWebApp.isFullscreen);
+        /* Re-disable swipes (TG may reset them) */
+        try { if (_tgWebApp.disableVerticalSwipes) _tgWebApp.disableVerticalSwipes(); } catch(e) {}
+        document.documentElement.classList.add('tg-fullscreen');
+        /* If exited fullscreen somehow — try to get back */
+        if (!_tgWebApp.isFullscreen) {
+          setTimeout(_tgRequestFullscreen, 100);
+          setTimeout(_tgRequestFullscreen, 500);
+        }
         /* Delay to let TG settle safe areas */
         setTimeout(_applySafeArea, 50);
         setTimeout(_applySafeArea, 200);
@@ -155,13 +197,17 @@ var TG = (function() {
       });
     } catch(e) {}
 
-    /* 6. Safe area change events */
+    /* =============================================
+       LEVEL 5: Safe area change events
+       ============================================= */
     try {
       _tgWebApp.onEvent('safeAreaChanged', function() { _applySafeArea(); });
       _tgWebApp.onEvent('contentSafeAreaChanged', function() { _applySafeArea(); });
     } catch(e) {}
 
-    /* 7. ANTI-SWIPE: Block "pull down to close" gesture */
+    /* =============================================
+       ANTI-SWIPE: Block "pull down to close" gesture
+       ============================================= */
     var startY = 0;
     document.addEventListener('touchstart', function(e) {
       startY = e.touches[0].clientY;
@@ -195,44 +241,49 @@ var TG = (function() {
       }
     }, { passive: false });
 
-    /* 8. Retry expand + fullscreen every 400ms for first 6 seconds */
+    /* =============================================
+       RETRY: expand + fullscreen every 400ms for first 6 seconds (15 times)
+       ============================================= */
     var retryCount = 0;
     var retryInterval = setInterval(function() {
       retryCount++;
-      try { _tgWebApp.expand(); } catch(e) {}
-      try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
-      try { _tgWebApp.requestFullscreen(); } catch(e) {}
+      _tgFullAction();
       _applySafeArea();
       _updateViewportHeight();
       if (retryCount >= 15) clearInterval(retryInterval);
     }, 400);
 
-    /* 9. On visibility change (return to app) */
+    /* =============================================
+       VISIBILITY: Re-expand when returning to app
+       ============================================= */
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
-        try { _tgWebApp.expand(); } catch(e) {}
-        try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
-        try { _tgWebApp.requestFullscreen(); } catch(e) {}
+        _tgFullAction();
         _applySafeArea();
         _updateViewportHeight();
       }
     });
 
-    /* 10. On focus */
+    /* =============================================
+       FOCUS: Re-expand on window focus
+       ============================================= */
     window.addEventListener('focus', function() {
-      try { _tgWebApp.expand(); } catch(e) {}
-      try { _tgWebApp.requestFullscreen(); } catch(e) {}
+      _tgFullAction();
     });
 
-    /* 11. On first touch — some TG versions need gesture for fullscreen */
+    /* =============================================
+       FIRST TOUCH: Some TG versions need gesture for fullscreen
+       ============================================= */
     var _firstTouch = function() {
-      try { _tgWebApp.expand(); } catch(e) {}
-      try { _tgWebApp.requestFullscreen(); } catch(e) {}
+      _tgFullAction();
       document.removeEventListener('touchstart', _firstTouch);
     };
     document.addEventListener('touchstart', _firstTouch, { passive: true });
 
-    /* 12. Apply safe areas immediately + delayed insurance */
+    /* =============================================
+       INSURANCE: Apply safe areas multiple times with delays
+       (Telegram API can be slow to provide correct values)
+       ============================================= */
     _applySafeArea();
     setTimeout(_applySafeArea, 100);
     setTimeout(_applySafeArea, 300);
@@ -333,7 +384,7 @@ var TG = (function() {
       }
 
       /* ============================
-         DEBUG OVERLAY
+         DEBUG OVERLAY (only if enabled)
          ============================ */
       if (DEBUG_SAFE_AREA) {
         _updateDebugOverlay({
