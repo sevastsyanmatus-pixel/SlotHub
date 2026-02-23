@@ -53,13 +53,21 @@ var SoundFX = (function() {
   function updateToggleUI() {
     var btn = document.getElementById('sound-toggle');
     if (!btn) return;
-    var icon = btn.querySelector('i');
+    var icon = btn.querySelector('i.fa-solid');
+    var label = document.getElementById('sound-label');
+    var emoji = btn.querySelector('.text-xl');
     if (enabled) {
       btn.classList.add('active');
-      if (icon) icon.className = 'fa-solid fa-volume-high';
+      if (icon) icon.className = 'fa-solid fa-volume-high flex-shrink-0';
+      if (icon) icon.style.color = '#C084FC';
+      if (label) label.textContent = 'Звук включен';
+      if (emoji) emoji.textContent = '🔊';
     } else {
       btn.classList.remove('active');
-      if (icon) icon.className = 'fa-solid fa-volume-xmark';
+      if (icon) icon.className = 'fa-solid fa-volume-xmark flex-shrink-0';
+      if (icon) icon.style.color = 'var(--text-muted)';
+      if (label) label.textContent = 'Звук выключен';
+      if (emoji) emoji.textContent = '🔇';
     }
   }
 
