@@ -13,7 +13,7 @@ var TG = (function() {
   var mainBtnCb = null;
 
   /* Debug mode — set to true to see safe area overlay */
-  var DEBUG_SAFE_AREA = false;
+  var DEBUG_SAFE_AREA = true;
 
   /* ========================================
      LAZY DETECTION
