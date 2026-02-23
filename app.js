@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
     currentGameObj = game;
 
     $('app').style.display = 'none';
-    $('game-view').style.display = 'flex';
+    $('game-view').style.display = 'block';
     $('game-loader').style.display = 'flex';
     $('game-fallback-btn').style.display = 'none';
     $('game-loading-text').textContent = 'Загрузка ' + game.name + '...';
@@ -180,6 +180,9 @@ document.addEventListener('DOMContentLoaded', function() {
     playSound('close-game');
     $('game-iframe').src = '';
     $('game-iframe').onload = null;
+    $('game-view').classList.remove('game-fs');
+    /* Exit TG fullscreen if active */
+    try { if (window.Telegram && Telegram.WebApp.exitFullscreen) Telegram.WebApp.exitFullscreen(); } catch(e) {}
     if (gameLoadTimeout) { clearTimeout(gameLoadTimeout); gameLoadTimeout = null; }
 
     $('game-view').style.display = 'none';
@@ -381,8 +384,39 @@ document.addEventListener('DOMContentLoaded', function() {
   $('game-landscape-back').addEventListener('click', closeGame);
   $('game-fallback-btn').addEventListener('click', function() { if (currentGameUrl) TG.openLink(currentGameUrl); });
   $('game-fullscreen-btn').addEventListener('click', function() {
-    var iframe = $('game-iframe');
-    try { if (iframe.requestFullscreen) iframe.requestFullscreen(); else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen(); } catch (e) {}
+    var gv = $('game-view');
+    var isFs = gv.classList.contains('game-fs');
+    gv.classList.toggle('game-fs');
+    if (!isFs) { try { if (window.Telegram && Telegram.WebApp.requestFullscreen) Telegram.WebApp.requestFullscreen(); } catch(e) {} }
+    try {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        if (gv.requestFullscreen) gv.requestFullscreen().catch(function(){});
+        else if (gv.webkitRequestFullscreen) gv.webkitRequestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen().catch(function(){});
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      }
+    } catch (e) {}
+  });
+
+  var fsRestore = $('game-fs-restore');
+  if (fsRestore) {
+    fsRestore.addEventListener('click', function() {
+      $('game-view').classList.remove('game-fs');
+      try {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) document.exitFullscreen().catch(function(){});
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        }
+      } catch(e) {}
+    });
+  }
+
+  document.addEventListener('fullscreenchange', function() {
+    if (!document.fullscreenElement) $('game-view').classList.remove('game-fs');
+  });
+  document.addEventListener('webkitfullscreenchange', function() {
+    if (!document.webkitFullscreenElement) $('game-view').classList.remove('game-fs');
   });
 
   /* Real play link — intercept for TG */
