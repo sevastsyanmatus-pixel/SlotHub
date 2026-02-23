@@ -61,9 +61,10 @@ body {
 
 /* === INTERACTIVE === */
 .interactive {
-  transition: transform 0.25s var(--ease-spring), opacity 0.15s ease;
+  transition: transform 0.15s var(--ease-spring), opacity 0.1s ease;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 .interactive:active { transform: scale(0.95); }
 
@@ -97,7 +98,7 @@ body {
 
 /* === BG ORBS === */
 #bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.35; will-change: transform; }
+.orb { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.2; will-change: transform; }
 .orb-1 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(139,92,246,0.4), transparent 70%); top: -15%; right: -10%; animation: of1 22s ease-in-out infinite; }
 .orb-2 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,0,110,0.3), transparent 70%); bottom: 5%; left: -12%; animation: of2 28s ease-in-out infinite; }
 .orb-3 { width: 250px; height: 250px; background: radial-gradient(circle, rgba(0,212,255,0.25), transparent 70%); top: 35%; right: -15%; animation: of3 20s ease-in-out infinite; }
@@ -194,8 +195,8 @@ body {
   position: sticky; top: 0; z-index: 30;
   padding: calc(var(--top-offset, 0px) + 12px) 20px 0;
   background: rgba(6,8,13,0.85);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255,255,255,0.04);
   flex-shrink: 0;
 }
@@ -257,20 +258,19 @@ body {
 #bottom-nav {
   display: flex; align-items: center; justify-content: space-around;
   padding: 4px 8px; margin-bottom: 4px;
-  background: rgba(12,16,23,0.88);
-  backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%);
+  background: rgba(12,16,23,0.95);
   border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-xl);
   box-shadow: 0 -4px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
 }
-.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 16px; border-radius: 16px; color: var(--text-muted); position: relative; border: none; background: transparent; transition: all 0.4s var(--ease-out-expo); min-height: 44px; min-width: 44px; }
+.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 16px; border-radius: 16px; color: var(--text-muted); position: relative; border: none; background: transparent; transition: color 0.2s ease; min-height: 44px; min-width: 44px; touch-action: manipulation; }
 .nav-icon-wrap { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-.nav-icon-wrap i { font-size: 16px; position: relative; z-index: 2; transition: transform 0.4s var(--ease-spring), color 0.3s ease, filter 0.3s ease; }
-.nav-active-bg { position: absolute; inset: -7px -14px; border-radius: 14px; background: rgba(0,255,135,0.1); opacity: 0; transform: scale(0.4); transition: all 0.4s var(--ease-spring); }
+.nav-icon-wrap i { font-size: 16px; position: relative; z-index: 2; transition: color 0.15s ease; }
+.nav-active-bg { position: absolute; inset: -7px -14px; border-radius: 14px; background: rgba(0,255,135,0.1); opacity: 0; transition: opacity 0.15s ease; }
 .nav-neon { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); width: 32px; height: 8px; border-radius: 50%; background: var(--accent-green); filter: blur(10px); opacity: 0; transition: opacity 0.4s ease; }
 .nav-label { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; transition: color 0.3s ease; }
 .nav-btn.active { color: var(--accent-green); }
-.nav-btn.active .nav-icon-wrap i { transform: scale(1.15) translateY(-2px); color: var(--accent-green); filter: drop-shadow(0 0 14px rgba(0,255,135,0.7)); }
-.nav-btn.active .nav-active-bg { opacity: 1; transform: scale(1); }
+.nav-btn.active .nav-icon-wrap i { color: var(--accent-green); filter: drop-shadow(0 0 10px rgba(0,255,135,0.5)); }
+.nav-btn.active .nav-active-bg { opacity: 1; }
 .nav-btn.active .nav-neon { opacity: 1; }
 .nav-btn.active .nav-label { color: var(--accent-green); font-weight: 800; text-shadow: 0 0 12px rgba(0,255,135,0.5); }
 .badge-pulse { width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, #EF4444, #FF006E); color: #fff; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; position: absolute; top: -7px; right: -11px; z-index: 5; animation: pbadge 2s infinite; box-shadow: 0 0 0 2px rgba(12,16,23,0.9); }
