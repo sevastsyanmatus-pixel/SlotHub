@@ -4,10 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>SlotX — Демо Казино</title>
+
+  <!-- Early Telegram detection (ARTHOLST pattern — prevents FOUC) -->
+  <script>
+  (function() {
+    var tg = null;
+    try { tg = window.Telegram && window.Telegram.WebApp; } catch(e) {}
+    if (tg) {
+      document.documentElement.classList.add('tg-app', 'tg-fullscreen');
+      try { tg.ready(); } catch(e) {}
+      try { tg.expand(); } catch(e) {}
+      try { if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } catch(e) {}
+      try { if (tg.requestFullscreen) tg.requestFullscreen(); } catch(e) {}
+      try { if (tg.setHeaderColor) tg.setHeaderColor('#06080D'); } catch(e) {}
+      try { if (tg.setBackgroundColor) tg.setBackgroundColor('#06080D'); } catch(e) {}
+      try { if (tg.setBottomBarColor) tg.setBottomBarColor('#06080D'); } catch(e) {}
+    }
+  })();
+  </script>
+
+  <!-- Global Error Handler (ARTHOLST pattern — one error won't break the app) -->
+  <script>
+  window.onerror = function(msg, url, line, col, err) {
+    console.error('[SlotX Error]', msg, 'at', url, ':', line);
+    return false;
+  };
+  window.addEventListener('unhandledrejection', function(e) {
+    console.error('[SlotX Promise Error]', e.reason);
+  });
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="tg-core.css">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="responsive.css">
 </head>
 <body class="safe-top safe-bottom">
 
@@ -366,7 +397,17 @@
 </div>
 
 <!-- SCRIPTS -->
-<script src="https://miniapps.ai/sdk/miniapps-ai-v1.js"></script>
+<!-- Conditional SDK loading (ARTHOLST pattern) -->
+<script>
+(function() {
+  /* miniapps SDK — load only when on miniapps.ai */
+  if (location.hostname.indexOf('miniapps.ai') !== -1) {
+    var s = document.createElement('script');
+    s.src = 'https://miniapps.ai/sdk/miniapps-ai-v1.js';
+    document.head.appendChild(s);
+  }
+})();
+</script>
 <script src="tg-core.js"></script>
 <script>TG.init({ headerColor: '#06080D', bgColor: '#06080D', bottomColor: '#06080D', fullscreen: true, closingConfirmation: true, disableSwipeClose: true });</script>
 <script src="sounds.js"></script>
@@ -374,5 +415,16 @@
 <script src="app.js"></script>
 <script src="ui.js"></script>
 <script src="admin.js"></script>
+
+<!-- Fallback: hide splash if something breaks (ARTHOLST pattern) -->
+<script>
+setTimeout(function() {
+  var s = document.getElementById('splash-screen');
+  if (s && !s.classList.contains('hide')) {
+    s.classList.add('hide');
+    setTimeout(function() { s.style.display = 'none'; }, 700);
+  }
+}, 5000);
+</script>
 </body>
 </html>
