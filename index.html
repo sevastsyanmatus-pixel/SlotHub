@@ -19,6 +19,36 @@
       try { if (tg.setHeaderColor) tg.setHeaderColor('#06080D'); } catch(e) {}
       try { if (tg.setBackgroundColor) tg.setBackgroundColor('#06080D'); } catch(e) {}
       try { if (tg.setBottomBarColor) tg.setBottomBarColor('#06080D'); } catch(e) {}
+
+      /* ARTHOLST CRITICAL: Set --top-offset BEFORE any CSS renders.
+         This prevents the header from flashing under TG buttons. */
+      try {
+        var root = document.documentElement;
+        var sa = tg.safeAreaInset || {};
+        var csa = tg.contentSafeAreaInset || {};
+        var deviceTop = sa.top || 0;
+        var contentTop = csa.top || 0;
+        var finalTop;
+
+        if (contentTop > 0) {
+          /* API already has content safe area data — best case */
+          finalTop = contentTop;
+        } else if (deviceTop > 0) {
+          /* Has device notch data but no content data yet */
+          finalTop = Math.max(deviceTop + 12, 44);
+        } else {
+          /* No API data yet — use safe platform defaults */
+          finalTop = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 56 : 48;
+        }
+
+        root.style.setProperty('--top-offset', finalTop + 'px');
+        root.style.setProperty('--tg-content-safe-top', finalTop + 'px');
+        root.style.setProperty('--tg-safe-bottom', (sa.bottom || 0) + 'px');
+        root.style.setProperty('--tg-viewport-height', (tg.viewportHeight || window.innerHeight) + 'px');
+      } catch(e) {
+        /* Ultimate fallback — 54px is safe for most devices */
+        document.documentElement.style.setProperty('--top-offset', '54px');
+      }
     }
   })();
   </script>
