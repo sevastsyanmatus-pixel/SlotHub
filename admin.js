@@ -46,6 +46,7 @@
 
     if (tab === 'games') renderAdminGames();
     else if (tab === 'casinos') renderAdminCasinos();
+    else if (tab === 'stats') renderAdminStats();
     else if (tab === 'settings') renderAdminSettings();
     else if (tab === 'data') renderAdminData();
   }
@@ -274,6 +275,111 @@
     else DataStore.addCasino(data);
     elFormOverlay.classList.remove('open');
     renderAdminCasinos();
+  }
+
+  /* ============================================
+     ADMIN STATS
+     ============================================ */
+  function renderAdminStats() {
+    elAdminFab.style.display = 'none';
+    var act = DataStore.getActivity();
+    var games = DataStore.getActiveGames();
+    var casinos = DataStore.getActiveCasinos();
+    var favs = DataStore.getFavoriteGames();
+    var html = '';
+
+    /* User info from TG */
+    html += '<div class="glass p-4 rounded-xl mb-4">';
+    html += '<p style="font-weight:700;font-size:12px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDC64 Текущий пользователь</p>';
+    var userName = (window.TG && TG.userName) ? TG.userName : 'Гость';
+    var userId = (window.TG && TG.userId) ? String(TG.userId) : '—';
+    var userUsername = (window.TG && TG.userUsername) ? '@' + TG.userUsername : '—';
+    var userLang = (window.TG && TG.userLang) ? TG.userLang : '—';
+    var platform = (window.TG) ? TG.platform : 'browser';
+    var isPremium = (window.TG && TG.isPremium) ? '⭐ Да' : 'Нет';
+    html += infoRow('Имя', esc(userName));
+    html += infoRow('Username', esc(userUsername));
+    html += infoRow('ID', userId);
+    html += infoRow('Платформа', platform);
+    html += infoRow('Язык', userLang);
+    html += infoRow('Premium', isPremium);
+    html += '</div>';
+
+    /* Activity overview */
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">';
+    html += statCard('\uD83C\uDFAE', act.totalPlays || 0, 'Запусков игр');
+    html += statCard('\uD83D\uDCCA', act.sessions || 0, 'Сессий');
+    html += statCard('❤️', favs.length, 'В избранном');
+    html += statCard('\uD83D\uDD17', act.affiliateClicks || 0, 'Переходов');
+    html += '</div>';
+
+    /* Dates */
+    html += '<div class="glass p-4 rounded-xl mb-4">';
+    html += '<p style="font-weight:700;font-size:12px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDCC5 Даты визитов</p>';
+    html += infoRow('Первый визит', act.firstVisit ? formatDate(act.firstVisit) : '—');
+    html += infoRow('Последний визит', act.lastVisit ? formatDate(act.lastVisit) : '—');
+    html += '</div>';
+
+    /* Top played games */
+    var launches = act.gameLaunches || {};
+    var topGames = Object.keys(launches).map(function(id) {
+      return { id: id, count: launches[id] };
+    }).sort(function(a, b) { return b.count - a.count; }).slice(0, 10);
+
+    if (topGames.length > 0) {
+      html += '<div class="glass p-4 rounded-xl mb-4">';
+      html += '<p style="font-weight:700;font-size:12px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83C\uDFC6 Топ играемых</p>';
+      for (var i = 0; i < topGames.length; i++) {
+        var g = DataStore.getGameById(topGames[i].id);
+        var gName = g ? g.name : topGames[i].id;
+        var gIcon = g ? (g.icon || '\uD83C\uDFB0') : '\uD83C\uDFB0';
+        html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;' + (i < topGames.length - 1 ? 'border-bottom:1px solid var(--border-subtle);' : '') + '">';
+        html += '<span style="font-size:10px;font-weight:800;color:var(--text-muted);width:20px;">#' + (i+1) + '</span>';
+        html += '<span style="font-size:18px;">' + gIcon + '</span>';
+        html += '<span style="flex:1;font-size:13px;font-weight:600;color:var(--text-primary);">' + esc(gName) + '</span>';
+        html += '<span style="font-size:12px;font-weight:800;color:var(--accent-green);">' + topGames[i].count + 'x</span>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    /* App content summary */
+    html += '<div class="glass p-4 rounded-xl mb-4">';
+    html += '<p style="font-weight:700;font-size:12px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDCE6 Контент приложения</p>';
+    html += infoRow('Всего игр', String(DataStore.games.length));
+    html += infoRow('Активных игр', String(games.length));
+    html += infoRow('Предложений казино', String(casinos.length));
+    var cur = DataStore.getCurrency();
+    html += infoRow('Текущая валюта', cur.code + ' ' + cur.flag);
+    html += '</div>';
+
+    /* Note */
+    html += '<div style="padding:14px;border-radius:var(--radius-md);background:rgba(255,165,0,0.06);border:1px solid rgba(255,165,0,0.12);margin-bottom:16px;">';
+    html += '<p style="font-size:12px;color:#FFA500;font-weight:700;margin-bottom:6px;">\uD83D\uDCA1 Совет</p>';
+    html += '<p style="font-size:11px;color:var(--text-muted);line-height:1.5;">Это локальная статистика текущего пользователя. Для сбора аналитики со всех пользователей подключите бэкенд (Firebase, Supabase или свой API) через бота.</p>';
+    html += '</div>';
+
+    elAdminContent.innerHTML = html;
+  }
+
+  function infoRow(label, value) {
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.03);">' +
+      '<span style="font-size:12px;color:var(--text-muted);font-weight:500;">' + label + '</span>' +
+      '<span style="font-size:12px;color:var(--text-primary);font-weight:700;">' + value + '</span></div>';
+  }
+
+  function statCard(icon, value, label) {
+    return '<div style="background:rgba(255,255,255,0.025);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:16px;text-align:center;">' +
+      '<div style="font-size:24px;margin-bottom:6px;">' + icon + '</div>' +
+      '<div style="font-size:22px;font-weight:900;color:var(--text-primary);">' + value + '</div>' +
+      '<div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-weight:600;">' + label + '</div></div>';
+  }
+
+  function formatDate(isoStr) {
+    try {
+      var d = new Date(isoStr);
+      return d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    } catch(e) { return isoStr; }
   }
 
   /* ============================================
