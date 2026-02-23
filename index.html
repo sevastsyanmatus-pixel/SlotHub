@@ -20,8 +20,7 @@
       try { if (tg.setBackgroundColor) tg.setBackgroundColor('#06080D'); } catch(e) {}
       try { if (tg.setBottomBarColor) tg.setBottomBarColor('#06080D'); } catch(e) {}
 
-      /* ARTHOLST CRITICAL: Set --top-offset BEFORE any CSS renders.
-         This prevents the header from flashing under TG buttons. */
+      /* ARTHOLST CRITICAL: Set --top-offset BEFORE any CSS renders. */
       try {
         var root = document.documentElement;
         var sa = tg.safeAreaInset || {};
@@ -31,13 +30,10 @@
         var finalTop;
 
         if (contentTop > 0) {
-          /* API already has content safe area data — best case */
           finalTop = contentTop;
         } else if (deviceTop > 0) {
-          /* Has device notch data but no content data yet */
           finalTop = Math.max(deviceTop + 12, 44);
         } else {
-          /* No API data yet — use safe platform defaults */
           finalTop = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 56 : 48;
         }
 
@@ -46,14 +42,28 @@
         root.style.setProperty('--tg-safe-bottom', (sa.bottom || 0) + 'px');
         root.style.setProperty('--tg-viewport-height', (tg.viewportHeight || window.innerHeight) + 'px');
       } catch(e) {
-        /* Ultimate fallback — 54px is safe for most devices */
         document.documentElement.style.setProperty('--top-offset', '54px');
       }
+
+      /* DEBUG: Write diagnostic info to a global so we can show it */
+      window.__TG_EARLY_DEBUG = {
+        platform: tg.platform || '?',
+        version: tg.version || '?',
+        saTop: (tg.safeAreaInset || {}).top || 0,
+        csaTop: (tg.contentSafeAreaInset || {}).top || 0,
+        finalTop: document.documentElement.style.getPropertyValue('--top-offset'),
+        viewportH: tg.viewportHeight || 0,
+        isFullscreen: !!tg.isFullscreen,
+        innerH: window.innerHeight,
+        ts: Date.now()
+      };
+    } else {
+      window.__TG_EARLY_DEBUG = { platform: 'browser', note: 'No TG WebApp detected' };
     }
   })();
   </script>
 
-  <!-- Global Error Handler (ARTHOLST pattern — one error won't break the app) -->
+  <!-- Global Error Handler -->
   <script>
   window.onerror = function(msg, url, line, col, err) {
     console.error('[SlotX Error]', msg, 'at', url, ':', line);
@@ -69,6 +79,21 @@
   <link rel="stylesheet" href="tg-core.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="responsive.css">
+
+  <!-- INLINE CRITICAL FIX: Ensure bottom nav is always visible -->
+  <style>
+    #bottom-nav-wrap {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      position: relative !important;
+      z-index: 40 !important;
+    }
+    #bottom-nav {
+      display: flex !important;
+      visibility: visible !important;
+    }
+  </style>
 </head>
 <body>
 
@@ -393,6 +418,11 @@
   <span class="text-sm flex-1 text-white" id="toast-text"></span>
 </div>
 
+<!-- DEBUG PANEL — built directly in HTML so it ALWAYS shows -->
+<div id="slotx-debug" style="position:fixed;bottom:90px;left:8px;z-index:99999;background:rgba(0,0,0,0.92);color:#0f0;font-size:10px;font-family:monospace;padding:10px 12px;border-radius:10px;border:2px solid #0f0;line-height:1.6;pointer-events:none;max-width:280px;word-break:break-all;display:none;">
+  Loading debug...
+</div>
+
 <!-- ADMIN -->
 <div id="admin-panel">
   <div class="admin-header">
@@ -427,10 +457,9 @@
 </div>
 
 <!-- SCRIPTS -->
-<!-- Conditional SDK loading (ARTHOLST pattern) -->
+<!-- Conditional SDK loading -->
 <script>
 (function() {
-  /* miniapps SDK — load only when on miniapps.ai */
   if (location.hostname.indexOf('miniapps.ai') !== -1) {
     var s = document.createElement('script');
     s.src = 'https://miniapps.ai/sdk/miniapps-ai-v1.js';
@@ -446,7 +475,64 @@
 <script src="ui.js"></script>
 <script src="admin.js"></script>
 
-<!-- Fallback: hide splash if something breaks (ARTHOLST pattern) -->
+<!-- DEBUG: Show diagnostic info (ALWAYS runs, no dependency on tg-core.js) -->
+<script>
+(function() {
+  var dbg = document.getElementById('slotx-debug');
+  if (!dbg) return;
+
+  function update() {
+    var tg = null;
+    try { tg = window.Telegram && Telegram.WebApp; } catch(e) {}
+
+    var lines = [];
+    lines.push('<b style="color:#ff0;">SlotX Debug v3</b>');
+
+    if (tg) {
+      var sa = tg.safeAreaInset || {};
+      var csa = tg.contentSafeAreaInset || {};
+      lines.push('platform: <b>' + (tg.platform || '?') + '</b> v' + (tg.version || '?'));
+      lines.push('fullscreen: <b style="color:' + (tg.isFullscreen ? '#0f0' : '#f00') + '">' + !!tg.isFullscreen + '</b>');
+      lines.push('sa.top: <b>' + (sa.top || 0) + 'px</b> bot: <b>' + (sa.bottom || 0) + 'px</b>');
+      lines.push('csa.top: <b>' + (csa.top || 0) + 'px</b>');
+      lines.push('--top-offset: <b style="color:#ff0;">' + getComputedStyle(document.documentElement).getPropertyValue('--top-offset') + '</b>');
+      lines.push('viewport: ' + (tg.viewportHeight || '?') + ' / stable: ' + (tg.viewportStableHeight || '?'));
+      lines.push('innerH: ' + window.innerHeight);
+      lines.push('body.is-telegram: ' + document.body.classList.contains('is-telegram'));
+    } else {
+      lines.push('TG: <b style="color:#f00">NOT AVAILABLE</b>');
+      lines.push('innerH: ' + window.innerHeight);
+    }
+
+    /* Check early debug */
+    if (window.__TG_EARLY_DEBUG) {
+      var ed = window.__TG_EARLY_DEBUG;
+      lines.push('---early---');
+      lines.push('earlyTop: ' + ed.finalTop);
+      lines.push('earlySaTop: ' + ed.saTop + ' csaTop: ' + ed.csaTop);
+    }
+
+    /* Bottom nav check */
+    var nav = document.getElementById('bottom-nav-wrap');
+    if (nav) {
+      var cs = getComputedStyle(nav);
+      lines.push('---nav---');
+      lines.push('nav display: ' + cs.display);
+      lines.push('nav visible: ' + cs.visibility);
+      lines.push('nav h: ' + nav.offsetHeight + 'px');
+    }
+
+    dbg.innerHTML = lines.join('<br>');
+    dbg.style.display = 'block';
+  }
+
+  /* Update immediately and every 2 seconds */
+  update();
+  setInterval(update, 2000);
+})();
+</script>
+
+<!-- Fallback: hide splash if something breaks -->
 <script>
 setTimeout(function() {
   var s = document.getElementById('splash-screen');
