@@ -193,7 +193,7 @@ body {
 #main-header {
   position: sticky; top: 0; z-index: 30;
   padding: 12px 20px 0;
-  padding-top: calc(var(--top-offset) + 12px);
+  padding-top: calc(max(env(safe-area-inset-top, 0px), var(--top-offset, 0px)) + 14px);
   background: rgba(6,8,13,0.85);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
@@ -257,20 +257,20 @@ body {
 #bottom-nav-wrap::before { content: ''; position: absolute; top: -60px; left: 0; right: 0; height: 60px; background: linear-gradient(to top, var(--bg-primary), transparent); pointer-events: none; z-index: -1; }
 #bottom-nav {
   display: flex; align-items: center; justify-content: space-around;
-  padding: 6px 10px; margin-bottom: 6px;
+  padding: 4px 8px; margin-bottom: 4px;
   background: rgba(12,16,23,0.88);
   backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%);
-  border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-2xl);
+  border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-xl);
   box-shadow: 0 -4px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
 }
-.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 18px; border-radius: 18px; color: var(--text-muted); position: relative; border: none; background: transparent; transition: all 0.4s var(--ease-out-expo); min-height: 44px; min-width: 44px; }
+.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 16px; border-radius: 16px; color: var(--text-muted); position: relative; border: none; background: transparent; transition: all 0.4s var(--ease-out-expo); min-height: 44px; min-width: 44px; }
 .nav-icon-wrap { position: relative; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-.nav-icon-wrap i { font-size: 18px; position: relative; z-index: 2; transition: transform 0.4s var(--ease-spring), color 0.3s ease, filter 0.3s ease; }
+.nav-icon-wrap i { font-size: 16px; position: relative; z-index: 2; transition: transform 0.4s var(--ease-spring), color 0.3s ease, filter 0.3s ease; }
 .nav-active-bg { position: absolute; inset: -7px -14px; border-radius: 14px; background: rgba(0,255,135,0.1); opacity: 0; transform: scale(0.4); transition: all 0.4s var(--ease-spring); }
 .nav-neon { position: absolute; bottom: -14px; left: 50%; transform: translateX(-50%); width: 32px; height: 8px; border-radius: 50%; background: var(--accent-green); filter: blur(10px); opacity: 0; transition: opacity 0.4s ease; }
-.nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; transition: color 0.3s ease; }
+.nav-label { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; transition: color 0.3s ease; }
 .nav-btn.active { color: var(--accent-green); }
-.nav-btn.active .nav-icon-wrap i { transform: scale(1.25) translateY(-3px); color: var(--accent-green); filter: drop-shadow(0 0 14px rgba(0,255,135,0.7)); }
+.nav-btn.active .nav-icon-wrap i { transform: scale(1.15) translateY(-2px); color: var(--accent-green); filter: drop-shadow(0 0 14px rgba(0,255,135,0.7)); }
 .nav-btn.active .nav-active-bg { opacity: 1; transform: scale(1); }
 .nav-btn.active .nav-neon { opacity: 1; }
 .nav-btn.active .nav-label { color: var(--accent-green); font-weight: 800; text-shadow: 0 0 12px rgba(0,255,135,0.5); }
@@ -399,21 +399,21 @@ body {
 /* === NOTIFICATION === */
 .notification-popup {
   position: fixed; top: 0; left: 0; right: 0; z-index: 150;
-  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-  margin: 20px 14px 10px; margin-top: calc(var(--top-offset) + 20px);
-  background: rgba(12,16,28,0.7); backdrop-filter: blur(28px) saturate(200%); -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  margin: 10px; margin-top: calc(var(--top-offset) + 10px);
+  background: rgba(12,16,28,0.85); backdrop-filter: blur(28px) saturate(200%); -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   transform: translateY(-150%); opacity: 0; visibility: hidden; pointer-events: none;
   transition: transform 0.5s var(--ease-spring), opacity 0.4s ease, visibility 0s 0.5s;
   cursor: pointer; overflow: hidden;
 }
 .notification-popup.show { transform: translateY(0); opacity: 1; visibility: visible; pointer-events: auto; transition: transform 0.5s var(--ease-spring), opacity 0.4s ease, visibility 0s 0s; }
-.notif-icon { font-size: 22px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.04); }
+.notif-icon { font-size: 16px; flex-shrink: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.04); }
 .notif-body { flex: 1; min-width: 0; }
-.notif-title { font-size: 13px; font-weight: 800; color: #fff; }
-.notif-text { font-size: 11px; color: var(--text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-.notif-close-btn { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.06); border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.notif-title { font-size: 12px; font-weight: 800; color: #fff; }
+.notif-text { font-size: 10px; color: var(--text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+.notif-close-btn { width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.06); border: none; color: var(--text-muted); font-size: 12px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 
 /* === PROFILE === */
 .profile-card { display: flex; align-items: center; gap: 16px; padding: 20px; border-radius: var(--radius-xl); background: linear-gradient(135deg, rgba(0,255,135,0.04), rgba(0,212,255,0.06), rgba(139,92,246,0.04)); border: 1px solid rgba(255,255,255,0.06); position: relative; overflow: hidden; }
@@ -500,14 +500,14 @@ body {
 /* ============================================
    TELEGRAM MINI APP ADAPTATION
    ============================================ */
-html.tg-app { --top-offset: calc(var(--tg-safe-top, 0px) + var(--tg-content-safe-top, 0px)); }
+html.tg-app { --top-offset: max(calc(var(--tg-safe-top, 0px) + var(--tg-content-safe-top, 0px)), env(safe-area-inset-top, 0px), 20px); }
 
 /* Fullscreen TG — guarantee minimum top offset so TG buttons don't overlap */
 html.tg-app.tg-fullscreen {
-  --top-offset: max(calc(var(--tg-safe-top, 0px) + var(--tg-content-safe-top, 0px)), 56px);
+  --top-offset: max(calc(var(--tg-safe-top, 0px) + var(--tg-content-safe-top, 0px)), calc(env(safe-area-inset-top, 0px) + 44px), 72px);
 }
 html.tg-app.tg-fullscreen #main-header {
-  padding-top: calc(var(--top-offset) + 16px);
+  padding-top: calc(var(--top-offset) + 22px);
 }
 html.tg-app.tg-fullscreen #main-header .header-inner {
   height: 62px;
@@ -516,7 +516,7 @@ html.tg-app.tg-fullscreen .logo-title {
   font-size: 26px;
 }
 html.tg-app.tg-fullscreen .notification-popup {
-  margin-top: calc(var(--top-offset) + 24px);
+  margin-top: calc(var(--top-offset) + 10px);
 }
 html.tg-app body { height: var(--tg-viewport-stable-height, 100dvh) !important; touch-action: manipulation; }
 html.tg-app #content-area { overscroll-behavior-y: contain !important; }
