@@ -29,7 +29,6 @@
   --radius-full: 9999px;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --top-offset: 0px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -193,7 +192,7 @@ body {
 /* === HEADER === */
 #main-header {
   position: sticky; top: 0; z-index: 30;
-  padding: 12px 20px 0;
+  padding: calc(var(--top-offset, 0px) + 12px) 20px 0;
   background: rgba(6,8,13,0.85);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
@@ -510,10 +509,7 @@ body {
 .is-telegram { height: var(--tg-viewport-height, 100dvh) !important; }
 body.is-telegram { overflow: hidden; }
 
-/* Header offset — uses --top-offset set by tg-core.js */
-.is-telegram #main-header {
-  padding-top: calc(var(--top-offset, 0px) + 12px);
-}
+/* Header offset — baked into base rule via var(--top-offset), no .is-telegram dependency */
 
 /* Notification below header */
 .is-telegram .notification-popup {
