@@ -44,11 +44,11 @@
         var finalTop;
 
         if (contentTop > 0) {
-          finalTop = contentTop;
+          finalTop = Math.max(contentTop + 20, deviceTop + 24, 64);
         } else if (deviceTop > 0) {
-          finalTop = Math.max(deviceTop + 12, 44);
+          finalTop = Math.max(deviceTop + 24, 64);
         } else {
-          finalTop = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 56 : 48;
+          finalTop = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 64 : 56;
         }
 
         root.style.setProperty('--top-offset', finalTop + 'px');
@@ -324,7 +324,7 @@
 
   <!-- BOTTOM NAV -->
   <nav id="bottom-nav-wrap">
-    <div id="bottom-nav">
+    <div id="bottom-nav" style="touch-action:manipulation;">
       <button class="nav-btn active" data-tab="home">
         <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i><div class="nav-active-bg"></div><div class="nav-neon"></div></div>
         <span class="nav-label">Главная</span>
@@ -433,7 +433,7 @@
 </div>
 
 <!-- DEBUG PANEL — built directly in HTML so it ALWAYS shows -->
-<div id="slotx-debug" style="position:fixed;bottom:90px;left:8px;z-index:99999;background:rgba(0,0,0,0.92);color:#0f0;font-size:10px;font-family:monospace;padding:10px 12px;border-radius:10px;border:2px solid #0f0;line-height:1.6;pointer-events:none;max-width:280px;word-break:break-all;display:none;">
+<div id="slotx-debug" style="display:none !important;">
   Loading debug...
 </div>
 
@@ -489,62 +489,7 @@
 <script src="ui.js"></script>
 <script src="admin.js"></script>
 
-<!-- DEBUG: Show diagnostic info (ALWAYS runs, no dependency on tg-core.js) -->
-<script>
-(function() {
-  var dbg = document.getElementById('slotx-debug');
-  if (!dbg) return;
-
-  function update() {
-    var tg = null;
-    try { tg = window.Telegram && Telegram.WebApp; } catch(e) {}
-
-    var lines = [];
-    lines.push('<b style="color:#ff0;">SlotX Debug v5</b>');
-
-    if (tg) {
-      var sa = tg.safeAreaInset || {};
-      var csa = tg.contentSafeAreaInset || {};
-      lines.push('platform: <b>' + (tg.platform || '?') + '</b> v' + (tg.version || '?'));
-      lines.push('fullscreen: <b style="color:' + (tg.isFullscreen ? '#0f0' : '#f00') + '">' + !!tg.isFullscreen + '</b>');
-      lines.push('sa.top: <b>' + (sa.top || 0) + 'px</b> bot: <b>' + (sa.bottom || 0) + 'px</b>');
-      lines.push('csa.top: <b>' + (csa.top || 0) + 'px</b>');
-      lines.push('--top-offset: <b style="color:#ff0;">' + getComputedStyle(document.documentElement).getPropertyValue('--top-offset') + '</b>');
-      lines.push('viewport: ' + (tg.viewportHeight || '?') + ' / stable: ' + (tg.viewportStableHeight || '?'));
-      lines.push('innerH: ' + window.innerHeight);
-      lines.push('body.is-telegram: ' + document.body.classList.contains('is-telegram'));
-    } else {
-      lines.push('TG: <b style="color:#f00">NOT AVAILABLE</b>');
-      lines.push('innerH: ' + window.innerHeight);
-    }
-
-    /* Check early debug */
-    if (window.__TG_EARLY_DEBUG) {
-      var ed = window.__TG_EARLY_DEBUG;
-      lines.push('---early---');
-      lines.push('earlyTop: ' + ed.finalTop);
-      lines.push('earlySaTop: ' + ed.saTop + ' csaTop: ' + ed.csaTop);
-    }
-
-    /* Bottom nav check */
-    var nav = document.getElementById('bottom-nav-wrap');
-    if (nav) {
-      var cs = getComputedStyle(nav);
-      lines.push('---nav---');
-      lines.push('nav display: ' + cs.display);
-      lines.push('nav visible: ' + cs.visibility);
-      lines.push('nav h: ' + nav.offsetHeight + 'px');
-    }
-
-    dbg.innerHTML = lines.join('<br>');
-    dbg.style.display = 'block';
-  }
-
-  /* Update immediately and every 2 seconds */
-  update();
-  setInterval(update, 2000);
-})();
-</script>
+<!-- Debug panel removed for production -->
 
 <!-- Fallback: hide splash if something breaks -->
 <script>
