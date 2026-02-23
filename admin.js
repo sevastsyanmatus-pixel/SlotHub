@@ -224,7 +224,7 @@
     var html = '';
 
     /* Section: basic info */
-    html += '<p style="font-size:12px;font-weight:700;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">📋 Основная информация</p>';
+    html += '<p style="font-size:12px;font-weight:700;color:#A78BFA;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">📋 Основная информация</p>';
     html += formGroup('Название казино', '<input class="form-input" id="af-cname" value="' + esc(c.name || '') + '" placeholder="1win Casino">');
     html += formGroup('Реферальная ссылка', '<input class="form-input" id="af-curl" value="' + esc(c.url || '') + '" placeholder="https://...">');
     html += formGroup('Логотип', buildImageUploader('af-clogo', c.logo || ''));
@@ -234,12 +234,12 @@
 
     /* Section: banner appearance */
     html += '<div style="height:1px;background:var(--border-subtle);margin:20px 0;"></div>';
-    html += '<p style="font-size:12px;font-weight:700;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">🖼️ Баннер на главной</p>';
+    html += '<p style="font-size:12px;font-weight:700;color:#A78BFA;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">🖼️ Баннер на главной</p>';
     html += '<p style="font-size:11px;color:var(--text-muted);margin-top:-8px;margin-bottom:16px;">Как предложение выглядит в карусели на главном экране</p>';
     html += formGroup('Заголовок баннера', '<input class="form-input" id="af-btitle" value="' + esc(c.bannerTitle || '') + '" placeholder="Бонус 500% на депозит">');
-    html += formGroup('Подзаголовок баннера', '<input class="form-input" id="af-bsub" value="' + esc(c.bannerSubtitle || '') + '" placeholder="Лучшее предложение 2025">');
+    html += formGroup('Подзаголовок баннера', '<input class="form-input" id="af-bsub" value="' + esc(c.bannerSubtitle || '') + '" placeholder="Лучшее предложение 2026">');
     html += formGroup('Фон баннера (изображение)', buildImageUploader('af-bimage', c.bannerImage || ''));
-    html += formGroup('Цвет/градиент фона', '<input class="form-input" id="af-ccolor" value="' + esc(c.color || 'linear-gradient(135deg,#FF006E,#8B5CF6)') + '">');
+    html += formGroup('Цвет/градиент фона', '<input class="form-input" id="af-ccolor" value="' + esc(c.color || 'linear-gradient(135deg,#FF006E,#6366F1)') + '">');
     html += '<p style="font-size:11px;color:var(--text-muted);margin-top:-8px;margin-bottom:16px;">Используется и для баннера, и для карточки казино</p>';
 
     /* Section: order & active */
@@ -290,7 +290,7 @@
 
     /* User info from TG */
     html += '<div class="glass p-4 rounded-xl mb-4">';
-    html += '<p style="font-weight:700;font-size:12px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDC64 Текущий пользователь</p>';
+    html += '<p style="font-weight:700;font-size:12px;color:#A78BFA;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDC64 Текущий пользователь</p>';
     var userName = (window.TG && TG.userName) ? TG.userName : 'Гость';
     var userId = (window.TG && TG.userId) ? String(TG.userId) : '—';
     var userUsername = (window.TG && TG.userUsername) ? '@' + TG.userUsername : '—';
@@ -315,7 +315,7 @@
 
     /* Dates */
     html += '<div class="glass p-4 rounded-xl mb-4">';
-    html += '<p style="font-weight:700;font-size:12px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDCC5 Даты визитов</p>';
+    html += '<p style="font-weight:700;font-size:12px;color:#A78BFA;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDCC5 Даты визитов</p>';
     html += infoRow('Первый визит', act.firstVisit ? formatDate(act.firstVisit) : '—');
     html += infoRow('Последний визит', act.lastVisit ? formatDate(act.lastVisit) : '—');
     html += '</div>';
@@ -328,7 +328,7 @@
 
     if (topGames.length > 0) {
       html += '<div class="glass p-4 rounded-xl mb-4">';
-      html += '<p style="font-weight:700;font-size:12px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83C\uDFC6 Топ играемых</p>';
+      html += '<p style="font-weight:700;font-size:12px;color:#A78BFA;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83C\uDFC6 Топ играемых</p>';
       for (var i = 0; i < topGames.length; i++) {
         var g = DataStore.getGameById(topGames[i].id);
         var gName = g ? g.name : topGames[i].id;
@@ -337,7 +337,7 @@
         html += '<span style="font-size:10px;font-weight:800;color:var(--text-muted);width:20px;">#' + (i+1) + '</span>';
         html += '<span style="font-size:18px;">' + gIcon + '</span>';
         html += '<span style="flex:1;font-size:13px;font-weight:600;color:var(--text-primary);">' + esc(gName) + '</span>';
-        html += '<span style="font-size:12px;font-weight:800;color:var(--accent-green);">' + topGames[i].count + 'x</span>';
+        html += '<span style="font-size:12px;font-weight:800;color:#A78BFA;">' + topGames[i].count + 'x</span>';
         html += '</div>';
       }
       html += '</div>';
@@ -345,7 +345,7 @@
 
     /* App content summary */
     html += '<div class="glass p-4 rounded-xl mb-4">';
-    html += '<p style="font-weight:700;font-size:12px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDCE6 Контент приложения</p>';
+    html += '<p style="font-weight:700;font-size:12px;color:#A78BFA;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">\uD83D\uDCE6 Контент приложения</p>';
     html += infoRow('Всего игр', String(DataStore.games.length));
     html += infoRow('Активных игр', String(games.length));
     html += infoRow('Предложений казино', String(casinos.length));
@@ -354,8 +354,8 @@
     html += '</div>';
 
     /* Note */
-    html += '<div style="padding:14px;border-radius:var(--radius-md);background:rgba(255,165,0,0.06);border:1px solid rgba(255,165,0,0.12);margin-bottom:16px;">';
-    html += '<p style="font-size:12px;color:#FFA500;font-weight:700;margin-bottom:6px;">\uD83D\uDCA1 Совет</p>';
+    html += '<div style="padding:14px;border-radius:var(--radius-md);background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.12);margin-bottom:16px;">';
+    html += '<p style="font-size:12px;color:#A78BFA;font-weight:700;margin-bottom:6px;">\uD83D\uDCA1 Совет</p>';
     html += '<p style="font-size:11px;color:var(--text-muted);line-height:1.5;">Это локальная статистика текущего пользователя. Для сбора аналитики со всех пользователей подключите бэкенд (Firebase, Supabase или свой API) через бота.</p>';
     html += '</div>';
 
@@ -397,7 +397,7 @@
     html += '<p style="font-size:11px;color:var(--text-muted);margin-top:-8px;margin-bottom:16px;">Плейсхолдеры: <code>{symbol}</code>, <code>{lang}</code>, <code>{currency}</code></p>';
     html += formGroup('Шаблон URL картинок игр', '<input class="form-input" id="af-imgtemplate" value="' + esc(s.gameImageUrlTemplate || '') + '" placeholder="https://...{symbol}...">');
     html += '<p style="font-size:11px;color:var(--text-muted);margin-top:-8px;margin-bottom:16px;">Автоматически подставляет картинку по символу. Плейсхолдер: <code>{symbol}</code></p>';
-    html += '<button id="admin-save-settings" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--accent-green);color:#000;margin-top:8px;">Сохранить настройки</button>';
+    html += '<button id="admin-save-settings" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--cta-gradient);color:#000;margin-top:8px;">Сохранить настройки</button>';
 
     elAdminContent.innerHTML = html;
     document.getElementById('admin-save-settings').addEventListener('click', function() {
@@ -416,14 +416,14 @@
     html += '<p style="font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:8px;">📤 Экспорт</p>';
     html += '<p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Скопируйте JSON как бэкап.</p>';
     html += '<textarea id="admin-export-area" class="form-input" rows="6" readonly style="font-size:11px;font-family:monospace;"></textarea>';
-    html += '<button id="admin-copy-btn" class="w-full py-2.5 rounded-xl text-sm font-semibold interactive mt-3" style="background:rgba(0,255,135,0.12);color:var(--accent-green);">Копировать JSON</button>';
+    html += '<button id="admin-copy-btn" class="w-full py-2.5 rounded-xl text-sm font-semibold interactive mt-3" style="background:rgba(99,102,241,0.12);color:#A78BFA;">Копировать JSON</button>';
     html += '</div>';
 
     html += '<div class="glass p-4 rounded-xl mb-4">';
     html += '<p style="font-weight:600;font-size:14px;color:var(--text-primary);margin-bottom:8px;">📥 Импорт</p>';
     html += '<p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Вставьте ранее экспортированный JSON.</p>';
     html += '<textarea id="admin-import-area" class="form-input" rows="6" placeholder="Вставьте JSON..." style="font-size:11px;font-family:monospace;"></textarea>';
-    html += '<button id="admin-import-btn" class="w-full py-2.5 rounded-xl text-sm font-semibold interactive mt-3" style="background:rgba(0,255,135,0.12);color:var(--accent-green);">Импортировать</button>';
+    html += '<button id="admin-import-btn" class="w-full py-2.5 rounded-xl text-sm font-semibold interactive mt-3" style="background:rgba(99,102,241,0.12);color:#A78BFA;">Импортировать</button>';
     html += '</div>';
 
     html += '<div class="glass p-4 rounded-xl">';
@@ -516,7 +516,7 @@
     html += '</div>';
     html += '<div style="flex:1;">';
     html += '<input class="form-input" id="' + id + '" value="' + esc(currentUrl) + '" placeholder="URL картинки" style="margin-bottom:8px;">';
-    html += '<label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--accent-green);cursor:pointer;padding:6px 12px;border-radius:8px;background:rgba(0,255,135,0.1);">';
+    html += '<label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:#C084FC;cursor:pointer;padding:6px 12px;border-radius:8px;background:rgba(67,56,202,0.1);">';
     html += '<i class="fa-solid fa-upload text-xs"></i> Загрузить';
     html += '<input type="file" accept="image/*" id="' + id + '-file" style="display:none;">';
     html += '</label></div></div>';
