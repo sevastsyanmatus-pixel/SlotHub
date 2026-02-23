@@ -369,7 +369,7 @@
     <p id="game-loading-text" class="text-sm" style="color:var(--text-secondary);">Загрузка игры...</p>
     <button id="game-fallback-btn" class="btn-cta interactive px-6 py-2.5 rounded-xl text-sm font-semibold" style="display:none;">Открыть в браузере</button>
   </div>
-  <iframe id="game-iframe" allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *; midi *; gyroscope *; accelerometer *; payment *"></iframe>
+  <iframe id="game-iframe" allowfullscreen allow="autoplay *; fullscreen *; encrypted-media *; microphone *; camera *; midi *; gyroscope *; accelerometer *; payment *" style="position:absolute;inset:0;width:100%;height:100%;border:none;"></iframe>  <button id="game-fs-restore" class="interactive" aria-label="Свернуть"><i class="fa-solid fa-compress"></i></button>
   <button id="game-landscape-back" class="interactive"><i class="fa-solid fa-chevron-left"></i></button>
 </div>
 
