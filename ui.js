@@ -19,10 +19,10 @@
 document.addEventListener('DOMContentLoaded', function() {
 
   var GRADIENTS = [
-    'linear-gradient(135deg,#667eea,#764ba2)', 'linear-gradient(135deg,#f093fb,#f5576c)',
-    'linear-gradient(135deg,#4facfe,#00f2fe)', 'linear-gradient(135deg,#43e97b,#38f9d7)',
-    'linear-gradient(135deg,#fa709a,#fee140)', 'linear-gradient(135deg,#a18cd1,#fbc2eb)',
-    'linear-gradient(135deg,#fccb90,#d57eeb)'
+    'linear-gradient(135deg,#2E1065,#6D28D9,#7C3AED)', 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)',
+    'linear-gradient(135deg,#120833,#3730A3,#C084FC)', 'linear-gradient(135deg,#08051A,#2E1065,#8B5CF6)',
+    'linear-gradient(135deg,#2E1065,#4338CA,#A78BFA)', 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)',
+    'linear-gradient(135deg,#1E0A4B,#6D28D9,#A78BFA)', 'linear-gradient(135deg,#08051A,#4338CA,#C084FC)'
   ];
 
   /* Banner state */
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
     for (var i = 0; i < renderFns.length; i++) {
       safeRender(renderFns[i][0], renderFns[i][1]);
     }
-    setTimeout(function() { safeRender('initNotifications', initNotifications); }, 30000);
+    setTimeout(function() { safeRender('initNotifications', initNotifications); }, 45000);
 
     /* Time tracking */
     setInterval(function() { var t = App.getLocal('timeInApp', 0); App.setLocal('timeInApp', t + 60000); }, 60000);
@@ -297,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
       el.appendChild(img);
     } else if (game.icon) {
       var emoji = document.createElement('div');
-      emoji.style.cssText = 'position:absolute;top:45%;left:50%;transform:translate(-50%,-55%);font-size:20px;';
+      emoji.style.cssText = 'position:absolute;top:45%;left:50%;transform:translate(-50%,-55%);font-size:20px;animation:emojiFloat 3s ease-in-out infinite;';
       emoji.textContent = game.icon; el.appendChild(emoji);
     }
 
@@ -338,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var c = casinos[i];
       var slide = document.createElement('a');
       slide.href = c.url || '#'; slide.target = '_blank'; slide.rel = 'noopener noreferrer';
-      slide.className = 'banner-slide'; slide.style.background = c.color || 'linear-gradient(135deg,#FF006E,#8B5CF6)';
+      slide.className = 'banner-slide'; slide.style.background = c.color || 'linear-gradient(135deg,#2E1065,#4338CA,#7C3AED)';
 
       var html = '';
       if (c.bannerImage) html += '<img src="' + esc(c.bannerImage) + '" class="banner-slide-img" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">';
@@ -469,13 +469,13 @@ document.addEventListener('DOMContentLoaded', function() {
       var el = document.createElement('a');
       el.href = c.url || '#'; el.target = '_blank'; el.rel = 'noopener noreferrer';
       el.className = 'flex-shrink-0 interactive rounded-2xl p-4 relative overflow-hidden row-card-animated';
-      el.style.cssText = 'width:220px;min-height:120px;background:' + (c.color || 'var(--glass-bg)') + ';border:1px solid rgba(255,255,255,0.08);animation-delay:' + (i * 80) + 'ms;display:block;text-decoration:none;color:inherit;';
+      el.style.cssText = 'width:220px;min-height:120px;background:' + (c.color || 'var(--glass-bg)') + ';border:1px solid rgba(109,40,217,0.15);animation-delay:' + (i * 80) + 'ms;display:block;text-decoration:none;color:inherit;';
 
       var h = '';
-      if (c.badge) h += '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,0.15);color:#fff;">' + esc(c.badge) + '</span>';
+      if (c.badge) h += '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(109,40,217,0.12);color:#C084FC;">' + esc(c.badge) + '</span>';
       h += '<p style="font-weight:700;font-size:15px;color:#fff;margin-top:8px;">' + esc(c.name) + '</p>';
       h += '<p style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px;">' + esc(c.bonus) + '</p>';
-      h += '<div style="margin-top:10px;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.2);color:#fff;">Получить <i class="fa-solid fa-arrow-right" style="font-size:9px;"></i></div>';
+      h += '<div style="margin-top:10px;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:rgba(109,40,217,0.12);color:#C084FC;">Получить <i class="fa-solid fa-arrow-right" style="font-size:9px;"></i></div>';
       el.innerHTML = h;
       el.addEventListener('click', function() { TG.haptic.heavy(); });
       row.appendChild(el);
@@ -564,8 +564,8 @@ document.addEventListener('DOMContentLoaded', function() {
       var h = '';
       if (c.badge) h += '<span class="casino-badge">' + esc(c.badge) + '</span>';
       h += '<div class="flex items-center gap-3" style="position:relative;z-index:2;">';
-      if (c.logo) h += '<img src="' + esc(c.logo) + '" style="width:48px;height:48px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">';
-      else h += '<div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;">' + esc(c.name.charAt(0)) + '</div>';
+      if (c.logo) h += '<img src="' + esc(c.logo) + '" style="width:48px;height:48px;border-radius:12px;object-fit:cover;border:1px solid rgba(67,56,202,0.12);" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">';
+      else h += '<div style="width:48px;height:48px;border-radius:12px;background:rgba(67,56,202,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;">' + esc(c.name.charAt(0)) + '</div>';
       h += '<div style="flex:1;min-width:0;">';
       h += '<p style="font-weight:700;font-size:16px;color:#fff;">' + esc(c.name) + '</p>';
       h += '<p style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:2px;">' + esc(c.bonus) + '</p>';
@@ -745,7 +745,8 @@ document.addEventListener('DOMContentLoaded', function() {
     var el = $('online-count'); if (!el) return;
     var fiveMin = Math.floor(Date.now() / 300000);
     var base = 800 + (simpleHash('global_online_' + fiveMin) % 1200);
-    el.textContent = (base + Math.floor((Math.random() - 0.5) * 30)).toLocaleString('ru-RU');
+    var val = base + Math.floor((Math.random() - 0.5) * 30);
+    el.textContent = val.toLocaleString('ru-RU');
   }
 
   /* ============================================
@@ -829,7 +830,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (notifQueue.length === 0) buildNotifQueue();
     var n = notifQueue.shift();
     showNotifPopup(n.icon, n.title, n.text);
-    setTimeout(showNextNotif, 60000 + Math.random() * 90000);
+    setTimeout(showNextNotif, 90000 + Math.random() * 120000);
   }
 
   function showNotifPopup(icon, title, text) {
@@ -839,7 +840,7 @@ document.addEventListener('DOMContentLoaded', function() {
     $('notif-title').textContent = title;
     $('notif-text').textContent = text;
     el.classList.add('show');
-    setTimeout(function() { el.classList.remove('show'); }, 6000);
+    setTimeout(function() { el.classList.remove('show'); }, 4000);
   }
 
   /* Notification close */
