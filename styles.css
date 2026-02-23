@@ -4,6 +4,7 @@
 /* System font — loaded via tg-core.css */
 
 :root {
+  --top-offset: 0px;
   --bg-primary: #06080D;
   --bg-secondary: #0C1017;
   --bg-card: rgba(255,255,255,0.035);
@@ -193,7 +194,6 @@ body {
 #main-header {
   position: sticky; top: 0; z-index: 30;
   padding: 12px 20px 0;
-  padding-top: calc(max(env(safe-area-inset-top, 0px), var(--top-offset, 0px)) + 14px);
   background: rgba(6,8,13,0.85);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
@@ -400,7 +400,7 @@ body {
 .notification-popup {
   position: fixed; top: 0; left: 0; right: 0; z-index: 150;
   display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-  margin: 10px; margin-top: calc(var(--top-offset) + 10px);
+  margin: 10px;
   background: rgba(12,16,28,0.85); backdrop-filter: blur(28px) saturate(200%); -webkit-backdrop-filter: blur(28px) saturate(200%);
   border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md);
   box-shadow: 0 8px 24px rgba(0,0,0,0.3);
@@ -490,6 +490,11 @@ body {
 .skeleton-card { aspect-ratio: 339/180; background: linear-gradient(90deg, rgba(255,255,255,0.02) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 75%); background-size: 200% 100%; animation: skel 1.5s ease infinite; border: 1px solid rgba(255,255,255,0.03); border-radius: var(--radius-xl); }
 @keyframes skel { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+/* === KEYBOARD OPEN (ARTHOLST pattern) === */
+.keyboard-open #bottom-nav-wrap { display: none !important; }
+.keyboard-open .toast { display: none !important; }
+.keyboard-open .notification-popup { display: none !important; }
+
 /* === UTILITY === */
 .text-accent { color: var(--accent-green); }
 .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -498,73 +503,76 @@ body {
 .empty-state { padding: 52px 28px; text-align: center; color: var(--text-muted); font-size: 14px; animation: fadeInUp 0.5s var(--ease-out-expo) both; }
 
 /* ============================================
-   TELEGRAM MINI APP ADAPTATION
+   TELEGRAM MINI APP ADAPTATION (ARTHOLST pattern)
    ============================================ */
-html.tg-app { --top-offset: max(calc(var(--tg-safe-top, 0px) + var(--tg-content-safe-top, 0px)), env(safe-area-inset-top, 0px), 20px); }
 
-/* Fullscreen TG — guarantee minimum top offset so TG buttons don't overlap */
-html.tg-app.tg-fullscreen {
-  --top-offset: max(calc(var(--tg-safe-top, 0px) + var(--tg-content-safe-top, 0px)), calc(env(safe-area-inset-top, 0px) + 44px), 72px);
+/* Height uses TG viewport */
+.is-telegram { height: var(--tg-viewport-height, 100dvh) !important; }
+body.is-telegram { overflow: hidden; }
+
+/* Header offset — uses --top-offset set by tg-core.js */
+.is-telegram #main-header {
+  padding-top: calc(var(--top-offset, 0px) + 14px);
 }
-html.tg-app.tg-fullscreen #main-header {
-  padding-top: calc(var(--top-offset) + 22px);
+
+/* Notification below header */
+.is-telegram .notification-popup {
+  margin-top: calc(var(--top-offset, 0px) + 80px);
 }
-html.tg-app.tg-fullscreen #main-header .header-inner {
-  height: 62px;
+
+/* Bottom nav safe area */
+.is-telegram #bottom-nav-wrap {
+  padding-bottom: calc(var(--tg-safe-bottom, 0px) + 4px) !important;
 }
-html.tg-app.tg-fullscreen .logo-title {
-  font-size: 26px;
+.is-telegram .toast {
+  bottom: calc(85px + var(--tg-safe-bottom, 0px)) !important;
 }
-html.tg-app.tg-fullscreen .notification-popup {
-  margin-top: calc(var(--top-offset) + 10px);
+
+/* Game view */
+.is-telegram #game-view {
+  padding-top: calc(var(--top-offset, 0px) + 4px) !important;
 }
-html.tg-app body { height: var(--tg-viewport-stable-height, 100dvh) !important; touch-action: manipulation; }
-html.tg-app #content-area { overscroll-behavior-y: contain !important; }
+
+/* Admin panel */
+.is-telegram #admin-panel {
+  padding-top: calc(var(--top-offset, 0px) + 8px) !important;
+}
+.is-telegram .admin-form-overlay {
+  padding-top: calc(var(--top-offset, 0px) + 8px) !important;
+}
+
+/* Story viewer */
+.is-telegram .story-progress {
+  padding-top: calc(var(--top-offset, 0px) + 16px) !important;
+}
+.is-telegram .story-close-btn {
+  top: calc(var(--top-offset, 0px) + 24px) !important;
+}
+
+/* Splash */
+.is-telegram #splash-screen {
+  padding-top: var(--top-offset, 0px);
+}
+
+/* Modal max height */
+.is-telegram .modal-overlay .modal-body {
+  max-height: calc(var(--tg-viewport-height, 85vh) - var(--top-offset, 0px) - 60px);
+}
 
 /* Hide duplicate nav in TG (BackButton replaces them) */
-html.tg-app #game-back-btn { display: none !important; }
-html.tg-app #game-landscape-back { display: none !important; }
-html.tg-app #admin-close { display: none !important; }
-html.tg-app #admin-form-back { display: none !important; }
-html.tg-app #story-close { display: none !important; }
+.is-telegram #game-back-btn { display: none !important; }
+.is-telegram #game-landscape-back { display: none !important; }
+.is-telegram #admin-close { display: none !important; }
+.is-telegram #admin-form-back { display: none !important; }
+.is-telegram #story-close { display: none !important; }
 
-html.tg-app #bottom-nav-wrap { padding-bottom: calc(var(--tg-safe-bottom) + 4px) !important; }
-html.tg-app .toast { bottom: calc(85px + var(--tg-safe-bottom)) !important; }
-html.tg-app #game-view { padding-top: var(--top-offset) !important; }
-html.tg-app.tg-fullscreen #game-view { padding-top: calc(var(--top-offset) + 4px) !important; }
-html.tg-app #game-topbar { padding-top: 4px !important; }
-html.tg-app #admin-panel { padding-top: calc(var(--top-offset) + 4px) !important; }
-html.tg-app.tg-fullscreen #admin-panel { padding-top: calc(var(--top-offset) + 12px) !important; }
-html.tg-app .admin-form-overlay { padding-top: calc(var(--top-offset) + 4px) !important; }
-html.tg-app.tg-fullscreen .admin-form-overlay { padding-top: calc(var(--top-offset) + 12px) !important; }
-html.tg-app .story-progress { padding-top: calc(var(--top-offset) + 16px) !important; }
-html.tg-app .story-close-btn { top: calc(var(--top-offset) + 24px) !important; }
-html.tg-app #splash-screen { padding-top: var(--top-offset); }
-html.tg-app .modal-overlay .modal-body { max-height: calc(var(--tg-viewport-height, 85vh) - var(--top-offset) - 60px); }
-
-/* iOS zoom prevention handled by tg-core.css */
+/* iOS zoom prevention */
+.is-telegram input, .is-telegram select, .is-telegram textarea {
+  font-size: 16px !important;
+}
 
 @media (orientation: landscape) and (max-height: 500px) {
-  html.tg-app #game-view { padding-top: 0 !important; }
+  .is-telegram #game-view { padding-top: 0 !important; }
 }
 
-/* === RESPONSIVE === */
-@media (max-height: 600px) {
-  .banner-slide { height: 125px; }
-  .banner-title { font-size: 15px; }
-  .section-header { margin-top: 18px; margin-bottom: 10px; }
-  .stat-card { padding: 14px 12px; }
-  .postgame-emoji { font-size: 52px; }
-}
-
-@media (max-width: 360px) {
-  .section-title { font-size: 15px; }
-  .section-icon { width: 28px; height: 28px; font-size: 16px; }
-  .banner-slide { height: 135px; }
-  .banner-title { font-size: 15px; }
-  .banner-deco { font-size: 34px; right: 8px; opacity: 0.4; }
-  .banner-slide-content { padding: 12px 14px; max-width: 72%; }
-  .logo-title { font-size: 20px; }
-  .timer-digit { width: 24px; height: 28px; font-size: 11px; }
-  .chip { font-size: 12px; padding: 8px 16px; }
-}
+/* === RESPONSIVE === moved to responsive.css */
