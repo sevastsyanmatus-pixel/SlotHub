@@ -79,6 +79,17 @@ var TG = (function() {
         api.requestFullscreen();
         setTimeout(function() { api.requestFullscreen(); }, 500);
         setTimeout(function() { api.requestFullscreen(); }, 1500);
+
+      /* Re-request fullscreen when user returns to app */
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) setTimeout(function() { api.requestFullscreen(); }, 300);
+      });
+
+      /* Set initial fullscreen class */
+      if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
+      setTimeout(function() {
+        if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
+      }, 2000);
       }
 
       /* Theme */
@@ -108,6 +119,7 @@ var TG = (function() {
       /* Fullscreen change → re-apply safe areas */
       api._safeCall(function() {
         webapp.onEvent('fullscreenChanged', function() {
+          document.documentElement.classList.toggle('tg-fullscreen', !!webapp.isFullscreen);
           setTimeout(function() { api._applySafeArea(); api._applyViewport(); }, 100);
           setTimeout(function() { api._applySafeArea(); api._applyViewport(); }, 500);
         });
