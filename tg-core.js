@@ -1,7 +1,8 @@
 /**
- * TG Core v2.1 — Based on ARTHOLST pattern
+ * TG Core v2.3 — ARTHOLST pattern with 3-level safe area protection
  * Direct _tgWebApp access, anti-swipe, aggressive fullscreen
  * Enhanced device detection for all screen sizes
+ * DEBUG: Temporary overlay to diagnose safe area issues
  */
 var TG = (function() {
   'use strict';
@@ -10,6 +11,9 @@ var TG = (function() {
   var backStack = [];
   var handlingBack = false;
   var mainBtnCb = null;
+
+  /* Debug mode — set to true to see safe area overlay */
+  var DEBUG_SAFE_AREA = true;
 
   /* ========================================
      LAZY DETECTION
@@ -142,13 +146,16 @@ var TG = (function() {
     try {
       _tgWebApp.onEvent('fullscreenChanged', function() {
         document.documentElement.classList.toggle('tg-fullscreen', !!_tgWebApp.isFullscreen);
-        _applySafeArea();
+        /* Delay to let TG settle safe areas */
+        setTimeout(_applySafeArea, 50);
+        setTimeout(_applySafeArea, 200);
+        setTimeout(_applySafeArea, 500);
         _updateViewportHeight();
         _applyScreenClasses();
       });
     } catch(e) {}
 
-    /* 6. Safe area change event */
+    /* 6. Safe area change events */
     try {
       _tgWebApp.onEvent('safeAreaChanged', function() { _applySafeArea(); });
       _tgWebApp.onEvent('contentSafeAreaChanged', function() { _applySafeArea(); });
@@ -196,6 +203,7 @@ var TG = (function() {
       try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
       try { _tgWebApp.requestFullscreen(); } catch(e) {}
       _applySafeArea();
+      _updateViewportHeight();
       if (retryCount >= 15) clearInterval(retryInterval);
     }, 400);
 
@@ -224,8 +232,14 @@ var TG = (function() {
     };
     document.addEventListener('touchstart', _firstTouch, { passive: true });
 
-    /* 12. Apply safe areas */
+    /* 12. Apply safe areas immediately + delayed insurance */
     _applySafeArea();
+    setTimeout(_applySafeArea, 100);
+    setTimeout(_applySafeArea, 300);
+    setTimeout(_applySafeArea, 600);
+    setTimeout(_applySafeArea, 1000);
+    setTimeout(_applySafeArea, 2000);
+    setTimeout(_applySafeArea, 4000);
   }
 
   function _updateViewportHeight() {
@@ -236,36 +250,137 @@ var TG = (function() {
     document.documentElement.style.setProperty('--tg-viewport-stable-height', sh);
   }
 
+  /* ========================================
+     SAFE AREA — 3-LEVEL ARTHOLST PROTECTION
+     ======================================== */
   function _applySafeArea() {
     var root = document.documentElement;
     if (!_tgWebApp) return;
 
-    var sa = _tgWebApp.safeAreaInset || {};
-    var csa = _tgWebApp.contentSafeAreaInset || {};
+    try {
+      var sa = _tgWebApp.safeAreaInset || {};
+      var csa = _tgWebApp.contentSafeAreaInset || {};
+      var isFullscreen = !!_tgWebApp.isFullscreen;
 
-    root.style.setProperty('--tg-safe-top', (sa.top || 0) + 'px');
-    root.style.setProperty('--tg-safe-bottom', (sa.bottom || 0) + 'px');
-    root.style.setProperty('--tg-safe-left', (sa.left || 0) + 'px');
-    root.style.setProperty('--tg-safe-right', (sa.right || 0) + 'px');
+      /* ============================
+         LAYER 1: DEVICE INSET (notch, Dynamic Island, status bar)
+         ============================ */
+      var deviceTop = sa.top || 0;
+      var deviceBottom = sa.bottom || 0;
+      var deviceLeft = sa.left || 0;
+      var deviceRight = sa.right || 0;
 
-    root.style.setProperty('--tg-content-safe-top', (csa.top || 0) + 'px');
-    root.style.setProperty('--tg-content-safe-bottom', (csa.bottom || 0) + 'px');
-    root.style.setProperty('--tg-content-safe-left', (csa.left || 0) + 'px');
-    root.style.setProperty('--tg-content-safe-right', (csa.right || 0) + 'px');
+      root.style.setProperty('--tg-safe-top', deviceTop + 'px');
+      root.style.setProperty('--tg-safe-bottom', deviceBottom + 'px');
+      root.style.setProperty('--tg-safe-left', deviceLeft + 'px');
+      root.style.setProperty('--tg-safe-right', deviceRight + 'px');
 
-    /* Combined top offset for header positioning */
-    var topOffset = (sa.top || 0) + (csa.top || 0);
-    root.style.setProperty('--top-offset', topOffset + 'px');
+      /* ============================
+         LAYER 2: CONTENT SAFE AREA (below Telegram buttons: back, dots, close)
+         ============================ */
+      var contentTop = csa.top || 0;
+      var contentBottom = csa.bottom || 0;
 
-    /* Update device classes when safe area changes (may detect Dynamic Island) */
-    var body = document.body;
-    if ((sa.top || 0) >= 55) {
-      body.classList.add('has-dynamic-island');
-      body.classList.remove('has-notch');
-    } else if ((sa.top || 0) >= 44) {
-      body.classList.add('has-notch');
-      body.classList.remove('has-dynamic-island');
+      root.style.setProperty('--tg-content-safe-bottom', contentBottom + 'px');
+      root.style.setProperty('--tg-content-safe-left', (csa.left || 0) + 'px');
+      root.style.setProperty('--tg-content-safe-right', (csa.right || 0) + 'px');
+
+      /* ============================
+         LAYER 3: FALLBACKS FOR FULLSCREEN
+         In fullscreen mode, TG buttons (back, close, dots) are drawn
+         ON TOP of our content. contentSafeAreaInset.top may be 0
+         on some devices even in fullscreen — this is a Telegram API bug.
+         We guarantee a minimum safe offset.
+         ============================ */
+      var finalTop = contentTop;
+
+      if (isFullscreen) {
+        /* Minimum: deviceTop (notch) + 12px buffer
+           OR 44px (minimum height of TG overlay buttons)
+           Whichever is larger */
+        var minFullscreenTop = Math.max(deviceTop + 12, 44);
+        finalTop = Math.max(contentTop, minFullscreenTop);
+      } else if (contentTop === 0 && deviceTop === 0) {
+        /* NOT fullscreen, API gave no data at all.
+           Estimate native Telegram header height */
+        var isIOS = api.isIOS || /iPad|iPhone|iPod/.test(navigator.userAgent || '');
+        finalTop = isIOS ? 56 : 48;
+      } else if (contentTop === 0 && deviceTop > 0) {
+        /* Has device inset but no content inset —
+           TG header is likely present but API didn't report it.
+           Use safe default */
+        finalTop = Math.max(deviceTop + 12, 48);
+      }
+
+      /* ============================
+         FINAL: Set CSS variables
+         ============================ */
+      root.style.setProperty('--tg-content-safe-top', finalTop + 'px');
+
+      /* Combined top offset — used by all UI elements */
+      root.style.setProperty('--top-offset', finalTop + 'px');
+
+      /* ============================
+         DETECT DEVICE FEATURES from safe area
+         ============================ */
+      var body = document.body;
+      if (deviceTop >= 55) {
+        body.classList.add('has-dynamic-island');
+        body.classList.remove('has-notch');
+      } else if (deviceTop >= 44) {
+        body.classList.add('has-notch');
+        body.classList.remove('has-dynamic-island');
+      }
+
+      /* ============================
+         DEBUG OVERLAY
+         ============================ */
+      if (DEBUG_SAFE_AREA) {
+        _updateDebugOverlay({
+          deviceTop: deviceTop,
+          deviceBottom: deviceBottom,
+          contentTopRaw: csa.top || 0,
+          contentTop: finalTop,
+          isFullscreen: isFullscreen,
+          viewportH: _tgWebApp.viewportHeight || 0,
+          stableH: _tgWebApp.viewportStableHeight || 0,
+          platform: _tgWebApp.platform || '?',
+          version: _tgWebApp.version || '?'
+        });
+      }
+
+    } catch(e) {
+      /* Ultimate fallback — 54px is safe for most devices */
+      root.style.setProperty('--tg-content-safe-top', '54px');
+      root.style.setProperty('--top-offset', '54px');
+      console.error('[TG SafeArea] Error:', e);
     }
+  }
+
+  /* ========================================
+     DEBUG OVERLAY — shows safe area values on screen
+     ======================================== */
+  function _updateDebugOverlay(data) {
+    var el = document.getElementById('tg-debug-overlay');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'tg-debug-overlay';
+      el.style.cssText = 'position:fixed;bottom:90px;left:8px;z-index:99999;' +
+        'background:rgba(0,0,0,0.85);color:#0f0;font-size:10px;font-family:monospace;' +
+        'padding:8px 10px;border-radius:8px;border:1px solid #0f0;line-height:1.5;' +
+        'pointer-events:none;max-width:260px;word-break:break-all;';
+      document.body.appendChild(el);
+    }
+    el.innerHTML =
+      '<b style="color:#ff0;">TG Safe Area Debug</b><br>' +
+      'platform: <b>' + data.platform + '</b> v' + data.version + '<br>' +
+      'fullscreen: <b style="color:' + (data.isFullscreen ? '#0f0' : '#f00') + '">' + data.isFullscreen + '</b><br>' +
+      'sa.top (device/notch): <b>' + data.deviceTop + 'px</b><br>' +
+      'sa.bottom (device): <b>' + data.deviceBottom + 'px</b><br>' +
+      'csa.top (raw from API): <b>' + data.contentTopRaw + 'px</b><br>' +
+      '--top-offset (final): <b style="color:#ff0;">' + data.contentTop + 'px</b><br>' +
+      'viewport: ' + data.viewportH + ' / stable: ' + data.stableH + '<br>' +
+      'window.innerH: ' + window.innerHeight;
   }
 
   /* ========================================
@@ -654,6 +769,7 @@ var TG = (function() {
 
     root.setAttribute('data-theme', 'dark');
     root.setAttribute('data-platform', 'browser');
+    document.body.classList.add('device-browser');
 
     window.addEventListener('resize', function() {
       root.style.setProperty('--tg-viewport-height', window.innerHeight + 'px');
