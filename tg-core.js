@@ -74,22 +74,47 @@ var TG = (function() {
         api._safeCall(function() { webapp.enableClosingConfirmation(); });
       }
 
-      /* Fullscreen */
+      /* Fullscreen — aggressive, always request */
       if (options.fullscreen !== false) {
+        /* Request immediately and keep retrying */
         api.requestFullscreen();
-        setTimeout(function() { api.requestFullscreen(); }, 500);
+        setTimeout(function() { api.requestFullscreen(); }, 300);
+        setTimeout(function() { api.requestFullscreen(); }, 800);
         setTimeout(function() { api.requestFullscreen(); }, 1500);
+        setTimeout(function() { api.requestFullscreen(); }, 3000);
+        setTimeout(function() { api.requestFullscreen(); }, 5000);
 
-      /* Re-request fullscreen when user returns to app */
-      document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) setTimeout(function() { api.requestFullscreen(); }, 300);
-      });
+        /* Re-request fullscreen when user returns to app */
+        document.addEventListener('visibilitychange', function() {
+          if (!document.hidden) {
+            api.requestFullscreen();
+            setTimeout(function() { api.requestFullscreen(); }, 200);
+            setTimeout(function() { api.requestFullscreen(); }, 600);
+          }
+        });
 
-      /* Set initial fullscreen class */
-      if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
-      setTimeout(function() {
+        /* Re-request on first user touch (some TG versions need user gesture) */
+        var _fsTouch = function() {
+          api.requestFullscreen();
+          document.removeEventListener('touchstart', _fsTouch);
+          document.removeEventListener('click', _fsTouch);
+        };
+        document.addEventListener('touchstart', _fsTouch, { passive: true });
+        document.addEventListener('click', _fsTouch, { passive: true });
+
+        /* Re-request on focus (when switching back to TG) */
+        window.addEventListener('focus', function() {
+          setTimeout(function() { api.requestFullscreen(); }, 200);
+        });
+
+        /* Set initial fullscreen class */
         if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
-      }, 2000);
+        setTimeout(function() {
+          if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
+        }, 1000);
+        setTimeout(function() {
+          if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
+        }, 3000);
       }
 
       /* Theme */
@@ -626,6 +651,9 @@ var TG = (function() {
     };
 
     for (var k in defaults) root.style.setProperty(k, defaults[k]);
+
+    /* Simulate TG safe area in browser preview */
+    root.style.setProperty('--top-offset', '48px');
 
     root.setAttribute('data-theme', 'dark');
     root.setAttribute('data-platform', 'browser');
