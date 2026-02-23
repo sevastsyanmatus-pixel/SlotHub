@@ -1,7 +1,6 @@
 /* ============================================
-   SlotX — UI Rendering
-   All render functions, banners, cards, leaderboard,
-   notifications, stats, online counter, timer
+   SlotX — UI Rendering (ARTHOLST pattern)
+   All renders wrapped in try/catch for stability
    ============================================ */
 
 /* Skeleton (immediate — before DOMContentLoaded) */
@@ -33,6 +32,10 @@ document.addEventListener('DOMContentLoaded', function() {
   /* Notification state */
   var notifQueue = [];
 
+  /* Keyboard state */
+  var _keyboardVisible = false;
+  var _stableViewportH = window.innerHeight;
+
   function waitReady(cb) {
     if (window.App && window.DataStore && DataStore._ready) return cb();
     setTimeout(function() { waitReady(cb); }, 80);
@@ -49,38 +52,136 @@ document.addEventListener('DOMContentLoaded', function() {
       updateSectionCounts: updateSectionCounts,
       trackGamePlayed: trackGamePlayed, buildRowCard: buildRowCard
     };
-    /* If init was already called from app.js, it will use UI. */
   });
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return App.escHtml(s); }
 
   /* ============================================
+     SAFE RENDER WRAPPER (ARTHOLST pattern)
+     One broken section won't crash the whole app
+     ============================================ */
+  function safeRender(name, fn) {
+    try { fn(); }
+    catch(e) { console.error('[SlotX UI] ' + name + ' error:', e); }
+  }
+
+  /* ============================================
      INIT
      ============================================ */
   function initAll() {
-    buildChips();
-    renderHome();
-    renderGamesGrid();
-    buildWinFeed();
-    initTimer();
-    initOnlineCounter();
-    initScrollAnimations();
-    initBannerSwipe();
-    setTimeout(initNotifications, 30000);
+    var renderFns = [
+      ['buildChips', buildChips],
+      ['renderHome', renderHome],
+      ['renderGamesGrid', renderGamesGrid],
+      ['buildWinFeed', buildWinFeed],
+      ['initTimer', initTimer],
+      ['initOnlineCounter', initOnlineCounter],
+      ['initScrollAnimations', initScrollAnimations],
+      ['initBannerSwipe', initBannerSwipe],
+      ['initKeyboardHandling', initKeyboardHandling]
+    ];
+    for (var i = 0; i < renderFns.length; i++) {
+      safeRender(renderFns[i][0], renderFns[i][1]);
+    }
+    setTimeout(function() { safeRender('initNotifications', initNotifications); }, 30000);
 
     /* Time tracking */
     setInterval(function() { var t = App.getLocal('timeInApp', 0); App.setLocal('timeInApp', t + 60000); }, 60000);
   }
 
   function refreshAll() {
-    renderHome();
-    buildChips();
-    renderGamesGrid();
-    buildWinFeed();
-    updateSectionCounts();
-    if (App.getActiveTab() === 'casinos') renderCasinos();
-    if (App.getActiveTab() === 'profile') renderProfile();
+    var fns = [
+      ['renderHome', renderHome],
+      ['buildChips', buildChips],
+      ['renderGamesGrid', renderGamesGrid],
+      ['buildWinFeed', buildWinFeed],
+      ['updateSectionCounts', updateSectionCounts]
+    ];
+    for (var i = 0; i < fns.length; i++) safeRender(fns[i][0], fns[i][1]);
+    if (App.getActiveTab() === 'casinos') safeRender('renderCasinos', renderCasinos);
+    if (App.getActiveTab() === 'profile') safeRender('renderProfile', renderProfile);
+  }
+
+  /* ============================================
+     KEYBOARD HANDLING (ARTHOLST pattern)
+     Works in Telegram + Browser + all platforms
+     ============================================ */
+  function initKeyboardHandling() {
+    var _tg = null;
+    try { _tg = window.Telegram && Telegram.WebApp; } catch(e) {}
+
+    /* Remember stable height */
+    _stableViewportH = window.innerHeight;
+
+    /* Method 1: Telegram viewportChanged (most reliable in TG) */
+    if (_tg) {
+      try {
+        _tg.onEvent('viewportChanged', function(e) {
+          var currentH = _tg.viewportHeight || window.innerHeight;
+          var diff = _stableViewportH - currentH;
+          if (diff > 60) {
+            _onKeyboardShow(diff);
+          } else if (diff < 30) {
+            _onKeyboardHide();
+          }
+          if (e && e.isStateStable) {
+            _stableViewportH = currentH;
+          }
+        });
+      } catch(e) {}
+    }
+
+    /* Method 2: visualViewport API (modern browsers, iOS Safari) */
+    if (window.visualViewport) {
+      var lastVVH = window.visualViewport.height;
+      window.visualViewport.addEventListener('resize', function() {
+        var diff = lastVVH - window.visualViewport.height;
+        if (diff > 100) {
+          _onKeyboardShow(diff);
+        } else if (diff < -50) {
+          _onKeyboardHide();
+        }
+        lastVVH = window.visualViewport.height;
+      });
+    }
+
+    /* Method 3: window.resize (old Android fallback) */
+    window.addEventListener('resize', function() {
+      var diff = _stableViewportH - window.innerHeight;
+      if (diff > 100) {
+        _onKeyboardShow(diff);
+      } else if (diff < 30 && _keyboardVisible) {
+        _onKeyboardHide();
+      }
+    });
+
+    /* Focus/blur on inputs — ensure scroll into view */
+    document.addEventListener('focusin', function(e) {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        setTimeout(function() {
+          try { e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(er) {}
+        }, 300);
+      }
+    });
+  }
+
+  function _onKeyboardShow(keyboardHeight) {
+    if (_keyboardVisible) return;
+    _keyboardVisible = true;
+    document.body.classList.add('keyboard-open');
+    /* Hide bottom nav to give more space */
+    var nav = $('bottom-nav-wrap');
+    if (nav) nav.style.display = 'none';
+  }
+
+  function _onKeyboardHide() {
+    if (!_keyboardVisible) return;
+    _keyboardVisible = false;
+    document.body.classList.remove('keyboard-open');
+    /* Restore bottom nav */
+    var nav = $('bottom-nav-wrap');
+    if (nav) nav.style.display = '';
   }
 
   /* ============================================
@@ -127,8 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
         App.fireConfetti(r.left + r.width / 2, r.top + r.height / 2);
         App.playSound('confetti');
       }
-      renderFavorites();
-      updateSectionCounts();
+      safeRender('renderFavorites', renderFavorites);
+      safeRender('updateSectionCounts', updateSectionCounts);
     });
     el.appendChild(heart);
   }
@@ -261,6 +362,11 @@ document.addEventListener('DOMContentLoaded', function() {
     bannerIdx = 0;
     updateBannerPosition();
     startBannerAuto();
+
+    /* Force reflow for TG WebView animation fix (ARTHOLST pattern) */
+    track.style.animation = 'none';
+    void track.offsetHeight;
+    track.style.animation = '';
   }
 
   function goToBanner(idx) {
@@ -298,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var carousel = $('banner-carousel');
     if (!carousel) return;
     var startX = 0, dragging = false;
-    carousel.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; dragging = true; }, { passive: true });
+    carousel.addEventListener('touchstart', function(e) { startX = e.touches[0].clientY !== undefined ? e.touches[0].clientX : 0; dragging = true; }, { passive: true });
     carousel.addEventListener('touchend', function(e) {
       if (!dragging) return; dragging = false;
       var dx = e.changedTouches[0].clientX - startX;
@@ -311,17 +417,23 @@ document.addEventListener('DOMContentLoaded', function() {
      ============================================ */
   function renderHome() {
     var games = DataStore.getActiveGames();
-    renderBanners();
-    renderFavorites();
-    updateSectionCounts();
+    safeRender('renderBanners', renderBanners);
+    safeRender('renderFavorites', renderFavorites);
+    safeRender('updateSectionCounts', updateSectionCounts);
 
-    renderRow('popular-row', games.filter(function(g) { return g.tag === 'popular'; }).slice(0, 8));
-    renderRow('top-row', games.filter(function(g) { return g.tag === 'top'; }).slice(0, 8));
-    renderRow('new-row', games.filter(function(g) { return g.tag === 'new'; }).slice(0, 8));
-    renderBonusBuy();
-    renderHomeCasinos();
-    renderRecent();
-    renderLeaderboard('day');
+    safeRender('popular-row', function() {
+      renderRow('popular-row', games.filter(function(g) { return g.tag === 'popular'; }).slice(0, 8));
+    });
+    safeRender('top-row', function() {
+      renderRow('top-row', games.filter(function(g) { return g.tag === 'top'; }).slice(0, 8));
+    });
+    safeRender('new-row', function() {
+      renderRow('new-row', games.filter(function(g) { return g.tag === 'new'; }).slice(0, 8));
+    });
+    safeRender('renderBonusBuy', renderBonusBuy);
+    safeRender('renderHomeCasinos', renderHomeCasinos);
+    safeRender('renderRecent', renderRecent);
+    safeRender('renderLeaderboard', function() { renderLeaderboard('day'); });
   }
 
   function renderRow(id, games) {
@@ -477,7 +589,7 @@ document.addEventListener('DOMContentLoaded', function() {
      PROFILE TAB
      ============================================ */
   function renderProfile() {
-    updateStats();
+    safeRender('updateStats', updateStats);
     /* Currency display */
     var cur = DataStore.getCurrency();
     $('currency-flag').textContent = cur.flag;
@@ -508,8 +620,8 @@ document.addEventListener('DOMContentLoaded', function() {
           TG.haptic.medium();
           DataStore.setCurrency(cur.code);
           App.hideModal($('modal-currency'));
-          renderProfile();
-          buildWinFeed();
+          safeRender('renderProfile', renderProfile);
+          safeRender('buildWinFeed', buildWinFeed);
           App.showToast('💱', 'Валюта изменена на ' + cur.code + ' ' + cur.symbol);
         });
       })(c);
@@ -559,14 +671,14 @@ document.addEventListener('DOMContentLoaded', function() {
       tab.addEventListener('click', function() {
         for (var j = 0; j < lbTabs.length; j++) lbTabs[j].classList.remove('active');
         tab.classList.add('active');
-        renderLeaderboard(tab.getAttribute('data-lb'));
+        safeRender('renderLeaderboard', function() { renderLeaderboard(tab.getAttribute('data-lb')); });
         TG.haptic.light();
       });
     })(lbTabs[li]);
   }
 
   /* ============================================
-     WIN FEED
+     WIN FEED (with force reflow for TG WebView)
      ============================================ */
   function buildWinFeed() {
     var el = $('win-feed-inner'); if (!el) return;
@@ -587,6 +699,11 @@ document.addEventListener('DOMContentLoaded', function() {
       items.push('<span class="wf-chip' + (isHuge ? ' wf-mega' : '') + '"><span class="wf-icon">' + (g.icon || '🎰') + '</span><span class="wf-name">' + esc(n) + '</span><span class="wf-sep">→</span><span class="wf-amt">' + amt + ' ' + esc(cur.symbol) + '</span><span class="wf-mult">' + mult + '</span></span>');
     }
     el.innerHTML = items.join('') + items.join('');
+
+    /* Force reflow for TG WebView animation restart (ARTHOLST pattern) */
+    el.style.animation = 'none';
+    void el.offsetHeight;
+    el.style.animation = '';
   }
 
   /* ============================================
