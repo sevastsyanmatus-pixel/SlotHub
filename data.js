@@ -243,6 +243,7 @@ var DataStore = {
   casinos: [],
   settings: {},
   favorites: [],
+  activity: {},
   _ready: false,
 
   async init() {
@@ -290,6 +291,12 @@ var DataStore = {
     for (var ni = 0; ni < DEFAULT_GAMES.length; ni++) {
       if (!existingIds[DEFAULT_GAMES[ni].id]) this.games.push(JSON.parse(JSON.stringify(DEFAULT_GAMES[ni])));
     }
+
+    this.activity = await Storage.get('activity', {
+      sessions: 0, firstVisit: null, lastVisit: null,
+      gameLaunches: {}, affiliateClicks: 0, totalPlays: 0,
+      userInfo: null
+    });
 
     this._ready = true;
     await this.save();
@@ -424,6 +431,44 @@ var DataStore = {
       return true;
     } catch (e) { return false; }
   },
+  /* ---- Activity Tracking ---- */
+  async trackSession() {
+    var act = this.activity;
+    act.sessions = (act.sessions || 0) + 1;
+    if (!act.firstVisit) act.firstVisit = new Date().toISOString();
+    act.lastVisit = new Date().toISOString();
+    /* Save TG user info */
+    if (window.TG && TG.user) {
+      act.userInfo = {
+        id: TG.userId,
+        firstName: TG.user.first_name || '',
+        lastName: TG.user.last_name || '',
+        username: TG.userUsername || '',
+        lang: TG.userLang || '',
+        isPremium: TG.isPremium || false,
+        platform: TG.platform || 'browser'
+      };
+    }
+    this.activity = act;
+    await Storage.set('activity', act);
+  },
+
+  trackGamePlay: function(gameId) {
+    if (!this.activity.gameLaunches) this.activity.gameLaunches = {};
+    this.activity.gameLaunches[gameId] = (this.activity.gameLaunches[gameId] || 0) + 1;
+    this.activity.totalPlays = (this.activity.totalPlays || 0) + 1;
+    Storage.set('activity', this.activity);
+  },
+
+  trackAffiliateClick: function() {
+    this.activity.affiliateClicks = (this.activity.affiliateClicks || 0) + 1;
+    Storage.set('activity', this.activity);
+  },
+
+  getActivity: function() {
+    return this.activity || {};
+  },
+
   resetToDefaults: async function() {
     this.games = JSON.parse(JSON.stringify(DEFAULT_GAMES));
     this.casinos = JSON.parse(JSON.stringify(DEFAULT_CASINOS));
