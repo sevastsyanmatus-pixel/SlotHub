@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>SlotX — Демо Казино</title>
 
+  <!-- CRITICAL: Telegram SDK MUST load BEFORE any TG API calls -->
+  <!-- On miniapps.ai this is blocked by CSP, but TG auto-injects it there -->
+  <!-- On GitHub Pages / custom hosting, we NEED this script -->
+  <script>
+  (function() {
+    /* If Telegram SDK already injected (by TG client), skip loading */
+    if (window.Telegram && window.Telegram.WebApp) return;
+    /* On miniapps.ai CSP blocks telegram.org, but TG injects SDK automatically */
+    if (location.hostname.indexOf('miniapps.ai') !== -1) return;
+    /* For all other hosts (GitHub Pages, custom domain) — load SDK */
+    document.write('<script src="https://telegram.org/js/telegram-web-app.js"><\/script>');
+  })();
+  </script>
+
   <!-- Early Telegram detection (ARTHOLST pattern — prevents FOUC) -->
   <script>
   (function() {
@@ -486,7 +500,7 @@
     try { tg = window.Telegram && Telegram.WebApp; } catch(e) {}
 
     var lines = [];
-    lines.push('<b style="color:#ff0;">SlotX Debug v3</b>');
+    lines.push('<b style="color:#ff0;">SlotX Debug v5</b>');
 
     if (tg) {
       var sa = tg.safeAreaInset || {};
