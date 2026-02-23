@@ -512,12 +512,12 @@ body.is-telegram { overflow: hidden; }
 
 /* Header offset — uses --top-offset set by tg-core.js */
 .is-telegram #main-header {
-  padding-top: calc(var(--top-offset, 0px) + 14px);
+  padding-top: calc(var(--top-offset, 0px) + 12px);
 }
 
 /* Notification below header */
 .is-telegram .notification-popup {
-  margin-top: calc(var(--top-offset, 0px) + 80px);
+  margin-top: calc(var(--top-offset, 0px) + 70px);
 }
 
 /* Bottom nav safe area */
@@ -535,18 +535,18 @@ body.is-telegram { overflow: hidden; }
 
 /* Admin panel */
 .is-telegram #admin-panel {
-  padding-top: calc(var(--top-offset, 0px) + 8px) !important;
+  padding-top: calc(var(--top-offset, 0px) + 4px) !important;
 }
 .is-telegram .admin-form-overlay {
-  padding-top: calc(var(--top-offset, 0px) + 8px) !important;
+  padding-top: calc(var(--top-offset, 0px) + 4px) !important;
 }
 
 /* Story viewer */
 .is-telegram .story-progress {
-  padding-top: calc(var(--top-offset, 0px) + 16px) !important;
+  padding-top: calc(var(--top-offset, 0px) + 12px) !important;
 }
 .is-telegram .story-close-btn {
-  top: calc(var(--top-offset, 0px) + 24px) !important;
+  top: calc(var(--top-offset, 0px) + 20px) !important;
 }
 
 /* Splash */
