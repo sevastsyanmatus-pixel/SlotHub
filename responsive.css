@@ -1,0 +1,377 @@
+/* ============================================
+   RESPONSIVE — Device Adaptation for All Screens
+   Classes set by tg-core.js:
+     .device-ios, .device-android, .device-desktop, .device-browser
+     .screen-xs (≤360), .screen-sm (361-389), .screen-md (390-413)
+     .screen-lg (414-479), .screen-xl (480-767), .screen-xxl (≥768)
+     .screen-short (≤667h), .screen-medium (668-811h), .screen-tall (≥812h)
+     .has-notch, .has-dynamic-island, .is-iphone-se
+     .is-tablet, .is-retina
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES — Dynamic grid
+   ============================================ */
+:root {
+  --grid-cols: 2;
+}
+
+/* ============================================
+   GAME GRID — Dynamic columns
+   ============================================ */
+#games-grid {
+  grid-template-columns: repeat(var(--grid-cols, 2), 1fr);
+}
+
+/* ============================================
+   SCREEN-XS — ≤360px (iPhone SE, Galaxy S mini, old Androids)
+   ============================================ */
+.screen-xs .logo-title { font-size: 20px; }
+.screen-xs .logo-sub { font-size: 9px; }
+.screen-xs .header-inner { height: 48px; }
+.screen-xs .online-counter { padding: 4px 10px; font-size: 10px; }
+.screen-xs .oc-num { font-size: 10px; }
+.screen-xs .sound-toggle { width: 32px; height: 32px; font-size: 12px; }
+
+.screen-xs .banner-slide { height: 130px; }
+.screen-xs .banner-title { font-size: 14px; }
+.screen-xs .banner-subtitle { font-size: 10px; }
+.screen-xs .banner-deco { font-size: 32px; right: 6px; opacity: 0.35; }
+.screen-xs .banner-slide-content { padding: 10px 12px; max-width: 70%; }
+.screen-xs .banner-badge { font-size: 8px; padding: 2px 6px; }
+.screen-xs .banner-cta { font-size: 10px; padding: 4px 10px; }
+
+.screen-xs .section-header { padding: 0 16px; margin-top: 18px; margin-bottom: 10px; }
+.screen-xs .section-title { font-size: 14px; gap: 6px; }
+.screen-xs .section-icon { width: 26px; height: 26px; font-size: 14px; }
+.screen-xs .section-link { font-size: 11px; padding: 4px 10px; }
+.screen-xs .section-count { font-size: 10px; padding: 2px 8px; }
+
+.screen-xs .promo-timer { padding: 10px 12px; gap: 8px; }
+.screen-xs .timer-icon { font-size: 22px; }
+.screen-xs .timer-title { font-size: 11px; }
+.screen-xs .timer-digit { width: 22px; height: 26px; font-size: 10px; }
+
+.screen-xs .scroll-row { gap: 10px; padding: 0 16px; }
+.screen-xs .game-card { border-radius: 14px; }
+.screen-xs .card-name { font-size: 10px; }
+.screen-xs .card-play { width: 26px; height: 26px; }
+.screen-xs .card-play i { font-size: 8px; }
+.screen-xs .card-heart { width: 24px; height: 24px; min-width: 28px; min-height: 28px; }
+.screen-xs .card-info { padding: 5px 8px; }
+.screen-xs .card-emoji { font-size: 28px; }
+
+.screen-xs .chip { font-size: 12px; padding: 7px 14px; min-height: 36px; }
+.screen-xs #games-grid { gap: 8px; padding: 0 16px; }
+.screen-xs .search-box { padding: 6px 10px; }
+.screen-xs .search-box input { font-size: 13px; }
+
+.screen-xs .cta-mid-card { padding: 16px; }
+.screen-xs .cta-mid-icon { font-size: 32px; }
+
+.screen-xs .recent-card { width: 100px; height: 58px; }
+.screen-xs .recent-name { font-size: 8px; }
+
+.screen-xs .stat-card { padding: 12px 10px; }
+.screen-xs .stat-icon { font-size: 22px; }
+.screen-xs .stat-value { font-size: 20px; }
+
+.screen-xs .nav-btn { padding: 5px 12px; }
+.screen-xs .nav-label { font-size: 8px; }
+
+.screen-xs .postgame-emoji { font-size: 50px; }
+.screen-xs .postgame-title { font-size: 17px; }
+.screen-xs .postgame-content { padding: 28px 20px 20px; }
+
+/* ============================================
+   SCREEN-SM — 361-389px (iPhone 12/13 mini, Pixel 5)
+   ============================================ */
+.screen-sm .banner-slide { height: 140px; }
+.screen-sm .banner-title { font-size: 15px; }
+.screen-sm .banner-deco { font-size: 36px; }
+.screen-sm .banner-slide-content { max-width: 72%; }
+
+.screen-sm .section-title { font-size: 15px; }
+.screen-sm .card-name { font-size: 10px; }
+.screen-sm .recent-card { width: 108px; height: 60px; }
+
+/* ============================================
+   SCREEN-MD — 390-413px (iPhone 14, Pixel 7) — BASE SIZE
+   Standard. Most rules in styles.css apply here.
+   ============================================ */
+
+/* ============================================
+   SCREEN-LG — 414-479px (iPhone Plus/Max, Galaxy S Ultra)
+   ============================================ */
+.screen-lg .banner-slide { height: 160px; }
+.screen-lg .banner-title { font-size: 19px; }
+.screen-lg .banner-deco { font-size: 48px; }
+.screen-lg .banner-slide-content { max-width: 68%; }
+
+.screen-lg .section-title { font-size: 18px; }
+.screen-lg .section-icon { width: 34px; height: 34px; font-size: 20px; }
+
+.screen-lg .card-emoji { font-size: 38px; }
+.screen-lg .card-name { font-size: 12px; }
+.screen-lg .card-play { width: 34px; height: 34px; }
+.screen-lg .card-info { padding: 8px 12px; }
+
+.screen-lg .recent-card { width: 130px; height: 72px; }
+.screen-lg .recent-name { font-size: 10px; }
+
+.screen-lg .postgame-emoji { font-size: 76px; }
+.screen-lg .postgame-title { font-size: 22px; }
+
+/* ============================================
+   SCREEN-XL — 480-767px (Landscape phones, small tablets)
+   ============================================ */
+.screen-xl .banner-slide { height: 170px; }
+.screen-xl .banner-title { font-size: 20px; }
+.screen-xl .banner-deco { font-size: 52px; }
+
+.screen-xl .section-title { font-size: 18px; }
+.screen-xl .scroll-row { gap: 14px; }
+.screen-xl .recent-card { width: 140px; height: 78px; }
+
+.screen-xl .stat-card { padding: 22px 18px; }
+.screen-xl .stat-icon { font-size: 32px; }
+.screen-xl .stat-value { font-size: 28px; }
+
+.screen-xl .profile-card { padding: 24px; }
+.screen-xl .profile-name { font-size: 22px; }
+
+.screen-xl .cta-mid-card { padding: 26px; }
+.screen-xl .postgame-modal { max-width: 440px; }
+
+/* ============================================
+   SCREEN-XXL — ≥768px (Tablets, Desktop)
+   ============================================ */
+.screen-xxl .banner-carousel { max-width: 720px; margin: 0 auto; }
+.screen-xxl .banner-slide { height: 200px; }
+.screen-xxl .banner-title { font-size: 24px; }
+.screen-xxl .banner-deco { font-size: 60px; }
+
+.screen-xxl .section-header { max-width: 900px; margin-left: auto; margin-right: auto; padding: 0 24px; }
+.screen-xxl .section-title { font-size: 20px; }
+
+.screen-xxl .scroll-row { max-width: 900px; margin: 0 auto; padding: 0 24px; gap: 16px; }
+.screen-xxl .recent-card { width: 160px; height: 90px; }
+
+.screen-xxl #games-grid { max-width: 900px; margin: 0 auto; gap: 16px; padding: 0 24px; }
+.screen-xxl #chips-row { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+
+.screen-xxl .profile-card { max-width: 600px; margin: 0 auto; }
+.screen-xxl .stats-grid { max-width: 600px; margin: 0 auto; }
+
+.screen-xxl .cta-mid-card { max-width: 720px; margin: 0 auto; }
+.screen-xxl #leaderboard { max-width: 720px; margin: 0 auto; }
+
+.screen-xxl .casino-card { max-width: 720px; margin-left: auto; margin-right: auto; }
+.screen-xxl #casinos-list { max-width: 760px; margin: 0 auto; }
+
+.screen-xxl .postgame-modal { max-width: 460px; }
+
+.screen-xxl .stat-card { padding: 24px 20px; }
+.screen-xxl .stat-icon { font-size: 36px; }
+.screen-xxl .stat-value { font-size: 30px; }
+
+.screen-xxl .nav-btn { padding: 8px 24px; }
+.screen-xxl .nav-label { font-size: 10px; }
+.screen-xxl #bottom-nav { max-width: 500px; margin: 0 auto; }
+
+/* ============================================
+   HEIGHT — Short screens (≤667px, iPhone SE, old phones)
+   ============================================ */
+.screen-short .banner-slide { height: 120px; }
+.screen-short .banner-title { font-size: 14px; }
+.screen-short .banner-deco { font-size: 30px; }
+.screen-short .banner-slide-content { padding: 10px 12px; }
+
+.screen-short .section-header { margin-top: 14px; margin-bottom: 8px; }
+.screen-short .promo-timer { padding: 8px 10px; }
+.screen-short .timer-icon { font-size: 20px; }
+
+.screen-short .stat-card { padding: 12px 10px; }
+.screen-short .stat-icon { font-size: 22px; margin-bottom: 4px; }
+.screen-short .stat-value { font-size: 18px; }
+
+.screen-short .postgame-emoji { font-size: 48px; }
+.screen-short .postgame-title { font-size: 17px; }
+.screen-short .postgame-content { padding: 24px 20px 20px; }
+.screen-short .postgame-bonus { margin-top: 14px; padding: 14px; }
+
+.screen-short .profile-card { padding: 14px; }
+.screen-short .profile-avatar { width: 48px; height: 48px; }
+.screen-short .profile-name { font-size: 17px; }
+
+/* ============================================
+   HEIGHT — Tall screens (≥812px, modern phones)
+   ============================================ */
+.screen-tall .banner-slide { min-height: 150px; }
+.screen-tall .section-header { margin-top: 26px; }
+
+/* ============================================
+   PLATFORM — iOS specific
+   ============================================ */
+.device-ios .game-card { border-radius: var(--radius-xl); }
+.device-ios .chip { border-radius: var(--radius-full); }
+.device-ios .nav-btn { min-height: 44px; min-width: 44px; }
+.device-ios .card-heart { min-width: 34px; min-height: 34px; }
+.device-ios .admin-btn-sm { min-width: 44px; min-height: 44px; }
+
+/* iPhone SE specific */
+.is-iphone-se .banner-slide { height: 115px; }
+.is-iphone-se .logo-title { font-size: 18px; }
+.is-iphone-se .header-inner { height: 44px; }
+.is-iphone-se .section-header { margin-top: 14px; margin-bottom: 8px; }
+.is-iphone-se .win-feed { height: 34px; }
+.is-iphone-se .wf-chip { font-size: 10px; padding: 3px 8px; }
+.is-iphone-se .postgame-modal { max-width: 320px; }
+.is-iphone-se .modal-body { max-height: 85vh; overflow-y: auto; }
+
+/* ============================================
+   PLATFORM — Android specific
+   ============================================ */
+.device-android .game-card { border-radius: 12px; }
+.device-android .glass { border-radius: 16px; }
+.device-android .chip { border-radius: 20px; }
+.device-android .nav-btn { min-height: 48px; min-width: 48px; }
+.device-android .card-heart { min-width: 36px; min-height: 36px; }
+.device-android .admin-btn-sm { min-width: 48px; min-height: 48px; }
+.device-android .interactive:active { transform: scale(0.97); }
+
+/* Android tall phones — extra space for gesture bar */
+.device-android.android-tall #bottom-nav-wrap {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+}
+
+/* ============================================
+   PLATFORM — Desktop / Browser
+   ============================================ */
+.device-desktop .interactive:hover,
+.device-browser .interactive:hover {
+  opacity: 0.85;
+}
+.device-desktop .interactive:active,
+.device-browser .interactive:active {
+  transform: scale(0.98);
+}
+.device-desktop .game-card:hover,
+.device-browser .game-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 32px rgba(0,255,135,0.12);
+}
+.device-desktop .chip:hover,
+.device-browser .chip:hover {
+  background: rgba(255,255,255,0.06);
+}
+.device-desktop .card-heart:hover,
+.device-browser .card-heart:hover {
+  transform: scale(1.15);
+}
+.device-desktop .banner-slide:hover,
+.device-browser .banner-slide:hover {
+  transform: scale(1.01);
+}
+
+/* Cursor hints for desktop */
+.device-desktop .game-card,
+.device-desktop .banner-slide,
+.device-desktop .casino-card,
+.device-browser .game-card,
+.device-browser .banner-slide,
+.device-browser .casino-card {
+  cursor: pointer;
+}
+
+/* ============================================
+   TABLET — ≥600px min dimension
+   ============================================ */
+.is-tablet #content-area { max-width: 960px; margin: 0 auto; }
+.is-tablet .stats-grid { grid-template-columns: repeat(4, 1fr); }
+.is-tablet .casino-card { display: grid; grid-template-columns: auto 1fr; }
+.is-tablet #bottom-nav { max-width: 500px; margin: 0 auto; border-radius: var(--radius-2xl); }
+.is-tablet .postgame-modal { max-width: 480px; }
+
+/* ============================================
+   TELEGRAM SPECIFIC — Adapt by device in TG
+   ============================================ */
+
+/* Dynamic Island — needs more top space */
+.is-telegram.has-dynamic-island #main-header {
+  padding-top: calc(var(--top-offset, 0px) + 8px);
+}
+
+/* Notch phones — standard offset */
+.is-telegram.has-notch #main-header {
+  padding-top: calc(var(--top-offset, 0px) + 10px);
+}
+
+/* iPhone SE in TG — less header padding needed */
+.is-telegram.is-iphone-se #main-header {
+  padding-top: calc(var(--top-offset, 0px) + 6px);
+}
+
+/* ============================================
+   LANDSCAPE MODE
+   ============================================ */
+@media (orientation: landscape) and (max-height: 500px) {
+  #main-header { padding: 4px 16px 0 !important; }
+  .header-inner { height: 40px; }
+  .win-feed { height: 32px; }
+  .banner-slide { height: 100px; }
+  .section-header { margin-top: 10px; margin-bottom: 6px; }
+  #bottom-nav-wrap { padding: 0 16px 4px !important; }
+  #bottom-nav { padding: 2px 8px; }
+  .nav-btn { padding: 3px 12px; min-height: 36px; }
+  .nav-label { display: none; }
+  .nav-icon-wrap i { font-size: 18px; }
+
+  /* Game view in landscape */
+  .is-telegram #game-view { padding-top: 0 !important; }
+}
+
+/* ============================================
+   ACCESSIBILITY — Reduced motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .orb { animation: none !important; opacity: 0.15; }
+  .win-feed-inner { animation: none !important; }
+  .splash-emoji { animation: none !important; }
+  .splash-bar-fill { animation: none !important; transform: scaleX(1); }
+}
+
+/* ============================================
+   HIGH CONTRAST — For readability
+   ============================================ */
+@media (prefers-contrast: high) {
+  :root {
+    --text-primary: #FFFFFF;
+    --text-secondary: #C0C0C0;
+    --text-muted: #808080;
+    --border-subtle: rgba(255,255,255,0.15);
+  }
+  .card-name { text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
+}
+
+/* ============================================
+   DARK/LIGHT — Currently dark only, ready for light
+   ============================================ */
+@media (prefers-color-scheme: light) {
+  /* Currently dark-only app, but structure is ready */
+}
+
+/* ============================================
+   PRINT — Hide unnecessary elements
+   ============================================ */
+@media print {
+  #bg-orbs, #confetti-canvas, #splash-screen,
+  #bottom-nav-wrap, .win-feed, #game-view,
+  .promo-timer, #admin-panel { display: none !important; }
+  body { background: #fff; color: #000; }
+}
