@@ -1,16 +1,41 @@
 /**
- * TG Core v1.0 — Universal Telegram Mini App API Wrapper
- * Works in Telegram WebApp and falls back gracefully in browser.
+ * TG Core v2.1 — Based on ARTHOLST pattern
+ * Direct _tgWebApp access, anti-swipe, aggressive fullscreen
+ * Enhanced device detection for all screen sizes
  */
 var TG = (function() {
   'use strict';
 
-  var webapp = null;
-  var ver = 0;
+  var _tgWebApp = null;
   var backStack = [];
   var handlingBack = false;
   var mainBtnCb = null;
 
+  /* ========================================
+     LAZY DETECTION
+     ======================================== */
+  try {
+    if (typeof window.Telegram !== 'undefined'
+        && window.Telegram && window.Telegram.WebApp) {
+      _tgWebApp = window.Telegram.WebApp;
+    }
+  } catch(e) {}
+
+  function _ensureTgWebApp() {
+    if (!_tgWebApp) {
+      try {
+        if (typeof window.Telegram !== 'undefined'
+            && window.Telegram && window.Telegram.WebApp) {
+          _tgWebApp = window.Telegram.WebApp;
+        }
+      } catch(e) {}
+    }
+    return _tgWebApp;
+  }
+
+  /* ========================================
+     API OBJECT
+     ======================================== */
   var api = {
     platform: 'browser',
     isIOS: false,
@@ -18,166 +43,353 @@ var TG = (function() {
     isDesktop: false
   };
 
-  /* ========================================
-     CORE
-     ======================================== */
-
   Object.defineProperty(api, 'isAvailable', {
-    get: function() { return !!webapp; }
+    get: function() { return !!_ensureTgWebApp(); }
   });
 
   api.versionAtLeast = function(v) {
-    return ver >= parseFloat(v);
-  };
-
-  api._safeCall = function(fn, fallback) {
-    try { return fn(); }
-    catch (e) {
-      if (fallback !== undefined) return typeof fallback === 'function' ? fallback() : fallback;
-    }
+    if (!_ensureTgWebApp()) return false;
+    try { return _tgWebApp.isVersionAtLeast(String(v)); } catch(e) { return false; }
   };
 
   /* ========================================
      INIT
      ======================================== */
-
   api.init = function(options) {
     options = options || {};
 
-    if (window.Telegram && window.Telegram.WebApp) {
-      webapp = window.Telegram.WebApp;
-      ver = parseFloat(webapp.version) || 0;
-
-      api._safeCall(function() { webapp.ready(); });
-      api._safeCall(function() { webapp.expand(); });
-
-      /* Colors */
-      var hdr = options.headerColor || '#0a0a1a';
-      var bg = options.bgColor || hdr;
-      var bot = options.bottomColor || hdr;
-
-      if (api.versionAtLeast(6.1)) {
-        api._safeCall(function() { webapp.setHeaderColor(hdr); });
-        api._safeCall(function() { webapp.setBackgroundColor(bg); });
-      }
-      if (api.versionAtLeast(7.10)) {
-        api._safeCall(function() { webapp.setBottomBarColor(bot); });
-      }
-
-      /* Disable swipe close */
-      if (options.disableSwipeClose !== false && api.versionAtLeast(7.7)) {
-        api._safeCall(function() { webapp.disableVerticalSwipes(); });
-      }
-
-      /* Closing confirmation */
-      if (options.closingConfirmation !== false && api.versionAtLeast(6.1)) {
-        api._safeCall(function() { webapp.enableClosingConfirmation(); });
-      }
-
-      /* Fullscreen — aggressive, always request */
-      if (options.fullscreen !== false) {
-        /* Request immediately and keep retrying */
-        api.requestFullscreen();
-        setTimeout(function() { api.requestFullscreen(); }, 300);
-        setTimeout(function() { api.requestFullscreen(); }, 800);
-        setTimeout(function() { api.requestFullscreen(); }, 1500);
-        setTimeout(function() { api.requestFullscreen(); }, 3000);
-        setTimeout(function() { api.requestFullscreen(); }, 5000);
-
-        /* Re-request fullscreen when user returns to app */
-        document.addEventListener('visibilitychange', function() {
-          if (!document.hidden) {
-            api.requestFullscreen();
-            setTimeout(function() { api.requestFullscreen(); }, 200);
-            setTimeout(function() { api.requestFullscreen(); }, 600);
-          }
-        });
-
-        /* Re-request on first user touch (some TG versions need user gesture) */
-        var _fsTouch = function() {
-          api.requestFullscreen();
-          document.removeEventListener('touchstart', _fsTouch);
-          document.removeEventListener('click', _fsTouch);
-        };
-        document.addEventListener('touchstart', _fsTouch, { passive: true });
-        document.addEventListener('click', _fsTouch, { passive: true });
-
-        /* Re-request on focus (when switching back to TG) */
-        window.addEventListener('focus', function() {
-          setTimeout(function() { api.requestFullscreen(); }, 200);
-        });
-
-        /* Set initial fullscreen class */
-        if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
-        setTimeout(function() {
-          if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
-        }, 1000);
-        setTimeout(function() {
-          if (webapp.isFullscreen) document.documentElement.classList.add('tg-fullscreen');
-        }, 3000);
-      }
-
-      /* Theme */
-      api._applyTheme();
-      api._safeCall(function() {
-        webapp.onEvent('themeChanged', function() {
-          api._applyTheme();
-          if (hdr) api._safeCall(function() { webapp.setHeaderColor(hdr); });
-          if (bg) api._safeCall(function() { webapp.setBackgroundColor(bg); });
-        });
-      });
-
-      /* Viewport */
-      api._applyViewport();
-      api._safeCall(function() {
-        webapp.onEvent('viewportChanged', function() {
-          api._applyViewport();
-          api.requestFullscreen();
-        });
-      });
-
-      /* Safe area */
-      api._applySafeArea();
-      setTimeout(function() { api._applySafeArea(); }, 600);
-      setTimeout(function() { api._applySafeArea(); }, 2000);
-
-      /* Fullscreen change → re-apply safe areas */
-      api._safeCall(function() {
-        webapp.onEvent('fullscreenChanged', function() {
-          document.documentElement.classList.toggle('tg-fullscreen', !!webapp.isFullscreen);
-          setTimeout(function() { api._applySafeArea(); api._applyViewport(); }, 100);
-          setTimeout(function() { api._applySafeArea(); api._applyViewport(); }, 500);
-        });
-      });
-
-      /* Back button */
-      api._safeCall(function() {
-        webapp.onEvent('backButtonClicked', _onBackPressed);
-      });
-
-      /* Main button hide by default */
-      api._safeCall(function() { webapp.MainButton.hide(); });
-
-      /* Device & platform */
+    if (!_ensureTgWebApp()) {
       api._detectDevice();
-
-      /* Mark HTML */
-      document.documentElement.classList.add('tg-app');
-
-    } else {
       api._applyBrowserFallback();
+      return api;
     }
+
+    /* Ready */
+    try { _tgWebApp.ready(); } catch(e) {}
+
+    /* Colors */
+    var hdr = options.headerColor || '#06080D';
+    var bg = options.bgColor || hdr;
+    var bot = options.bottomColor || hdr;
+    try { _tgWebApp.setHeaderColor(hdr); } catch(e) {}
+    try { _tgWebApp.setBackgroundColor(bg); } catch(e) {}
+    try { _tgWebApp.setBottomBarColor(bot); } catch(e) {}
+
+    /* Closing confirmation */
+    if (options.closingConfirmation !== false) {
+      try { _tgWebApp.enableClosingConfirmation(); } catch(e) {}
+    }
+
+    /* Back button */
+    try {
+      _tgWebApp.onEvent('backButtonClicked', _onBackPressed);
+    } catch(e) {}
+
+    /* Main button hide */
+    try { _tgWebApp.MainButton.hide(); } catch(e) {}
+
+    /* Theme */
+    api._applyTheme();
+    try {
+      _tgWebApp.onEvent('themeChanged', function() {
+        api._applyTheme();
+        try { _tgWebApp.setHeaderColor(hdr); } catch(e) {}
+        try { _tgWebApp.setBackgroundColor(bg); } catch(e) {}
+      });
+    } catch(e) {}
+
+    /* Device detection */
+    api._detectDevice();
+
+    /* Mark HTML */
+    document.documentElement.classList.add('tg-app');
+    document.body.classList.add('is-telegram');
+
+    /* === PREVENT TELEGRAM COLLAPSE (ARTHOLST PATTERN) === */
+    _preventTelegramCollapse(options);
 
     return api;
   };
 
   /* ========================================
-     THEME & COLORS
+     ANTI-SWIPE & FULLSCREEN (ARTHOLST)
      ======================================== */
+  function _preventTelegramCollapse(options) {
+    if (!_tgWebApp) return;
 
+    /* 1. Expand + disable swipes + fullscreen */
+    try { _tgWebApp.expand(); } catch(e) {}
+    try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
+    try { _tgWebApp.requestFullscreen(); } catch(e) {}
+
+    /* 2. CSS classes */
+    document.documentElement.classList.add('tg-fullscreen');
+
+    /* 3. Viewport height CSS variable */
+    _updateViewportHeight();
+
+    /* 4. Listen viewport changes */
+    try {
+      _tgWebApp.onEvent('viewportChanged', function() {
+        try { _tgWebApp.expand(); } catch(e) {}
+        try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
+        _updateViewportHeight();
+        _applyScreenClasses();
+      });
+    } catch(e) {}
+
+    /* 5. Fullscreen change event */
+    try {
+      _tgWebApp.onEvent('fullscreenChanged', function() {
+        document.documentElement.classList.toggle('tg-fullscreen', !!_tgWebApp.isFullscreen);
+        _applySafeArea();
+        _updateViewportHeight();
+        _applyScreenClasses();
+      });
+    } catch(e) {}
+
+    /* 6. Safe area change event */
+    try {
+      _tgWebApp.onEvent('safeAreaChanged', function() { _applySafeArea(); });
+      _tgWebApp.onEvent('contentSafeAreaChanged', function() { _applySafeArea(); });
+    } catch(e) {}
+
+    /* 7. ANTI-SWIPE: Block "pull down to close" gesture */
+    var startY = 0;
+    document.addEventListener('touchstart', function(e) {
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+      var currentY = e.touches[0].clientY;
+      var deltaY = currentY - startY;
+
+      /* Only block downward swipe */
+      if (deltaY < 5) return;
+
+      /* Find scrollable parent */
+      var scrollable = null;
+      var el = e.target;
+      while (el && el !== document.body && el !== document.documentElement) {
+        if (el.scrollHeight > el.clientHeight) {
+          scrollable = el;
+          break;
+        }
+        el = el.parentElement;
+      }
+
+      var scrollTop = scrollable
+        ? scrollable.scrollTop
+        : (window.pageYOffset || 0);
+
+      /* If at top and pulling down — BLOCK */
+      if (scrollTop <= 1 && deltaY > 5) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    /* 8. Retry expand + fullscreen every 400ms for first 6 seconds */
+    var retryCount = 0;
+    var retryInterval = setInterval(function() {
+      retryCount++;
+      try { _tgWebApp.expand(); } catch(e) {}
+      try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
+      try { _tgWebApp.requestFullscreen(); } catch(e) {}
+      _applySafeArea();
+      if (retryCount >= 15) clearInterval(retryInterval);
+    }, 400);
+
+    /* 9. On visibility change (return to app) */
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        try { _tgWebApp.expand(); } catch(e) {}
+        try { _tgWebApp.disableVerticalSwipes(); } catch(e) {}
+        try { _tgWebApp.requestFullscreen(); } catch(e) {}
+        _applySafeArea();
+        _updateViewportHeight();
+      }
+    });
+
+    /* 10. On focus */
+    window.addEventListener('focus', function() {
+      try { _tgWebApp.expand(); } catch(e) {}
+      try { _tgWebApp.requestFullscreen(); } catch(e) {}
+    });
+
+    /* 11. On first touch — some TG versions need gesture for fullscreen */
+    var _firstTouch = function() {
+      try { _tgWebApp.expand(); } catch(e) {}
+      try { _tgWebApp.requestFullscreen(); } catch(e) {}
+      document.removeEventListener('touchstart', _firstTouch);
+    };
+    document.addEventListener('touchstart', _firstTouch, { passive: true });
+
+    /* 12. Apply safe areas */
+    _applySafeArea();
+  }
+
+  function _updateViewportHeight() {
+    if (!_tgWebApp) return;
+    var h = (_tgWebApp.viewportHeight || window.innerHeight) + 'px';
+    var sh = (_tgWebApp.viewportStableHeight || window.innerHeight) + 'px';
+    document.documentElement.style.setProperty('--tg-viewport-height', h);
+    document.documentElement.style.setProperty('--tg-viewport-stable-height', sh);
+  }
+
+  function _applySafeArea() {
+    var root = document.documentElement;
+    if (!_tgWebApp) return;
+
+    var sa = _tgWebApp.safeAreaInset || {};
+    var csa = _tgWebApp.contentSafeAreaInset || {};
+
+    root.style.setProperty('--tg-safe-top', (sa.top || 0) + 'px');
+    root.style.setProperty('--tg-safe-bottom', (sa.bottom || 0) + 'px');
+    root.style.setProperty('--tg-safe-left', (sa.left || 0) + 'px');
+    root.style.setProperty('--tg-safe-right', (sa.right || 0) + 'px');
+
+    root.style.setProperty('--tg-content-safe-top', (csa.top || 0) + 'px');
+    root.style.setProperty('--tg-content-safe-bottom', (csa.bottom || 0) + 'px');
+    root.style.setProperty('--tg-content-safe-left', (csa.left || 0) + 'px');
+    root.style.setProperty('--tg-content-safe-right', (csa.right || 0) + 'px');
+
+    /* Combined top offset for header positioning */
+    var topOffset = (sa.top || 0) + (csa.top || 0);
+    root.style.setProperty('--top-offset', topOffset + 'px');
+
+    /* Update device classes when safe area changes (may detect Dynamic Island) */
+    var body = document.body;
+    if ((sa.top || 0) >= 55) {
+      body.classList.add('has-dynamic-island');
+      body.classList.remove('has-notch');
+    } else if ((sa.top || 0) >= 44) {
+      body.classList.add('has-notch');
+      body.classList.remove('has-dynamic-island');
+    }
+  }
+
+  /* ========================================
+     DEVICE DETECTION (Enhanced)
+     ======================================== */
+  api._detectDevice = function() {
+    var ua = navigator.userAgent || '';
+    var p = 'desktop';
+
+    if (_tgWebApp && _tgWebApp.platform) {
+      var tp = _tgWebApp.platform.toLowerCase();
+      if (tp === 'ios' || tp === 'macos') p = 'ios';
+      else if (tp === 'android') p = 'android';
+      else if (tp === 'tdesktop' || tp === 'web' || tp === 'weba') p = 'desktop';
+    } else {
+      if (/iPhone|iPad|iPod/i.test(ua)) p = 'ios';
+      else if (/Android/i.test(ua)) p = 'android';
+    }
+
+    api.platform = p;
+    api.isIOS = (p === 'ios');
+    api.isAndroid = (p === 'android');
+    api.isDesktop = (p === 'desktop');
+
+    var root = document.documentElement;
+    var body = document.body;
+    root.setAttribute('data-platform', p);
+
+    /* Platform class */
+    body.classList.add('device-' + p);
+
+    /* Screen size classes */
+    _applyScreenClasses();
+
+    /* Pixel ratio */
+    var dpr = window.devicePixelRatio || 1;
+    if (dpr >= 2) body.classList.add('is-retina');
+    root.style.setProperty('--dpr', String(dpr));
+
+    /* Tablet detection */
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    if (Math.min(w, h) >= 600) body.classList.add('is-tablet');
+
+    /* iOS specific */
+    if (p === 'ios') {
+      /* iPhone SE — small screen */
+      if (w <= 375 && h <= 667) body.classList.add('is-iphone-se');
+      /* Notch detection via screen height (before safe area data arrives) */
+      if (h >= 812 && w <= 430) body.classList.add('has-notch');
+    }
+
+    /* Android specific */
+    if (p === 'android') {
+      /* Detect Android small bar phones */
+      if (h >= 700 && w <= 400) body.classList.add('android-tall');
+    }
+
+    /* Listen for resize and orientation */
+    window.addEventListener('resize', function() {
+      _applyScreenClasses();
+      root.style.setProperty('--screen-w', window.innerWidth + 'px');
+      root.style.setProperty('--screen-h', window.innerHeight + 'px');
+    });
+
+    if (window.screen && window.screen.orientation) {
+      try {
+        window.screen.orientation.addEventListener('change', function() {
+          setTimeout(_applyScreenClasses, 100);
+        });
+      } catch(e) {}
+    }
+  };
+
+  /* Screen size classes — runs on resize */
+  function _applyScreenClasses() {
+    var body = document.body;
+    var root = document.documentElement;
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+
+    /* Remove old width classes */
+    body.classList.remove('screen-xs', 'screen-sm', 'screen-md', 'screen-lg', 'screen-xl', 'screen-xxl');
+    /* Remove old height classes */
+    body.classList.remove('screen-short', 'screen-medium', 'screen-tall');
+    /* Remove tablet */
+    body.classList.remove('is-tablet');
+
+    /* Width breakpoints */
+    if (w <= 360)      body.classList.add('screen-xs');   /* iPhone SE, Galaxy S small */
+    else if (w <= 389) body.classList.add('screen-sm');   /* iPhone 12 mini, Pixel 5 */
+    else if (w <= 413) body.classList.add('screen-md');   /* iPhone 14, Pixel 7 */
+    else if (w <= 479) body.classList.add('screen-lg');   /* iPhone Plus/Max, Galaxy S Ultra */
+    else if (w <= 767) body.classList.add('screen-xl');   /* Large phones landscape, small tablets */
+    else               body.classList.add('screen-xxl');  /* Tablets, desktop */
+
+    /* Height breakpoints */
+    if (h <= 667)      body.classList.add('screen-short');   /* iPhone SE, short phones */
+    else if (h <= 811) body.classList.add('screen-medium');  /* iPhone 12 mini, older iPhones */
+    else               body.classList.add('screen-tall');    /* Modern tall phones */
+
+    /* Tablet (re-check on resize) */
+    if (Math.min(w, h) >= 600) body.classList.add('is-tablet');
+
+    /* CSS custom properties */
+    root.style.setProperty('--screen-w', w + 'px');
+    root.style.setProperty('--screen-h', h + 'px');
+
+    /* Dynamic columns for game grid */
+    var cols = 2;
+    if (w >= 1200) cols = 5;
+    else if (w >= 900) cols = 4;
+    else if (w >= 600) cols = 3;
+    else if (w >= 480) cols = 3;
+    root.style.setProperty('--grid-cols', String(cols));
+  }
+
+  /* ========================================
+     THEME
+     ======================================== */
   api._applyTheme = function() {
     var root = document.documentElement;
-    var tp = (webapp && webapp.themeParams) ? webapp.themeParams : {};
+    if (!_tgWebApp) return;
+    var tp = _tgWebApp.themeParams || {};
 
     var vars = {
       '--tg-bg': tp.bg_color || '#1a1a2e',
@@ -189,123 +401,32 @@ var TG = (function() {
       '--tg-secondary-bg': tp.secondary_bg_color || '#131320',
       '--tg-header-bg': tp.header_bg_color || '#0a0a1a',
       '--tg-section-bg': tp.section_bg_color || '#1a1a2e',
-      '--tg-section-header': tp.section_header_text_color || '#999999',
-      '--tg-subtitle': tp.subtitle_text_color || '#999999',
       '--tg-destructive': tp.destructive_text_color || '#ff3b30',
       '--tg-accent': tp.accent_text_color || tp.link_color || '#5eadff'
     };
 
     for (var k in vars) root.style.setProperty(k, vars[k]);
-
-    /* Light or dark */
-    var hex = (vars['--tg-bg'] || '#000').replace('#', '');
-    var r = parseInt(hex.substr(0, 2), 16) || 0;
-    var g = parseInt(hex.substr(2, 2), 16) || 0;
-    var b = parseInt(hex.substr(4, 2), 16) || 0;
-    var brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    root.setAttribute('data-theme', brightness > 128 ? 'light' : 'dark');
-  };
-
-  api.setColors = function(bg, header, bottom) {
-    if (!webapp) return;
-    if (bg && api.versionAtLeast(6.1)) api._safeCall(function() { webapp.setBackgroundColor(bg); });
-    if (header && api.versionAtLeast(6.1)) api._safeCall(function() { webapp.setHeaderColor(header); });
-    if (bottom && api.versionAtLeast(7.10)) api._safeCall(function() { webapp.setBottomBarColor(bottom); });
-  };
-
-  /* ========================================
-     VIEWPORT
-     ======================================== */
-
-  api._applyViewport = function() {
-    var root = document.documentElement;
-    if (webapp) {
-      root.style.setProperty('--tg-viewport-height', (webapp.viewportHeight || window.innerHeight) + 'px');
-      root.style.setProperty('--tg-viewport-stable-height', (webapp.viewportStableHeight || window.innerHeight) + 'px');
-      root.style.setProperty('--tg-is-expanded', webapp.isExpanded ? '1' : '0');
-    } else {
-      root.style.setProperty('--tg-viewport-height', window.innerHeight + 'px');
-      root.style.setProperty('--tg-viewport-stable-height', window.innerHeight + 'px');
-      root.style.setProperty('--tg-is-expanded', '1');
-    }
-  };
-
-  /* ========================================
-     SAFE AREA
-     ======================================== */
-
-  api._applySafeArea = function() {
-    var root = document.documentElement;
-
-    if (webapp && api.versionAtLeast(7.7)) {
-      var sa = webapp.safeAreaInset || {};
-      var csa = webapp.contentSafeAreaInset || {};
-
-      root.style.setProperty('--tg-safe-top', Math.min(sa.top || 0, 80) + 'px');
-      root.style.setProperty('--tg-safe-bottom', Math.min(sa.bottom || 0, 50) + 'px');
-      root.style.setProperty('--tg-safe-left', (sa.left || 0) + 'px');
-      root.style.setProperty('--tg-safe-right', (sa.right || 0) + 'px');
-
-      root.style.setProperty('--tg-content-safe-top', Math.min(csa.top || 0, 80) + 'px');
-      root.style.setProperty('--tg-content-safe-bottom', (csa.bottom || 0) + 'px');
-      root.style.setProperty('--tg-content-safe-left', (csa.left || 0) + 'px');
-      root.style.setProperty('--tg-content-safe-right', (csa.right || 0) + 'px');
-    } else {
-      var z = '0px';
-      var props = ['--tg-safe-top','--tg-safe-bottom','--tg-safe-left','--tg-safe-right',
-                   '--tg-content-safe-top','--tg-content-safe-bottom','--tg-content-safe-left','--tg-content-safe-right'];
-      for (var i = 0; i < props.length; i++) root.style.setProperty(props[i], z);
-    }
-  };
-
-  /* ========================================
-     DEVICE DETECTION
-     ======================================== */
-
-  api._detectDevice = function() {
-    var ua = navigator.userAgent || '';
-    var p = 'desktop';
-
-    if (webapp && webapp.platform) {
-      var tp = webapp.platform.toLowerCase();
-      if (tp === 'ios' || tp === 'macos') p = 'ios';
-      else if (tp === 'android') p = 'android';
-      else if (tp === 'tdesktop' || tp === 'web' || tp === 'weba') p = 'desktop';
-    } else {
-      if (/iPhone|iPad|iPod/i.test(ua)) p = 'ios';
-      else if (/Android/i.test(ua)) p = 'android';
-    }
-
-    if (!webapp) p = 'browser';
-
-    api.platform = p;
-    api.isIOS = (p === 'ios');
-    api.isAndroid = (p === 'android');
-    api.isDesktop = (p === 'desktop');
-
-    document.documentElement.setAttribute('data-platform', p);
+    root.setAttribute('data-theme', 'dark');
   };
 
   /* ========================================
      HAPTIC FEEDBACK
      ======================================== */
-
   api.haptic = {
-    light:   function() { api._safeCall(function() { webapp.HapticFeedback.impactOccurred('light'); }); },
-    medium:  function() { api._safeCall(function() { webapp.HapticFeedback.impactOccurred('medium'); }); },
-    heavy:   function() { api._safeCall(function() { webapp.HapticFeedback.impactOccurred('heavy'); }); },
-    rigid:   function() { api._safeCall(function() { webapp.HapticFeedback.impactOccurred('rigid'); }); },
-    soft:    function() { api._safeCall(function() { webapp.HapticFeedback.impactOccurred('soft'); }); },
-    success: function() { api._safeCall(function() { webapp.HapticFeedback.notificationOccurred('success'); }); },
-    warning: function() { api._safeCall(function() { webapp.HapticFeedback.notificationOccurred('warning'); }); },
-    error:   function() { api._safeCall(function() { webapp.HapticFeedback.notificationOccurred('error'); }); },
-    select:  function() { api._safeCall(function() { webapp.HapticFeedback.selectionChanged(); }); }
+    light:   function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.impactOccurred('light'); } catch(e) {} },
+    medium:  function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.impactOccurred('medium'); } catch(e) {} },
+    heavy:   function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.impactOccurred('heavy'); } catch(e) {} },
+    rigid:   function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.impactOccurred('rigid'); } catch(e) {} },
+    soft:    function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.impactOccurred('soft'); } catch(e) {} },
+    success: function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.notificationOccurred('success'); } catch(e) {} },
+    warning: function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.notificationOccurred('warning'); } catch(e) {} },
+    error:   function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.notificationOccurred('error'); } catch(e) {} },
+    select:  function() { if (!_ensureTgWebApp()) return; try { _tgWebApp.HapticFeedback.selectionChanged(); } catch(e) {} }
   };
 
   /* ========================================
      BACK BUTTON (Stack)
      ======================================== */
-
   function _onBackPressed() {
     if (backStack.length > 0) {
       handlingBack = true;
@@ -317,10 +438,10 @@ var TG = (function() {
   }
 
   function _syncBackBtn() {
-    if (!webapp) return;
-    api._safeCall(function() {
-      backStack.length > 0 ? webapp.BackButton.show() : webapp.BackButton.hide();
-    });
+    if (!_tgWebApp) return;
+    try {
+      backStack.length > 0 ? _tgWebApp.BackButton.show() : _tgWebApp.BackButton.hide();
+    } catch(e) {}
   }
 
   api.showBack = function(callback) {
@@ -346,55 +467,44 @@ var TG = (function() {
   /* ========================================
      MAIN BUTTON
      ======================================== */
-
   api.showMainButton = function(text, callback, options) {
-    if (!webapp) return;
+    if (!_ensureTgWebApp()) return;
     options = options || {};
-
-    if (mainBtnCb) api._safeCall(function() { webapp.MainButton.offClick(mainBtnCb); });
-    mainBtnCb = callback;
-
-    api._safeCall(function() {
-      var mb = webapp.MainButton;
+    try {
+      if (mainBtnCb) _tgWebApp.MainButton.offClick(mainBtnCb);
+      mainBtnCb = callback;
+      var mb = _tgWebApp.MainButton;
       mb.setText(text);
       if (options.color) mb.color = options.color;
       if (options.textColor) mb.textColor = options.textColor;
       if (options.disabled) mb.disable(); else mb.enable();
       if (callback) mb.onClick(callback);
       mb.show();
-    });
+    } catch(e) {}
   };
 
   api.hideMainButton = function() {
-    if (!webapp) return;
-    api._safeCall(function() {
-      if (mainBtnCb) webapp.MainButton.offClick(mainBtnCb);
+    if (!_ensureTgWebApp()) return;
+    try {
+      if (mainBtnCb) _tgWebApp.MainButton.offClick(mainBtnCb);
       mainBtnCb = null;
-      webapp.MainButton.hide();
-    });
-  };
-
-  api.mainButtonLoading = function(show) {
-    if (!webapp) return;
-    api._safeCall(function() {
-      show !== false ? webapp.MainButton.showProgress() : webapp.MainButton.hideProgress();
-    });
+      _tgWebApp.MainButton.hide();
+    } catch(e) {}
   };
 
   /* ========================================
      POPUPS
      ======================================== */
-
   api.popup = function(title, message, buttons) {
-    if (webapp && api.versionAtLeast(6.2)) {
+    if (_ensureTgWebApp()) {
       return new Promise(function(resolve) {
-        api._safeCall(function() {
-          webapp.showPopup({
+        try {
+          _tgWebApp.showPopup({
             title: title || '',
             message: message,
             buttons: buttons || [{ type: 'ok' }]
           }, function(id) { resolve(id); });
-        }, function() { alert(message); resolve('ok'); });
+        } catch(e) { alert(message); resolve('ok'); }
       });
     }
     alert((title ? title + '\n' : '') + message);
@@ -402,22 +512,22 @@ var TG = (function() {
   };
 
   api.confirm = function(message) {
-    if (webapp && api.versionAtLeast(6.2)) {
+    if (_ensureTgWebApp()) {
       return new Promise(function(resolve) {
-        api._safeCall(function() {
-          webapp.showConfirm(message, function(ok) { resolve(!!ok); });
-        }, function() { resolve(confirm(message)); });
+        try {
+          _tgWebApp.showConfirm(message, function(ok) { resolve(!!ok); });
+        } catch(e) { resolve(confirm(message)); }
       });
     }
     return Promise.resolve(confirm(message));
   };
 
   api.alert = function(message) {
-    if (webapp && api.versionAtLeast(6.2)) {
+    if (_ensureTgWebApp()) {
       return new Promise(function(resolve) {
-        api._safeCall(function() {
-          webapp.showAlert(message, function() { resolve(); });
-        }, function() { alert(message); resolve(); });
+        try {
+          _tgWebApp.showAlert(message, function() { resolve(); });
+        } catch(e) { alert(message); resolve(); }
       });
     }
     alert(message);
@@ -427,119 +537,33 @@ var TG = (function() {
   /* ========================================
      LINKS
      ======================================== */
-
   api.openLink = function(url, options) {
     if (!url) return;
     options = options || {};
-    if (webapp) {
-      api._safeCall(function() {
-        webapp.openLink(url, { try_instant_view: !!options.tryInstantView });
-      }, function() { window.open(url, '_blank'); });
-    } else {
-      window.open(url, '_blank');
+    if (_ensureTgWebApp()) {
+      try {
+        _tgWebApp.openLink(url, { try_instant_view: !!options.tryInstantView });
+        return;
+      } catch(e) {}
     }
+    window.open(url, '_blank');
   };
 
   api.openTelegramLink = function(url) {
     if (!url) return;
-    if (webapp) {
-      api._safeCall(function() { webapp.openTelegramLink(url); },
-                     function() { window.open(url, '_blank'); });
-    } else {
-      window.open(url, '_blank');
+    if (_ensureTgWebApp()) {
+      try { _tgWebApp.openTelegramLink(url); return; } catch(e) {}
     }
+    window.open(url, '_blank');
   };
 
   /* ========================================
-     CLOUD STORAGE
+     USER DATA
      ======================================== */
-
-  function _lsKey(k) { return 'tg_' + k; }
-
-  function _lsKeys() {
-    var res = [];
-    try {
-      for (var i = 0; i < localStorage.length; i++) {
-        var k = localStorage.key(i);
-        if (k && k.indexOf('tg_') === 0) res.push(k.substr(3));
-      }
-    } catch (e) {}
-    return res;
-  }
-
-  api.storage = {
-    set: function(key, value) {
-      var str = typeof value === 'string' ? value : JSON.stringify(value);
-      if (webapp && webapp.CloudStorage && api.versionAtLeast(6.9)) {
-        return new Promise(function(resolve) {
-          api._safeCall(function() {
-            webapp.CloudStorage.setItem(key, str, function(err) { resolve(!err); });
-          }, function() {
-            try { localStorage.setItem(_lsKey(key), str); resolve(true); } catch (e) { resolve(false); }
-          });
-        });
-      }
-      try { localStorage.setItem(_lsKey(key), str); return Promise.resolve(true); }
-      catch (e) { return Promise.resolve(false); }
-    },
-
-    get: function(key, defaultValue) {
-      if (webapp && webapp.CloudStorage && api.versionAtLeast(6.9)) {
-        return new Promise(function(resolve) {
-          api._safeCall(function() {
-            webapp.CloudStorage.getItem(key, function(err, val) {
-              if (err || val === null || val === undefined || val === '') return resolve(defaultValue);
-              try { resolve(JSON.parse(val)); } catch (e) { resolve(val); }
-            });
-          }, function() {
-            _lsGet(key, defaultValue, resolve);
-          });
-        });
-      }
-      return new Promise(function(resolve) { _lsGet(key, defaultValue, resolve); });
-    },
-
-    remove: function(key) {
-      if (webapp && webapp.CloudStorage && api.versionAtLeast(6.9)) {
-        return new Promise(function(resolve) {
-          api._safeCall(function() {
-            webapp.CloudStorage.removeItem(key, function(err) { resolve(!err); });
-          }, function() {
-            try { localStorage.removeItem(_lsKey(key)); resolve(true); } catch (e) { resolve(false); }
-          });
-        });
-      }
-      try { localStorage.removeItem(_lsKey(key)); return Promise.resolve(true); }
-      catch (e) { return Promise.resolve(false); }
-    },
-
-    keys: function() {
-      if (webapp && webapp.CloudStorage && api.versionAtLeast(6.9)) {
-        return new Promise(function(resolve) {
-          api._safeCall(function() {
-            webapp.CloudStorage.getKeys(function(err, keys) { resolve(err ? [] : (keys || [])); });
-          }, function() { resolve(_lsKeys()); });
-        });
-      }
-      return Promise.resolve(_lsKeys());
-    }
-  };
-
-  function _lsGet(key, def, resolve) {
-    try {
-      var raw = localStorage.getItem(_lsKey(key));
-      if (raw === null) return resolve(def);
-      try { resolve(JSON.parse(raw)); } catch (e) { resolve(raw); }
-    } catch (e) { resolve(def); }
-  }
-
-  /* ========================================
-     USER DATA (getters)
-     ======================================== */
-
   Object.defineProperty(api, 'user', {
     get: function() {
-      return (webapp && webapp.initDataUnsafe && webapp.initDataUnsafe.user) ? webapp.initDataUnsafe.user : null;
+      if (!_ensureTgWebApp()) return null;
+      return (_tgWebApp.initDataUnsafe && _tgWebApp.initDataUnsafe.user) ? _tgWebApp.initDataUnsafe.user : null;
     }
   });
 
@@ -576,61 +600,38 @@ var TG = (function() {
   });
 
   Object.defineProperty(api, 'initData', {
-    get: function() { return webapp ? (webapp.initData || '') : ''; }
+    get: function() { return _tgWebApp ? (_tgWebApp.initData || '') : ''; }
   });
 
   Object.defineProperty(api, 'isFullscreen', {
-    get: function() { return webapp ? !!webapp.isFullscreen : false; }
+    get: function() { return _tgWebApp ? !!_tgWebApp.isFullscreen : false; }
   });
 
   /* ========================================
      UTILITIES
      ======================================== */
-
   api.close = function() {
-    if (webapp) api._safeCall(function() { webapp.close(); });
+    if (_ensureTgWebApp()) { try { _tgWebApp.close(); } catch(e) {} }
     else window.close();
   };
 
   api.sendData = function(data) {
-    if (!webapp) return;
+    if (!_ensureTgWebApp()) return;
     var str = typeof data === 'string' ? data : JSON.stringify(data);
-    api._safeCall(function() { webapp.sendData(str); });
-  };
-
-  api.requestContact = function() {
-    if (webapp && api.versionAtLeast(6.9)) {
-      return new Promise(function(resolve) {
-        api._safeCall(function() {
-          webapp.requestContact(function(ok) { resolve(!!ok); });
-        }, function() { resolve(false); });
-      });
-    }
-    return Promise.resolve(false);
-  };
-
-  api.switchInlineQuery = function(query, chatTypes) {
-    if (webapp && api.versionAtLeast(6.7)) {
-      api._safeCall(function() { webapp.switchInlineQuery(query, chatTypes); });
-    }
+    try { _tgWebApp.sendData(str); } catch(e) {}
   };
 
   api.requestFullscreen = function() {
-    if (webapp && api.versionAtLeast(8.0)) {
-      api._safeCall(function() { webapp.requestFullscreen(); });
-    }
+    if (_ensureTgWebApp()) { try { _tgWebApp.requestFullscreen(); } catch(e) {} }
   };
 
   api.exitFullscreen = function() {
-    if (webapp && api.versionAtLeast(8.0)) {
-      api._safeCall(function() { webapp.exitFullscreen(); });
-    }
+    if (_ensureTgWebApp()) { try { _tgWebApp.exitFullscreen(); } catch(e) {} }
   };
 
   /* ========================================
      BROWSER FALLBACK
      ======================================== */
-
   api._applyBrowserFallback = function() {
     var root = document.documentElement;
 
@@ -638,30 +639,21 @@ var TG = (function() {
       '--tg-bg': '#1a1a2e', '--tg-text': '#ffffff', '--tg-hint': '#999999',
       '--tg-link': '#5eadff', '--tg-button': '#5eadff', '--tg-button-text': '#ffffff',
       '--tg-secondary-bg': '#131320', '--tg-header-bg': '#0a0a1a',
-      '--tg-section-bg': '#1a1a2e', '--tg-section-header': '#999999',
-      '--tg-subtitle': '#999999', '--tg-destructive': '#ff3b30',
+      '--tg-section-bg': '#1a1a2e', '--tg-destructive': '#ff3b30',
       '--tg-accent': '#5eadff',
       '--tg-viewport-height': window.innerHeight + 'px',
       '--tg-viewport-stable-height': window.innerHeight + 'px',
-      '--tg-is-expanded': '1',
       '--tg-safe-top': '0px', '--tg-safe-bottom': '0px',
       '--tg-safe-left': '0px', '--tg-safe-right': '0px',
       '--tg-content-safe-top': '0px', '--tg-content-safe-bottom': '0px',
-      '--tg-content-safe-left': '0px', '--tg-content-safe-right': '0px'
+      '--tg-content-safe-left': '0px', '--tg-content-safe-right': '0px',
+      '--top-offset': '0px'
     };
 
     for (var k in defaults) root.style.setProperty(k, defaults[k]);
 
-    /* Simulate TG safe area in browser preview */
-    root.style.setProperty('--top-offset', '48px');
-
     root.setAttribute('data-theme', 'dark');
     root.setAttribute('data-platform', 'browser');
-
-    api.platform = 'browser';
-    api.isIOS = false;
-    api.isAndroid = false;
-    api.isDesktop = false;
 
     window.addEventListener('resize', function() {
       root.style.setProperty('--tg-viewport-height', window.innerHeight + 'px');
