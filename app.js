@@ -14,12 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
   var gameCloseCount = 0;
   var toastTimer = null;
 
-  /* Admin auth */
-  var ADMIN_PASS = 'slotx2025';
+  /* Admin auth — locked to owner TG ID */
+  var ADMIN_ID = 479031991;
+  var ADMIN_PASS = 'slotx2025'; /* Fallback for browser testing only */
   var isAdminAuthed = false;
   var logoTapCount = 0;
   var logoTapTimer = null;
-  try { if (sessionStorage.getItem('sh_admin') === '1') isAdminAuthed = true; } catch (e) {}
+
+  function isOwner() {
+    return TG.isAvailable && TG.userId === ADMIN_ID;
+  }
 
   /* === DOM === */
   var $ = function(id) { return document.getElementById(id); };
@@ -118,6 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
     TG.haptic.heavy();
     var link = url || (DataStore.casinos.length > 0 ? DataStore.casinos[0].url : '');
     if (!link) return;
+    DataStore.trackAffiliateClick();
     TG.openLink(link);
   }
 
@@ -174,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     saveRecent(game.id);
     if (window.UI) UI.trackGamePlayed(game.id);
+    DataStore.trackGamePlay(game.id);
   }
 
   function closeGame() {
@@ -282,6 +288,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
   /* === Admin Auth === */
   function tryOpenAdmin() {
+    /* In Telegram: only owner ID can access */
+    if (TG.isAvailable) {
+      if (!isOwner()) {
+        TG.haptic.error();
+        return; /* Silent deny — no hint that admin exists */
+      }
+      isAdminAuthed = true;
+      window.openAdminPanel();
+      showAdminBtn();
+      return;
+    }
+    /* In browser: password fallback for dev/testing */
     if (isAdminAuthed) { window.openAdminPanel(); showAdminBtn(); return; }
     var modal = $('modal-admin-pass');
     $('admin-pass-input').value = '';
@@ -347,11 +365,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   $('btn-admin-profile').addEventListener('click', function() { TG.haptic.medium(); tryOpenAdmin(); });
 
-  /* Secret admin: 5 taps on logo */
+  /* Secret admin: 5 taps on logo (only works for owner or browser) */
   var logoEl = document.querySelector('.header-logo');
   if (logoEl) {
     logoEl.style.cursor = 'pointer';
     logoEl.addEventListener('click', function() {
+      /* In TG: only owner can trigger */
+      if (TG.isAvailable && !isOwner()) return;
       logoTapCount++;
       if (logoTapTimer) clearTimeout(logoTapTimer);
       logoTapTimer = setTimeout(function() { logoTapCount = 0; }, 2000);
@@ -403,12 +423,18 @@ document.addEventListener('DOMContentLoaded', function() {
   async function init() {
     if (window.SoundFX) SoundFX.init();
     await DataStore.init();
+    await DataStore.trackSession();
 
     var badge = document.querySelector('#bottom-nav .badge-pulse');
     if (badge) badge.textContent = DataStore.getActiveCasinos().length || '';
 
     updateUserUI();
-    if (isAdminAuthed) showAdminBtn();
+
+    /* Auto-auth admin by TG ID */
+    if (isOwner()) {
+      isAdminAuthed = true;
+      showAdminBtn();
+    }
 
     /* Hide modals initially */
     $('modal-currency').style.display = 'none';
