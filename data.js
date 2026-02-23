@@ -62,37 +62,37 @@ function getCurrencyByCode(code) {
   return CURRENCIES[0];
 }
 
-/* ---- DEFAULT GAMES (24 Pragmatic Play) ---- */
+/* ---- DEFAULT GAMES (24 Pragmatic Play) — Pure purple gradients ---- */
 var DEFAULT_GAMES = [
   /* === POPULAR (8) === */
-  { id: 'g1',  name: 'Sweet Bonanza',       symbol: 'vs20fruitsw',    provider: 'Pragmatic Play', tag: 'popular', icon: '🍬', image: '', gradient: 'linear-gradient(135deg,#FF6B9D,#C44569)', rtp: '96.48', maxWin: '21100x', volatility: 'high',   bonusBuy: true,  order: 0,  active: true },
-  { id: 'g2',  name: 'Gates of Olympus',    symbol: 'vs20olympgate',  provider: 'Pragmatic Play', tag: 'popular', icon: '⚡', image: '', gradient: 'linear-gradient(135deg,#FFD700,#FF8C00)', rtp: '96.50', maxWin: '5000x',  volatility: 'high',   bonusBuy: true,  order: 1,  active: true },
-  { id: 'g4',  name: 'The Dog House',       symbol: 'vs20doghouse',   provider: 'Pragmatic Play', tag: 'popular', icon: '🐕', image: '', gradient: 'linear-gradient(135deg,#a18cd1,#fbc2eb)', rtp: '96.51', maxWin: '6750x',  volatility: 'high',   bonusBuy: true,  order: 2,  active: true },
-  { id: 'g5',  name: 'Starlight Princess',  symbol: 'vs20starlight',  provider: 'Pragmatic Play', tag: 'popular', icon: '⭐', image: '', gradient: 'linear-gradient(135deg,#a855f7,#ec4899)', rtp: '96.50', maxWin: '5000x',  volatility: 'high',   bonusBuy: true,  order: 3,  active: true },
-  { id: 'g8',  name: 'Wild West Gold',      symbol: 'vs40wildwest',   provider: 'Pragmatic Play', tag: 'popular', icon: '🤠', image: '', gradient: 'linear-gradient(135deg,#c79081,#dfa579)', rtp: '96.51', maxWin: '10000x', volatility: 'medium', bonusBuy: false, order: 4,  active: true },
-  { id: 'g9',  name: 'Wolf Gold',           symbol: 'vs25wolfgold',   provider: 'Pragmatic Play', tag: 'popular', icon: '🐺', image: '', gradient: 'linear-gradient(135deg,#B8860B,#FFD700)', rtp: '96.01', maxWin: '2500x',  volatility: 'high',   bonusBuy: false, order: 5,  active: true },
-  { id: 'g10', name: 'Zeus vs Hades',       symbol: 'vs15godsofwar',  provider: 'Pragmatic Play', tag: 'popular', icon: '🔱', image: '', gradient: 'linear-gradient(135deg,#434343,#ff4500)', rtp: '96.07', maxWin: '15000x', volatility: 'high',   bonusBuy: true,  order: 6,  active: true },
-  { id: 'g12', name: 'Hand of Midas',       symbol: 'vs20midas',      provider: 'Pragmatic Play', tag: 'popular', icon: '👑', image: '', gradient: 'linear-gradient(135deg,#FFD700,#B8860B)', rtp: '96.54', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 7,  active: true },
+  { id: 'g1',  name: 'Sweet Bonanza',       symbol: 'vs20fruitsw',    provider: 'Pragmatic Play', tag: 'popular', icon: '🍬', image: '', gradient: 'linear-gradient(135deg,#2E1065,#6D28D9,#A78BFA)', rtp: '96.48', maxWin: '21100x', volatility: 'high',   bonusBuy: true,  order: 0,  active: true },
+  { id: 'g2',  name: 'Gates of Olympus',    symbol: 'vs20olympgate',  provider: 'Pragmatic Play', tag: 'popular', icon: '⚡', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.50', maxWin: '5000x',  volatility: 'high',   bonusBuy: true,  order: 1,  active: true },
+  { id: 'g4',  name: 'The Dog House',       symbol: 'vs20doghouse',   provider: 'Pragmatic Play', tag: 'popular', icon: '🐕', image: '', gradient: 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)', rtp: '96.51', maxWin: '6750x',  volatility: 'high',   bonusBuy: true,  order: 2,  active: true },
+  { id: 'g5',  name: 'Starlight Princess',  symbol: 'vs20starlight',  provider: 'Pragmatic Play', tag: 'popular', icon: '⭐', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#C084FC)', rtp: '96.50', maxWin: '5000x',  volatility: 'high',   bonusBuy: true,  order: 3,  active: true },
+  { id: 'g8',  name: 'Wild West Gold',      symbol: 'vs40wildwest',   provider: 'Pragmatic Play', tag: 'popular', icon: '🤠', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.51', maxWin: '10000x', volatility: 'medium', bonusBuy: false, order: 4,  active: true },
+  { id: 'g9',  name: 'Wolf Gold',           symbol: 'vs25wolfgold',   provider: 'Pragmatic Play', tag: 'popular', icon: '🐺', image: '', gradient: 'linear-gradient(135deg,#08051A,#2E1065,#7C3AED)', rtp: '96.01', maxWin: '2500x',  volatility: 'high',   bonusBuy: false, order: 5,  active: true },
+  { id: 'g10', name: 'Zeus vs Hades',       symbol: 'vs15godsofwar',  provider: 'Pragmatic Play', tag: 'popular', icon: '🔱', image: '', gradient: 'linear-gradient(135deg,#08051A,#3730A3,#8B5CF6)', rtp: '96.07', maxWin: '15000x', volatility: 'high',   bonusBuy: true,  order: 6,  active: true },
+  { id: 'g12', name: 'Hand of Midas',       symbol: 'vs20midas',      provider: 'Pragmatic Play', tag: 'popular', icon: '👑', image: '', gradient: 'linear-gradient(135deg,#2E1065,#7C3AED,#A78BFA)', rtp: '96.54', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 7,  active: true },
 
   /* === TOP (8) === */
-  { id: 'g3',  name: 'Sugar Rush',          symbol: 'vs20sugarrush',  provider: 'Pragmatic Play', tag: 'top', icon: '🍭', image: '', gradient: 'linear-gradient(135deg,#f6d365,#fda085)', rtp: '96.50', maxWin: '5000x',  volatility: 'high',   bonusBuy: true,  order: 8,  active: true },
-  { id: 'g6',  name: 'Big Bass Splash',     symbol: 'vs10txbigbass',  provider: 'Pragmatic Play', tag: 'top', icon: '🐟', image: '', gradient: 'linear-gradient(135deg,#89f7fe,#66a6ff)', rtp: '96.71', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 9,  active: true },
-  { id: 'g7',  name: 'Fruit Party',         symbol: 'vs20fruitparty', provider: 'Pragmatic Play', tag: 'top', icon: '🍉', image: '', gradient: 'linear-gradient(135deg,#f7971e,#ffd200)', rtp: '96.47', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 10, active: true },
-  { id: 'g14', name: 'Hot Fiesta',          symbol: 'vs25hotfiesta',  provider: 'Pragmatic Play', tag: 'top', icon: '🌶️', image: '', gradient: 'linear-gradient(135deg,#FF4500,#FFD700)', rtp: '96.56', maxWin: '5000x',  volatility: 'medium', bonusBuy: false, order: 11, active: true },
-  { id: 'g15', name: 'Gems Bonanza',        symbol: 'vs20goldfever',  provider: 'Pragmatic Play', tag: 'top', icon: '💎', image: '', gradient: 'linear-gradient(135deg,#00d2ff,#928DAB)', rtp: '96.51', maxWin: '10000x', volatility: 'high',   bonusBuy: true,  order: 12, active: true },
-  { id: 'g17', name: 'Big Bass Bonanza',    symbol: 'vs10bbbonanza',  provider: 'Pragmatic Play', tag: 'top', icon: '🎣', image: '', gradient: 'linear-gradient(135deg,#2193b0,#6dd5ed)', rtp: '96.71', maxWin: '2100x',  volatility: 'medium', bonusBuy: false, order: 13, active: true },
-  { id: 'g20', name: 'Wisdom of Athena',    symbol: 'vs20procount',   provider: 'Pragmatic Play', tag: 'top', icon: '🦉', image: '', gradient: 'linear-gradient(135deg,#4A00E0,#8E2DE2)', rtp: '96.07', maxWin: '5000x',  volatility: 'high',   bonusBuy: true,  order: 14, active: true },
-  { id: 'g21', name: 'Book of Fallen',      symbol: 'vs10bookfallen', provider: 'Pragmatic Play', tag: 'top', icon: '📖', image: '', gradient: 'linear-gradient(135deg,#1a1a2e,#e94560)', rtp: '96.50', maxWin: '5000x',  volatility: 'high',   bonusBuy: false, order: 15, active: true },
+  { id: 'g3',  name: 'Sugar Rush',          symbol: 'vs20sugarrush',  provider: 'Pragmatic Play', tag: 'top', icon: '🍭', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#C084FC)', rtp: '96.50', maxWin: '5000x',  volatility: 'high',   bonusBuy: true,  order: 8,  active: true },
+  { id: 'g6',  name: 'Big Bass Splash',     symbol: 'vs10txbigbass',  provider: 'Pragmatic Play', tag: 'top', icon: '🐟', image: '', gradient: 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)', rtp: '96.71', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 9,  active: true },
+  { id: 'g7',  name: 'Fruit Party',         symbol: 'vs20fruitparty', provider: 'Pragmatic Play', tag: 'top', icon: '🍉', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A855F7)', rtp: '96.47', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 10, active: true },
+  { id: 'g14', name: 'Hot Fiesta',          symbol: 'vs25hotfiesta',  provider: 'Pragmatic Play', tag: 'top', icon: '🌶️', image: '', gradient: 'linear-gradient(135deg,#2E1065,#4338CA,#C084FC)', rtp: '96.56', maxWin: '5000x',  volatility: 'medium', bonusBuy: false, order: 11, active: true },
+  { id: 'g15', name: 'Gems Bonanza',        symbol: 'vs20goldfever',  provider: 'Pragmatic Play', tag: 'top', icon: '💎', image: '', gradient: 'linear-gradient(135deg,#08051A,#2E1065,#C084FC)', rtp: '96.51', maxWin: '10000x', volatility: 'high',   bonusBuy: true,  order: 12, active: true },
+  { id: 'g17', name: 'Big Bass Bonanza',    symbol: 'vs10bbbonanza',  provider: 'Pragmatic Play', tag: 'top', icon: '🎣', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#C084FC)', rtp: '96.71', maxWin: '2100x',  volatility: 'medium', bonusBuy: false, order: 13, active: true },
+  { id: 'g20', name: 'Wisdom of Athena',    symbol: 'vs20procount',   provider: 'Pragmatic Play', tag: 'top', icon: '🦉', image: '', gradient: 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)', rtp: '96.07', maxWin: '5000x',  volatility: 'high',   bonusBuy: true,  order: 14, active: true },
+  { id: 'g21', name: 'Book of Fallen',      symbol: 'vs10bookfallen', provider: 'Pragmatic Play', tag: 'top', icon: '📖', image: '', gradient: 'linear-gradient(135deg,#08051A,#2E1065,#7C3AED)', rtp: '96.50', maxWin: '5000x',  volatility: 'high',   bonusBuy: false, order: 15, active: true },
 
   /* === NEW (8) === */
-  { id: 'g13', name: 'Mustang Gold',        symbol: 'vs25mustang',    provider: 'Pragmatic Play', tag: 'new', icon: '🐴', image: '', gradient: 'linear-gradient(135deg,#D2691E,#F4A460)', rtp: '96.53', maxWin: '12000x', volatility: 'medium', bonusBuy: false, order: 16, active: true },
-  { id: 'g19', name: 'Floating Dragon',     symbol: 'vs10floatdrg',   provider: 'Pragmatic Play', tag: 'new', icon: '🐉', image: '', gradient: 'linear-gradient(135deg,#d32f2f,#ff6659)', rtp: '96.71', maxWin: '50000x', volatility: 'medium', bonusBuy: true,  order: 17, active: true },
-  { id: 'g23', name: 'Aztec Gems',          symbol: 'vs5aztecgems',   provider: 'Pragmatic Play', tag: 'new', icon: '💚', image: '', gradient: 'linear-gradient(135deg,#00b09b,#96c93d)', rtp: '96.52', maxWin: '375x',   volatility: 'medium', bonusBuy: false, order: 18, active: true },
-  { id: 'g11', name: 'Cleocatra',           symbol: 'vs20cleocatra',  provider: 'Pragmatic Play', tag: 'new', icon: '🐱', image: '', gradient: 'linear-gradient(135deg,#c2e59c,#64b3f4)', rtp: '96.20', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 19, active: true },
-  { id: 'g16', name: 'Pirate Gold',         symbol: 'vs40pirate',     provider: 'Pragmatic Play', tag: 'new', icon: '🏴‍☠️', image: '', gradient: 'linear-gradient(135deg,#1a1a2e,#d4a017)', rtp: '96.50', maxWin: '45000x', volatility: 'medium', bonusBuy: false, order: 20, active: true },
-  { id: 'g18', name: 'Mochimon',            symbol: 'vs20mochimon',   provider: 'Pragmatic Play', tag: 'new', icon: '🧸', image: '', gradient: 'linear-gradient(135deg,#ee9ca7,#ffdde1)', rtp: '96.46', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 21, active: true },
-  { id: 'g22', name: 'Sweet Bonanza Xmas',  symbol: 'vs20sbxmas',     provider: 'Pragmatic Play', tag: 'new', icon: '🎄', image: '', gradient: 'linear-gradient(135deg,#e74c3c,#2ecc71)', rtp: '96.48', maxWin: '21100x', volatility: 'high',   bonusBuy: true,  order: 22, active: true },
-  { id: 'g28', name: 'Hot to Burn',         symbol: 'vs5hotburn',     provider: 'Pragmatic Play', tag: 'new', icon: '🔥', image: '', gradient: 'linear-gradient(135deg,#FF4500,#FF8C00)', rtp: '96.70', maxWin: '1000x',  volatility: 'low',    bonusBuy: false, order: 23, active: true }
+  { id: 'g13', name: 'Mustang Gold',        symbol: 'vs25mustang',    provider: 'Pragmatic Play', tag: 'new', icon: '🐴', image: '', gradient: 'linear-gradient(135deg,#2E1065,#6D28D9,#A78BFA)', rtp: '96.53', maxWin: '12000x', volatility: 'medium', bonusBuy: false, order: 16, active: true },
+  { id: 'g19', name: 'Floating Dragon',     symbol: 'vs10floatdrg',   provider: 'Pragmatic Play', tag: 'new', icon: '🐉', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#3730A3,#A78BFA)', rtp: '96.71', maxWin: '50000x', volatility: 'medium', bonusBuy: true,  order: 17, active: true },
+  { id: 'g23', name: 'Aztec Gems',          symbol: 'vs5aztecgems',   provider: 'Pragmatic Play', tag: 'new', icon: '💚', image: '', gradient: 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)', rtp: '96.52', maxWin: '375x',   volatility: 'medium', bonusBuy: false, order: 18, active: true },
+  { id: 'g11', name: 'Cleocatra',           symbol: 'vs20cleocatra',  provider: 'Pragmatic Play', tag: 'new', icon: '🐱', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#C084FC)', rtp: '96.20', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 19, active: true },
+  { id: 'g16', name: 'Pirate Gold',         symbol: 'vs40pirate',     provider: 'Pragmatic Play', tag: 'new', icon: '🏴‍☠️', image: '', gradient: 'linear-gradient(135deg,#08051A,#2E1065,#7C3AED)', rtp: '96.50', maxWin: '45000x', volatility: 'medium', bonusBuy: false, order: 20, active: true },
+  { id: 'g18', name: 'Mochimon',            symbol: 'vs20mochimon',   provider: 'Pragmatic Play', tag: 'new', icon: '🧸', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#C084FC)', rtp: '96.46', maxWin: '5000x',  volatility: 'medium', bonusBuy: true,  order: 21, active: true },
+  { id: 'g22', name: 'Sweet Bonanza Xmas',  symbol: 'vs20sbxmas',     provider: 'Pragmatic Play', tag: 'new', icon: '🎄', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.48', maxWin: '21100x', volatility: 'high',   bonusBuy: true,  order: 22, active: true },
+  { id: 'g28', name: 'Hot to Burn',         symbol: 'vs5hotburn',     provider: 'Pragmatic Play', tag: 'new', icon: '🔥', image: '', gradient: 'linear-gradient(135deg,#2E1065,#7C3AED,#C084FC)', rtp: '96.70', maxWin: '1000x',  volatility: 'low',    bonusBuy: false, order: 23, active: true }
 ];
 
 var GAME_ICONS = {};
@@ -100,7 +100,7 @@ for (var _gi = 0; _gi < DEFAULT_GAMES.length; _gi++) {
   GAME_ICONS[DEFAULT_GAMES[_gi].id] = DEFAULT_GAMES[_gi].icon;
 }
 
-/* ---- DEFAULT CASINOS (unified: casino card + banner slide) ---- */
+/* ---- DEFAULT CASINOS — Pure purple ---- */
 var DEFAULT_CASINOS = [
   {
     id: 'c1', name: '1win Casino',
@@ -108,10 +108,10 @@ var DEFAULT_CASINOS = [
     logo: '',
     bonus: 'До 500% на первый депозит',
     description: 'Топовое казино с моментальными выплатами, более 5000 игр и щедрой бонусной программой. Вывод на карту за 5 минут.',
-    badge: '🔥 ХИТ',
-    color: 'linear-gradient(135deg,#FF006E,#8B5CF6)',
+    badge: '⚡ ХИТ',
+    color: 'linear-gradient(135deg, #2E1065, #6D28D9, #A78BFA)',
     bannerTitle: 'Бонус 500% на депозит',
-    bannerSubtitle: '1win Casino — Лучшее предложение 2025',
+    bannerSubtitle: '1win Casino — Лучшее предложение 2026',
     bannerImage: '',
     order: 0, active: true
   },
@@ -122,7 +122,7 @@ var DEFAULT_CASINOS = [
     bonus: '100 FS без депозита',
     description: 'Фриспины сразу после регистрации. Более 3000 слотов от лучших провайдеров.',
     badge: '🎁 БЕСПЛАТНО',
-    color: 'linear-gradient(135deg,#6a0572,#f953c6)',
+    color: 'linear-gradient(135deg, #120833, #4338CA, #C084FC)',
     bannerTitle: '100 FS за регистрацию',
     bannerSubtitle: 'Фриспины сразу после регистрации',
     bannerImage: '',
@@ -135,7 +135,7 @@ var DEFAULT_CASINOS = [
     bonus: 'VIP кэшбэк до 30%',
     description: 'Эксклюзивная VIP-программа с персональным менеджером и повышенным кэшбэком.',
     badge: '💎 VIP',
-    color: 'linear-gradient(135deg,#FFD700,#FF8C00)',
+    color: 'linear-gradient(135deg, #08051A, #2E1065, #7C3AED)',
     bannerTitle: 'VIP Кэшбэк 30%',
     bannerSubtitle: 'Возвращаем деньги каждую неделю',
     bannerImage: '',
@@ -148,7 +148,7 @@ var DEFAULT_CASINOS = [
     bonus: 'Бонус 200% на Live Casino',
     description: 'Живые дилеры, рулетка, блэкджек и баккара в реальном времени с реальными крупье.',
     badge: '🏆 Live Casino',
-    color: 'linear-gradient(135deg,#0d1b2a,#1b4332)',
+    color: 'linear-gradient(135deg, #2E1065, #4338CA, #A78BFA)',
     bannerTitle: 'Моментальные выплаты',
     bannerSubtitle: 'Вывод за 5 минут на любую карту',
     bannerImage: '',
@@ -161,7 +161,7 @@ var DEFAULT_SETTINGS = {
   currencyCode: 'RUB',
   demoUrlTemplate: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol={symbol}&jurisdiction=99&lang={lang}&cur={currency}&stylename=generic',
   gameImageUrlTemplate: '',
-  dataVersion: 20
+  dataVersion: 38
 };
 
 /* ============================================
@@ -270,7 +270,6 @@ var DataStore = {
     if (!this.settings.demoUrlTemplate) this.settings.demoUrlTemplate = DEFAULT_SETTINGS.demoUrlTemplate;
     if (this.settings.gameImageUrlTemplate === undefined) this.settings.gameImageUrlTemplate = '';
 
-    /* Sync icons and new fields for games */
     for (var i = 0; i < this.games.length; i++) {
       var g = this.games[i];
       if (!g.icon && GAME_ICONS[g.id]) g.icon = GAME_ICONS[g.id];
@@ -278,7 +277,6 @@ var DataStore = {
       if (g.bonusBuy === undefined) g.bonusBuy = false;
     }
 
-    /* Ensure new casino banner fields exist */
     for (var ci = 0; ci < this.casinos.length; ci++) {
       var c = this.casinos[ci];
       if (!c.bannerTitle) c.bannerTitle = c.bonus || c.name;
@@ -308,96 +306,48 @@ var DataStore = {
     await Storage.set('settings', this.settings);
   },
 
-  /* ---- Favorites ---- */
-  isFavorite: function(id) {
-    return this.favorites.indexOf(id) !== -1;
-  },
+  isFavorite: function(id) { return this.favorites.indexOf(id) !== -1; },
   toggleFavorite: function(id) {
     var idx = this.favorites.indexOf(id);
-    if (idx === -1) this.favorites.push(id);
-    else this.favorites.splice(idx, 1);
+    if (idx === -1) this.favorites.push(id); else this.favorites.splice(idx, 1);
     Storage.set('favorites', this.favorites);
     return this.isFavorite(id);
   },
   getFavoriteGames: function() {
     var self = this;
-    var games = this.getActiveGames();
-    return games.filter(function(g) { return self.isFavorite(g.id); });
+    return this.getActiveGames().filter(function(g) { return self.isFavorite(g.id); });
   },
 
-  /* ---- Currency helpers ---- */
   getCurrency: function() { return getCurrencyByCode(this.settings.currencyCode || 'RUB'); },
   getCurrencySymbol: function() { return this.getCurrency().symbol; },
   setCurrency: function(code) { this.settings.currencyCode = code; this.save(); },
 
-  /* ---- Games CRUD ---- */
-  getActiveGames: function() {
-    return this.games.filter(function(g) { return g.active; }).sort(function(a, b) { return a.order - b.order; });
-  },
-  getAllGames: function() {
-    return this.games.slice().sort(function(a, b) { return a.order - b.order; });
-  },
-  getBonusBuyGames: function() {
-    return this.getActiveGames().filter(function(g) { return g.bonusBuy; });
-  },
-  getGameById: function(id) {
-    for (var i = 0; i < this.games.length; i++) { if (this.games[i].id === id) return this.games[i]; }
-    return null;
-  },
+  getActiveGames: function() { return this.games.filter(function(g) { return g.active; }).sort(function(a, b) { return a.order - b.order; }); },
+  getAllGames: function() { return this.games.slice().sort(function(a, b) { return a.order - b.order; }); },
+  getBonusBuyGames: function() { return this.getActiveGames().filter(function(g) { return g.bonusBuy; }); },
+  getGameById: function(id) { for (var i = 0; i < this.games.length; i++) { if (this.games[i].id === id) return this.games[i]; } return null; },
   addGame: function(data) {
-    var game = Object.assign({
-      id: 'g_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-      name: '', symbol: '', url: '', provider: 'Pragmatic Play', tag: 'new',
-      image: '', icon: '🎰', gradient: 'linear-gradient(135deg,#667eea,#764ba2)',
-      rtp: '96.50', maxWin: '5000x', volatility: 'medium', bonusBuy: false,
-      order: this.games.length, active: true
-    }, data);
-    this.games.push(game);
-    this.save();
-    return game;
+    var game = Object.assign({ id: 'g_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5), name: '', symbol: '', url: '', provider: 'Pragmatic Play', tag: 'new', image: '', icon: '🎰', gradient: 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)', rtp: '96.50', maxWin: '5000x', volatility: 'medium', bonusBuy: false, order: this.games.length, active: true }, data);
+    this.games.push(game); this.save(); return game;
   },
-  updateGame: function(id, data) {
-    for (var i = 0; i < this.games.length; i++) {
-      if (this.games[i].id === id) { Object.assign(this.games[i], data); this.save(); return this.games[i]; }
-    }
-    return null;
-  },
+  updateGame: function(id, data) { for (var i = 0; i < this.games.length; i++) { if (this.games[i].id === id) { Object.assign(this.games[i], data); this.save(); return this.games[i]; } } return null; },
   deleteGame: function(id) { this.games = this.games.filter(function(g) { return g.id !== id; }); this.save(); },
 
-  /* ---- Casinos CRUD ---- */
-  getActiveCasinos: function() {
-    return this.casinos.filter(function(c) { return c.active; }).sort(function(a, b) { return a.order - b.order; });
-  },
+  getActiveCasinos: function() { return this.casinos.filter(function(c) { return c.active; }).sort(function(a, b) { return a.order - b.order; }); },
   getAllCasinos: function() { return this.casinos.slice().sort(function(a, b) { return a.order - b.order; }); },
-  getCasinoById: function(id) {
-    for (var i = 0; i < this.casinos.length; i++) { if (this.casinos[i].id === id) return this.casinos[i]; }
-    return null;
-  },
+  getCasinoById: function(id) { for (var i = 0; i < this.casinos.length; i++) { if (this.casinos[i].id === id) return this.casinos[i]; } return null; },
   addCasino: function(data) {
-    var c = Object.assign({
-      id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-      name: '', url: '', logo: '', bonus: '', description: '', badge: '',
-      color: 'linear-gradient(135deg,#667eea,#764ba2)',
-      bannerTitle: '', bannerSubtitle: '', bannerImage: '',
-      order: this.casinos.length, active: true
-    }, data);
+    var c = Object.assign({ id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5), name: '', url: '', logo: '', bonus: '', description: '', badge: '', color: 'linear-gradient(135deg,#2E1065,#4338CA,#A78BFA)', bannerTitle: '', bannerSubtitle: '', bannerImage: '', order: this.casinos.length, active: true }, data);
     if (!c.bannerTitle) c.bannerTitle = c.bonus || c.name;
     if (!c.bannerSubtitle) c.bannerSubtitle = c.name;
     this.casinos.push(c); this.save(); return c;
   },
-  updateCasino: function(id, data) {
-    for (var i = 0; i < this.casinos.length; i++) {
-      if (this.casinos[i].id === id) { Object.assign(this.casinos[i], data); this.save(); return this.casinos[i]; }
-    }
-    return null;
-  },
+  updateCasino: function(id, data) { for (var i = 0; i < this.casinos.length; i++) { if (this.casinos[i].id === id) { Object.assign(this.casinos[i], data); this.save(); return this.casinos[i]; } } return null; },
   deleteCasino: function(id) { this.casinos = this.casinos.filter(function(c) { return c.id !== id; }); this.save(); },
 
-  /* ---- Settings ---- */
   getSettings: function() { return this.settings; },
   updateSettings: function(data) { Object.assign(this.settings, data); this.save(); },
 
-  /* ---- Game URL ---- */
   getGameUrl: function(game) {
     if (game.url) return game.url;
     var template = this.settings.demoUrlTemplate || DEFAULT_SETTINGS.demoUrlTemplate;
@@ -405,49 +355,24 @@ var DataStore = {
     return template.replace('{symbol}', game.symbol).replace('{lang}', cur.lang).replace('{currency}', cur.code);
   },
 
-  /* ---- Game Image URL ---- */
   getGameImageUrl: function(game) {
-    /* 1. Manual image set in admin → highest priority */
     if (game.image) return game.image;
-    /* 2. Auto-generate from symbol + template (if configured) */
-    if (game.symbol && this.settings.gameImageUrlTemplate) {
-      return this.settings.gameImageUrlTemplate.replace('{symbol}', game.symbol);
-    }
-    /* 3. No image — card will show emoji icon */
+    if (game.symbol && this.settings.gameImageUrlTemplate) return this.settings.gameImageUrlTemplate.replace('{symbol}', game.symbol);
     return '';
   },
 
-  /* ---- Export / Import ---- */
-  exportConfig: function() {
-    return JSON.stringify({ games: this.games, casinos: this.casinos, settings: this.settings, exportedAt: new Date().toISOString() }, null, 2);
-  },
+  exportConfig: function() { return JSON.stringify({ games: this.games, casinos: this.casinos, settings: this.settings, exportedAt: new Date().toISOString() }, null, 2); },
   importConfig: async function(jsonStr) {
-    try {
-      var data = JSON.parse(jsonStr);
-      if (data.games && Array.isArray(data.games)) this.games = data.games;
-      if (data.casinos && Array.isArray(data.casinos)) this.casinos = data.casinos;
-      if (data.settings) Object.assign(this.settings, data.settings);
-      await this.save();
-      return true;
-    } catch (e) { return false; }
+    try { var data = JSON.parse(jsonStr); if (data.games && Array.isArray(data.games)) this.games = data.games; if (data.casinos && Array.isArray(data.casinos)) this.casinos = data.casinos; if (data.settings) Object.assign(this.settings, data.settings); await this.save(); return true; } catch (e) { return false; }
   },
-  /* ---- Activity Tracking ---- */
+
   async trackSession() {
     var act = this.activity;
     act.sessions = (act.sessions || 0) + 1;
     if (!act.firstVisit) act.firstVisit = new Date().toISOString();
     act.lastVisit = new Date().toISOString();
-    /* Save TG user info */
     if (window.TG && TG.user) {
-      act.userInfo = {
-        id: TG.userId,
-        firstName: TG.user.first_name || '',
-        lastName: TG.user.last_name || '',
-        username: TG.userUsername || '',
-        lang: TG.userLang || '',
-        isPremium: TG.isPremium || false,
-        platform: TG.platform || 'browser'
-      };
+      act.userInfo = { id: TG.userId, firstName: TG.user.first_name || '', lastName: TG.user.last_name || '', username: TG.userUsername || '', lang: TG.userLang || '', isPremium: TG.isPremium || false, platform: TG.platform || 'browser' };
     }
     this.activity = act;
     await Storage.set('activity', act);
@@ -465,9 +390,7 @@ var DataStore = {
     Storage.set('activity', this.activity);
   },
 
-  getActivity: function() {
-    return this.activity || {};
-  },
+  getActivity: function() { return this.activity || {}; },
 
   resetToDefaults: async function() {
     this.games = JSON.parse(JSON.stringify(DEFAULT_GAMES));
