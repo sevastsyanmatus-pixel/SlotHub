@@ -30,9 +30,9 @@
       try { tg.expand(); } catch(e) {}
       try { if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } catch(e) {}
       try { if (tg.requestFullscreen) tg.requestFullscreen(); } catch(e) {}
-      try { if (tg.setHeaderColor) tg.setHeaderColor('#06080D'); } catch(e) {}
-      try { if (tg.setBackgroundColor) tg.setBackgroundColor('#06080D'); } catch(e) {}
-      try { if (tg.setBottomBarColor) tg.setBottomBarColor('#06080D'); } catch(e) {}
+      try { if (tg.setHeaderColor) tg.setHeaderColor('#030510'); } catch(e) {}
+      try { if (tg.setBackgroundColor) tg.setBackgroundColor('#030510'); } catch(e) {}
+      try { if (tg.setBottomBarColor) tg.setBottomBarColor('#030510'); } catch(e) {}
 
       /* ARTHOLST CRITICAL: Set --top-offset BEFORE any CSS renders. */
       try {
@@ -88,6 +88,9 @@
   });
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="tg-core.css">
@@ -135,16 +138,13 @@
         <p class="logo-title">Slot<span class="text-accent">X</span></p>
         <p class="logo-sub" id="header-greeting">Демо-слоты бесплатно</p>
       </div>
-      <div class="header-right">
-        <button id="sound-toggle" class="sound-toggle interactive active" aria-label="Звук"><i class="fa-solid fa-volume-high"></i></button>
-        <div class="online-counter"><span class="oc-dot"></span><span id="online-count" class="oc-num">1,247</span><span class="oc-label">online</span></div>
-      </div>
     </div>
   </header>
 
   <!-- LIVE WIN FEED -->
   <div class="win-feed">
     <div class="wf-live-badge"><span class="wf-live-dot"></span>LIVE</div>
+    <div class="wf-online-badge"><span class="wf-online-dot"></span><span id="online-count" class="wf-online-num">1,247</span></div>
     <div class="win-feed-inner" id="win-feed-inner"></div>
   </div>
 
@@ -246,7 +246,7 @@
 
     <!-- GAMES -->
     <section id="tab-games" style="display:none;">
-      <div class="sticky top-0 z-20 px-5 pt-3 pb-2" style="background:rgba(11,14,20,0.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);">
+      <div class="sticky top-0 z-20 px-5 pt-3 pb-2" style="background:rgba(10,10,20,0.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);">
         <div class="search-box flex items-center px-3 py-2.5 gap-2">
           <i class="fa-solid fa-magnifying-glass text-sm" style="color:var(--text-muted);"></i>
           <input id="search-input" type="text" placeholder="🎰 Найти слот..." autocomplete="off">
@@ -261,7 +261,7 @@
     <!-- CASINOS -->
     <section id="tab-casinos" style="display:none;">
       <div class="px-5 pt-4">
-        <p class="font-bold text-xl text-white">🏆 Лучшие казино 2025</p>
+        <p class="font-bold text-xl text-white">🏆 Лучшие казино 2026</p>
         <p class="text-sm mt-1" style="color:var(--text-muted);">Эксклюзивные бонусы от проверенных партнёров</p>
       </div>
       <div id="casinos-list" class="px-5 mt-4 pb-8"></div>
@@ -285,6 +285,18 @@
         <p class="font-bold text-lg text-white mb-1">⚙️ Настройки</p>
         <p class="text-sm mb-5" style="color:var(--text-muted);">Параметры демо-режима</p>
 
+        <div class="mb-4">
+          <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-muted);">Звук</p>
+          <button id="sound-toggle" class="btn-ghost interactive w-full py-3.5 px-4 rounded-xl text-sm flex items-center gap-3 sound-toggle active">
+            <span class="text-xl flex-shrink-0">🔊</span>
+            <div class="flex-1 text-left" style="min-width:0;">
+              <span class="font-bold text-white" id="sound-label">Звук включен</span>
+              <p class="text-xs mt-0.5" style="color:var(--text-muted);">Эффекты и уведомления</p>
+            </div>
+            <i class="fa-solid fa-volume-high flex-shrink-0" style="color:#C084FC;"></i>
+          </button>
+        </div>
+
         <div class="stats-grid mb-5">
           <div class="stat-card"><div class="stat-icon">🎮</div><div class="stat-value" id="stat-played">0</div><div class="stat-label">Игр сыграно</div></div>
           <div class="stat-card"><div class="stat-icon">❤️</div><div class="stat-value" id="stat-favorites">0</div><div class="stat-label">В избранном</div></div>
@@ -298,14 +310,14 @@
             <span id="currency-flag" class="text-xl flex-shrink-0">🇷🇺</span>
             <div class="flex-1 text-left" style="min-width:0;">
               <span id="currency-code" class="font-bold text-white">RUB</span>
-              <span id="currency-symbol-display" class="ml-1 font-semibold" style="color:var(--accent-green);">₽</span>
+              <span id="currency-symbol-display" class="ml-1 font-semibold" style="color:#22C55E;">₽</span>
               <p id="currency-name" class="text-xs mt-0.5 truncate" style="color:var(--text-muted);">Российский рубль</p>
             </div>
             <i class="fa-solid fa-chevron-right text-xs flex-shrink-0" style="color:var(--text-muted);"></i>
           </button>
         </div>
 
-        <div class="mt-5 p-5 rounded-2xl relative overflow-hidden" style="background:linear-gradient(135deg,rgba(255,0,110,0.15),rgba(139,92,246,0.15));border:1px solid rgba(255,0,110,0.2);">
+        <div class="mt-5 p-5 rounded-2xl relative overflow-hidden" style="background:linear-gradient(135deg,rgba(46,16,101,0.15),rgba(109,40,217,0.08),rgba(67,56,202,0.05));border:1px solid rgba(109,40,217,0.12);">
           <div class="text-3xl mb-3">🎰</div>
           <p class="font-bold text-lg text-white">Играйте на реальные деньги!</p>
           <p class="text-sm mt-2" style="color:var(--text-secondary);">Получите бонус до 500% и выигрывайте</p>
@@ -406,7 +418,7 @@
     </div>
     <input id="admin-pass-input" type="password" class="form-input" style="width:100%;margin-bottom:12px;" placeholder="Введите пароль">
     <p id="admin-pass-error" style="display:none;color:#EF4444;font-size:12px;margin-bottom:12px;">Неверный пароль</p>
-    <button id="admin-pass-submit" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--accent-green);color:#000;">Войти</button>
+    <button id="admin-pass-submit" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--cta-gradient);color:#fff;">Войти</button>
   </div>
 </div>
 
@@ -444,7 +456,7 @@
       <button id="admin-close" class="w-8 h-8 rounded-lg flex items-center justify-center interactive" style="background:rgba(255,255,255,0.06);"><i class="fa-solid fa-xmark text-sm" style="color:var(--text-secondary);"></i></button>
       <span class="font-bold text-base text-white">Админ-панель</span>
     </div>
-    <button id="admin-export-btn" class="interactive text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(0,255,135,0.12);color:var(--accent-green);">Экспорт</button>
+    <button id="admin-export-btn" class="interactive text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:rgba(139,92,246,0.12);color:#C084FC;">Экспорт</button>
   </div>
   <div class="admin-tabs hide-scrollbar">
     <button class="admin-tab active" data-admin-tab="games"><i class="fa-solid fa-gamepad mr-1.5"></i>Игры</button>
@@ -455,7 +467,7 @@
   </div>
   <div class="admin-content hide-scrollbar" id="admin-content"></div>
   <div id="admin-fab" style="display:none;position:fixed;bottom:24px;right:24px;z-index:210;">
-    <button id="admin-add-btn" class="w-14 h-14 rounded-full flex items-center justify-center interactive shadow-lg" style="background:var(--accent-green);box-shadow:0 4px 20px rgba(0,255,135,0.3);"><i class="fa-solid fa-plus text-lg" style="color:#000;"></i></button>
+    <button id="admin-add-btn" class="w-14 h-14 rounded-full flex items-center justify-center interactive shadow-lg" style="background:linear-gradient(135deg,#2E1065,#4338CA,#6D28D9,#7C3AED);box-shadow:0 4px 20px rgba(124,58,237,0.4);"><i class="fa-solid fa-plus text-lg" style="color:#fff;"></i></button>
   </div>
 </div>
 
@@ -465,7 +477,7 @@
       <button id="admin-form-back" class="w-8 h-8 rounded-lg flex items-center justify-center interactive" style="background:rgba(255,255,255,0.06);"><i class="fa-solid fa-chevron-left text-sm" style="color:var(--text-secondary);"></i></button>
       <span class="font-bold text-base text-white" id="admin-form-title">Добавить</span>
     </div>
-    <button id="admin-form-save" class="interactive text-sm font-bold px-4 py-1.5 rounded-lg" style="background:var(--accent-green);color:#000;">Сохранить</button>
+    <button id="admin-form-save" class="interactive text-sm font-bold px-4 py-1.5 rounded-lg" style="background:var(--cta-gradient);color:#fff;">Сохранить</button>
   </div>
   <div class="flex-1 overflow-y-auto p-4 hide-scrollbar" id="admin-form-body"></div>
 </div>
@@ -482,7 +494,7 @@
 })();
 </script>
 <script src="tg-core.js"></script>
-<script>TG.init({ headerColor: '#06080D', bgColor: '#06080D', bottomColor: '#06080D', fullscreen: true, closingConfirmation: true, disableSwipeClose: true });</script>
+<script>TG.init({ headerColor: '#030510', bgColor: '#030510', bottomColor: '#030510', fullscreen: true, closingConfirmation: true, disableSwipeClose: true });</script>
 <script src="sounds.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>
