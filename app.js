@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
     TG.hideBack();
 
     /* Build stack in reverse priority — last pushed = first handled on back press */
-    if (activeTab !== 'home' && $('game-view').style.display !== 'flex') {
+    if (activeTab !== 'home' && $('game-view').style.display === 'none') {
       TG.showBack(function() { switchTab('home'); });
     }
 
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
       TG.showBack(function() { $('story-close').click(); });
     }
 
-    if ($('game-view').style.display === 'flex') {
+    if ($('game-view').style.display !== 'none') {
       TG.showBack(function() { closeGame(); });
     }
   }
@@ -383,41 +383,6 @@ document.addEventListener('DOMContentLoaded', function() {
   $('game-back-btn').addEventListener('click', closeGame);
   $('game-landscape-back').addEventListener('click', closeGame);
   $('game-fallback-btn').addEventListener('click', function() { if (currentGameUrl) TG.openLink(currentGameUrl); });
-  $('game-fullscreen-btn').addEventListener('click', function() {
-    var gv = $('game-view');
-    var isFs = gv.classList.contains('game-fs');
-    gv.classList.toggle('game-fs');
-    if (!isFs) { try { if (window.Telegram && Telegram.WebApp.requestFullscreen) Telegram.WebApp.requestFullscreen(); } catch(e) {} }
-    try {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (gv.requestFullscreen) gv.requestFullscreen().catch(function(){});
-        else if (gv.webkitRequestFullscreen) gv.webkitRequestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen().catch(function(){});
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      }
-    } catch (e) {}
-  });
-
-  var fsRestore = $('game-fs-restore');
-  if (fsRestore) {
-    fsRestore.addEventListener('click', function() {
-      $('game-view').classList.remove('game-fs');
-      try {
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
-          if (document.exitFullscreen) document.exitFullscreen().catch(function(){});
-          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        }
-      } catch(e) {}
-    });
-  }
-
-  document.addEventListener('fullscreenchange', function() {
-    if (!document.fullscreenElement) $('game-view').classList.remove('game-fs');
-  });
-  document.addEventListener('webkitfullscreenchange', function() {
-    if (!document.webkitFullscreenElement) $('game-view').classList.remove('game-fs');
-  });
 
   /* Real play link — intercept for TG */
   var realPlayBtn = $('btn-real-play');
@@ -442,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
   $('modal-postgame').addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
   $('toast').addEventListener('click', function() { openAffiliate(); });
   window.addEventListener('resize', function() { if (window.UI) UI.updateBannerPosition(); });
-  window.addEventListener('popstate', function() { if ($('game-view').style.display === 'flex') closeGame(); });
+  window.addEventListener('popstate', function() { if ($('game-view').style.display !== 'none') closeGame(); });
 
   /* Sound toggle */
   var soundBtn = $('sound-toggle');
