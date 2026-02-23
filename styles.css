@@ -501,6 +501,23 @@ body {
    TELEGRAM MINI APP ADAPTATION
    ============================================ */
 html.tg-app { --top-offset: calc(var(--tg-safe-top, 0px) + var(--tg-content-safe-top, 0px)); }
+
+/* Fullscreen TG — guarantee minimum top offset so TG buttons don't overlap */
+html.tg-app.tg-fullscreen {
+  --top-offset: max(calc(var(--tg-safe-top, 0px) + var(--tg-content-safe-top, 0px)), 56px);
+}
+html.tg-app.tg-fullscreen #main-header {
+  padding-top: calc(var(--top-offset) + 16px);
+}
+html.tg-app.tg-fullscreen #main-header .header-inner {
+  height: 62px;
+}
+html.tg-app.tg-fullscreen .logo-title {
+  font-size: 26px;
+}
+html.tg-app.tg-fullscreen .notification-popup {
+  margin-top: calc(var(--top-offset) + 24px);
+}
 html.tg-app body { height: var(--tg-viewport-stable-height, 100dvh) !important; touch-action: manipulation; }
 html.tg-app #content-area { overscroll-behavior-y: contain !important; }
 
@@ -514,9 +531,12 @@ html.tg-app #story-close { display: none !important; }
 html.tg-app #bottom-nav-wrap { padding-bottom: calc(var(--tg-safe-bottom) + 4px) !important; }
 html.tg-app .toast { bottom: calc(85px + var(--tg-safe-bottom)) !important; }
 html.tg-app #game-view { padding-top: var(--top-offset) !important; }
+html.tg-app.tg-fullscreen #game-view { padding-top: calc(var(--top-offset) + 4px) !important; }
 html.tg-app #game-topbar { padding-top: 4px !important; }
 html.tg-app #admin-panel { padding-top: calc(var(--top-offset) + 4px) !important; }
+html.tg-app.tg-fullscreen #admin-panel { padding-top: calc(var(--top-offset) + 12px) !important; }
 html.tg-app .admin-form-overlay { padding-top: calc(var(--top-offset) + 4px) !important; }
+html.tg-app.tg-fullscreen .admin-form-overlay { padding-top: calc(var(--top-offset) + 12px) !important; }
 html.tg-app .story-progress { padding-top: calc(var(--top-offset) + 16px) !important; }
 html.tg-app .story-close-btn { top: calc(var(--top-offset) + 24px) !important; }
 html.tg-app #splash-screen { padding-top: var(--top-offset); }
