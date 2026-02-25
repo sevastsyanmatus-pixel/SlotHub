@@ -165,7 +165,7 @@ var DEFAULT_GAMES = [
   { id: 'g_rio', name: 'Heart of Rio', symbol: 'vs25rio', provider: 'Pragmatic Play', tag: 'popular', icon: '🦜', image: '', gradient: 'linear-gradient(135deg,#2E1065,#6D28D9,#C084FC)', rtp: '96.50', maxWin: '10500x', volatility: 'medium', bonusBuy: false, order: 102, active: true },
   { id: 'g_chicken', name: 'The Great Chicken Escape', symbol: 'vs20chicken', provider: 'Pragmatic Play', tag: 'top', icon: '🐔', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.50', maxWin: '5000x', volatility: 'medium', bonusBuy: false, order: 103, active: true },
   { id: 'g_bbarnhouse', name: 'Bigger Barn House Bonanza', symbol: 'vswaysbbarnh', provider: 'Pragmatic Play', tag: 'new', icon: '🚜', image: '', gradient: 'linear-gradient(135deg,#2E1065,#6D28D9,#C084FC)', rtp: '96.50', maxWin: '10000x', volatility: 'high', bonusBuy: true, order: 104, active: true },
-  { id: 'g_mummy100', name: 'Mummy\'s Jewels 100', symbol: 'vswaysmjwl2', url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=vswaysmjwl2&websiteUrl=https%3A%2F%2Fdemogamesfree.pragmaticplay.net&jurisdiction=99&lobby_url=https%3A%2F%2Fwww.pragmaticplay.com%2Fen%2F&lang={lang}&cur={currency}', provider: 'Pragmatic Play', tag: 'new', icon: '💎', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.50', maxWin: '5000x', volatility: 'high', bonusBuy: true, order: 105, active: true },
+  { id: 'g_mummy100', name: 'Mummy\'s Jewels 100', symbol: 'vswaysmjwl2', url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=vswaysmjwl2&websiteUrl=https%3A%2F%2Fdemogamesfree.pragmaticplay.net&jurisdiction=99&lobby_url=https%3A%2F%2Fwww.pragmaticplay.com%2Fen%2F&lang={lang}&cur={currency}', provider: 'Pragmatic Play', tag: 'new', icon: '💎', image: 'https://www.pragmaticplay.com/wp-content/uploads/2026/02/Mummys-Jewels-100_339x180_EN.png', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.50', maxWin: '5000x', volatility: 'high', bonusBuy: true, order: 105, active: true },
   { id: 'g_osiris', name: 'Treasures of Osiris', symbol: 'vs25tripleps', provider: 'Pragmatic Play', tag: 'new', icon: '⚱️', image: '', gradient: 'linear-gradient(135deg,#08051A,#3730A3,#A78BFA)', rtp: '96.50', maxWin: '5000x', volatility: 'high', bonusBuy: true, order: 106, active: true }
 ];
 
@@ -234,7 +234,7 @@ var DEFAULT_SETTINGS = {
   currencyCode: 'RUB',
   demoUrlTemplate: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol={symbol}&jurisdiction=99&lang={lang}&cur={currency}',
   gameImageUrlTemplate: '',
-  dataVersion: 93
+  dataVersion: 102
 };
 
 /* ============================================
