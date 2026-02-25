@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
     for (var i = 0; i < renderFns.length; i++) {
       safeRender(renderFns[i][0], renderFns[i][1]);
     }
-    setTimeout(function() { safeRender('initNotifications', initNotifications); }, 45000);
+    setTimeout(function() { safeRender('initNotifications', initNotifications); }, 10000);
 
     /* Time tracking */
     setInterval(function() { var t = App.getLocal('timeInApp', 0); App.setLocal('timeInApp', t + 60000); }, 60000);
