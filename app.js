@@ -181,7 +181,6 @@ document.addEventListener('DOMContentLoaded', function() {
     $('game-iframe').src = '';
     $('game-iframe').onload = null;
     $('game-view').classList.remove('game-fs');
-    /* Exit TG fullscreen if active */
     try { if (window.Telegram && Telegram.WebApp.exitFullscreen) Telegram.WebApp.exitFullscreen(); } catch(e) {}
     if (gameLoadTimeout) { clearTimeout(gameLoadTimeout); gameLoadTimeout = null; }
 
@@ -192,10 +191,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.UI) { UI.renderRecent(); UI.renderFavorites(); }
 
     gameCloseCount++;
-    if (gameCloseCount >= 2 && gameCloseCount % 2 === 0 && currentGameObj) {
-      showPostgamePopup(currentGameObj);
-    }
-
     updateNavigation();
   }
 
@@ -205,15 +200,6 @@ document.addEventListener('DOMContentLoaded', function() {
     r.unshift(gameId);
     if (r.length > 6) r = r.slice(0, 6);
     setLocal('recentGames', r);
-  }
-
-  function showPostgamePopup(game) {
-    $('postgame-emoji').textContent = game.icon || '🎰';
-    $('postgame-game-name').textContent = game.name;
-    var title = document.querySelector('.postgame-title');
-    var firstName = TG.userFirstName;
-    if (title && firstName) title.textContent = firstName + ', понравилась игра?';
-    showModal($('modal-postgame'));
   }
 
   /* === Modals === */
@@ -401,11 +387,8 @@ document.addEventListener('DOMContentLoaded', function() {
     (function(btn) { btn.addEventListener('click', function() { var m = btn.closest('.modal-overlay'); if (m) hideModal(m); }); })(closeBtns[ci]);
   }
 
-  $('postgame-cta').addEventListener('click', function() { hideModal($('modal-postgame')); switchTab('casinos'); });
-  $('postgame-skip').addEventListener('click', function() { hideModal($('modal-postgame')); });
-  $('modal-currency').addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
-  $('modal-postgame').addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
-  $('toast').addEventListener('click', function() { openAffiliate(); });
+      $('modal-currency').addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
+    $('toast').addEventListener('click', function() { openAffiliate(); });
   window.addEventListener('resize', function() { if (window.UI) UI.updateBannerPosition(); });
   window.addEventListener('popstate', function() { if ($('game-view').style.display !== 'none') closeGame(); });
 
@@ -434,8 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Hide modals initially */
     $('modal-currency').style.display = 'none';
-    $('modal-postgame').style.display = 'none';
-    $('modal-admin-pass').style.display = 'none';
+        $('modal-admin-pass').style.display = 'none';
 
     var firstName = TG.userFirstName;
     if (firstName) {
