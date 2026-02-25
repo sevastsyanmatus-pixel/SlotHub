@@ -1,4 +1,43 @@
-/* ============================================
+  function renderRecent() {
+    var el = document.getElementById('recent-games');
+    if (!el) return;
+    var r = App.getLocal('recentGames', []);
+    if (!r || r.length === 0) { el.parentElement.style.display = 'none'; return; }
+    el.parentElement.style.display = 'block';
+    var html = '';
+    for (var i = 0; i < r.length; i++) {
+      var g = DataStore.getGameById(r[i]);
+      if (!g) continue;
+      html += '<div class="recent-item interactive" data-game-id="' + g.id + '">';
+      html += '<div class="recent-thumb" style="background:' + (g.image ? 'url(\'' + esc(g.image) + '\') center/cover' : g.gradient) + ';">';
+      if (!g.image) html += '<div class="recent-emoji">' + g.icon + '</div>';
+      html += '</div>';
+      html += '<div class="recent-name">' + esc(g.name) + '</div>';
+      html += '</div>';
+    }
+    el.innerHTML = html;
+  }  function createGameCard(game) {
+    var isFav = DataStore.isFavorite(game.id);
+    var heat = getGameHeat(game.id);
+    var html = '<div class="game-card interactive" data-game-id="' + game.id + '">';
+    html += '<div class="game-card-thumb" style="background:' + (game.image ? 'url(\'' + esc(game.image) + '\') center/cover' : game.gradient) + ';">';
+    if (!game.image) html += '<div class="card-emoji">' + game.icon + '</div>';
+
+    html += '<div class="card-top">';
+    if (game.tag) { html += '<span class="card-chip chip-' + game.tag + '">' + getTagLabel(game.tag) + '</span>'; }
+    else { html += '<div></div>'; }
+    html += '<button class="card-heart' + (isFav ? ' active' : '') + '" data-fav-id="' + game.id + '"><i class="' + (isFav ? 'fa-solid' : 'fa-regular') + ' fa-heart"></i></button>';
+    html += '</div>';
+
+    html += '<div class="card-play-overlay"><div class="card-play"><i class="fa-solid fa-play"></i></div></div>';
+    html += '</div>';
+
+    html += '<div class="game-card-info">';
+    html += '<div class="card-name">' + esc(game.name) + '</div>';
+    html += '<div class="card-provider">' + esc(game.provider || 'Pragmatic Play') + '</div>';
+    html += '</div></div>';
+    return html;
+  }/* ============================================
    SlotX — UI Rendering (ARTHOLST pattern)
    All renders wrapped in try/catch for stability
    ============================================ */
