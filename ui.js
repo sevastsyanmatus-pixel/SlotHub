@@ -1,43 +1,4 @@
-  function renderRecent() {
-    var el = document.getElementById('recent-games');
-    if (!el) return;
-    var r = App.getLocal('recentGames', []);
-    if (!r || r.length === 0) { el.parentElement.style.display = 'none'; return; }
-    el.parentElement.style.display = 'block';
-    var html = '';
-    for (var i = 0; i < r.length; i++) {
-      var g = DataStore.getGameById(r[i]);
-      if (!g) continue;
-      html += '<div class="recent-item interactive" data-game-id="' + g.id + '">';
-      html += '<div class="recent-thumb" style="background:' + (g.image ? 'url(\'' + esc(g.image) + '\') center/cover' : g.gradient) + ';">';
-      if (!g.image) html += '<div class="recent-emoji">' + g.icon + '</div>';
-      html += '</div>';
-      html += '<div class="recent-name">' + esc(g.name) + '</div>';
-      html += '</div>';
-    }
-    el.innerHTML = html;
-  }  function createGameCard(game) {
-    var isFav = DataStore.isFavorite(game.id);
-    var heat = getGameHeat(game.id);
-    var html = '<div class="game-card interactive" data-game-id="' + game.id + '">';
-    html += '<div class="game-card-thumb" style="background:' + (game.image ? 'url(\'' + esc(game.image) + '\') center/cover' : game.gradient) + ';">';
-    if (!game.image) html += '<div class="card-emoji">' + game.icon + '</div>';
-
-    html += '<div class="card-top">';
-    if (game.tag) { html += '<span class="card-chip chip-' + game.tag + '">' + getTagLabel(game.tag) + '</span>'; }
-    else { html += '<div></div>'; }
-    html += '<button class="card-heart' + (isFav ? ' active' : '') + '" data-fav-id="' + game.id + '"><i class="' + (isFav ? 'fa-solid' : 'fa-regular') + ' fa-heart"></i></button>';
-    html += '</div>';
-
-    html += '<div class="card-play-overlay"><div class="card-play"><i class="fa-solid fa-play"></i></div></div>';
-    html += '</div>';
-
-    html += '<div class="game-card-info">';
-    html += '<div class="card-name">' + esc(game.name) + '</div>';
-    html += '<div class="card-provider">' + esc(game.provider || 'Pragmatic Play') + '</div>';
-    html += '</div></div>';
-    return html;
-  }/* ============================================
+/* ============================================
    SlotX — UI Rendering (ARTHOLST pattern)
    All renders wrapped in try/catch for stability
    ============================================ */
@@ -49,7 +10,7 @@
     var el = document.getElementById(rows[r]);
     if (el && el.children.length === 0) {
       var h = '';
-      for (var i = 0; i < 4; i++) h += '<div class="skeleton-card flex-shrink-0" style="width:200px;height:112px;border-radius:16px;"></div>';
+      for (var i = 0; i < 4; i++) h += '<div class="skeleton-card flex-shrink-0" style="width:200px;height:160px;border-radius:16px;"></div>';
       el.innerHTML = h;
     }
   }
@@ -279,20 +240,33 @@ document.addEventListener('DOMContentLoaded', function() {
   function buildRowCard(game, w, h, delay) {
     var el = document.createElement('div');
     el.className = 'game-card row-card-animated flex-shrink-0';
-    el.style.width = w + 'px'; el.style.height = h + 'px';
-    el.style.background = game.gradient || GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
+    el.style.width = w + 'px';
     if (delay) el.style.animationDelay = delay + 'ms';
 
-    buildGameImage(game, el);
+    var banner = document.createElement('div'); banner.className = 'card-banner';
+    var bg = document.createElement('div'); bg.className = 'card-banner-bg';
+    bg.style.background = game.gradient || GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
+    banner.appendChild(bg);
+    buildGameImage(game, banner);
+    var overlay = document.createElement('div'); overlay.className = 'card-play-overlay';
+    overlay.innerHTML = '<div class="card-play-btn"><i class="fa-solid fa-play"></i></div>';
+    banner.appendChild(overlay);
+    el.appendChild(banner);
 
-    var ov = document.createElement('div'); ov.className = 'card-overlay'; el.appendChild(ov);
-    buildHeart(game, el);
+    var content = document.createElement('div'); content.className = 'card-content';
+    var topRow = document.createElement('div'); topRow.className = 'card-top-row';
+    var titles = document.createElement('div'); titles.className = 'card-titles';
+    titles.innerHTML = '<div class="card-name">' + esc(game.name) + '</div><div class="card-provider">' + esc(game.provider || '') + '</div>';
+    topRow.appendChild(titles);
+    buildHeart(game, topRow);
+    content.appendChild(topRow);
 
-    var info = document.createElement('div'); info.className = 'card-info';
+    var bottomRow = document.createElement('div'); bottomRow.className = 'card-bottom-row';
     var online = getGameOnline(game.id);
-    info.innerHTML = '<div class="card-name">' + esc(game.name) + '</div><div class="card-provider">' + esc(game.provider || '') + '<span class="card-online"><span class="online-dot"></span>' + online + '</span></div>';
-    el.appendChild(info);
+    bottomRow.innerHTML = '<div class="card-badges"></div><span class="card-online"><span class="online-dot"></span>' + online + '</span>';
+    content.appendChild(bottomRow);
 
+    el.appendChild(content);
     el.addEventListener('click', function() { TG.haptic.heavy(); App.playSound('click'); App.openGame(game); });
     return el;
   }
@@ -300,23 +274,33 @@ document.addEventListener('DOMContentLoaded', function() {
   function buildGridCard(game, delay) {
     var el = document.createElement('div');
     el.className = 'game-card grid-card-animated';
-    el.style.background = game.gradient || GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
     if (delay) el.style.animationDelay = delay + 'ms';
 
-    buildGameImage(game, el);
+    var banner = document.createElement('div'); banner.className = 'card-banner';
+    var bg = document.createElement('div'); bg.className = 'card-banner-bg';
+    bg.style.background = game.gradient || GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
+    banner.appendChild(bg);
+    buildGameImage(game, banner);
+    var overlay = document.createElement('div'); overlay.className = 'card-play-overlay';
+    overlay.innerHTML = '<div class="card-play-btn"><i class="fa-solid fa-play"></i></div>';
+    banner.appendChild(overlay);
+    el.appendChild(banner);
 
-    var ov = document.createElement('div'); ov.className = 'card-overlay'; el.appendChild(ov);
-    buildHeart(game, el);
+    var content = document.createElement('div'); content.className = 'card-content';
+    var topRow = document.createElement('div'); topRow.className = 'card-top-row';
+    var titles = document.createElement('div'); titles.className = 'card-titles';
+    titles.innerHTML = '<div class="card-name">' + esc(game.name) + '</div><div class="card-provider">' + esc(game.provider || '') + '</div>';
+    topRow.appendChild(titles);
+    buildHeart(game, topRow);
+    content.appendChild(topRow);
 
-    var info = document.createElement('div'); info.className = 'card-info';
+    var bottomRow = document.createElement('div'); bottomRow.className = 'card-bottom-row';
     var vol = getVolatilityLabel(game.volatility);
     var online = getGameOnline(game.id);
-    info.innerHTML = '<div class="card-name">' + esc(game.name) + '</div><div class="card-provider"><span class="card-volatility ' + vol.cls + '">⚡' + vol.text + '</span><span class="card-online"><span class="online-dot"></span>' + online + '</span></div>';
-    el.appendChild(info);
+    bottomRow.innerHTML = '<div class="card-badges"><span class="card-volatility ' + vol.cls + '">⚡' + vol.text + '</span></div><span class="card-online"><span class="online-dot"></span>' + online + '</span>';
+    content.appendChild(bottomRow);
 
-    var play = document.createElement('div'); play.className = 'card-play';
-    play.innerHTML = '<i class="fa-solid fa-play"></i>'; el.appendChild(play);
-
+    el.appendChild(content);
     el.addEventListener('click', function() { TG.haptic.heavy(); App.playSound('click'); App.openGame(game); });
     return el;
   }
