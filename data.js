@@ -164,9 +164,9 @@ var DEFAULT_GAMES = [
   { id: 'g_candyb', name: 'Candy Blitz', symbol: 'vs20candyblitz', provider: 'Pragmatic Play', tag: 'top', icon: '🍭', image: '', gradient: 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)', rtp: '96.02', maxWin: '10000x', volatility: 'high', bonusBuy: true, order: 101, active: true },
   { id: 'g_rio', name: 'Heart of Rio', symbol: 'vs25rio', provider: 'Pragmatic Play', tag: 'popular', icon: '🦜', image: '', gradient: 'linear-gradient(135deg,#2E1065,#6D28D9,#C084FC)', rtp: '96.50', maxWin: '10500x', volatility: 'medium', bonusBuy: false, order: 102, active: true },
   { id: 'g_chicken', name: 'The Great Chicken Escape', symbol: 'vs20chicken', provider: 'Pragmatic Play', tag: 'top', icon: '🐔', image: '', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.50', maxWin: '5000x', volatility: 'medium', bonusBuy: false, order: 103, active: true },
-  { id: 'g_bbarnhouse', name: 'Bigger Barn House Bonanza', symbol: 'vswaysbbarnh', provider: 'Pragmatic Play', tag: 'new', icon: '🚜', image: '', gradient: 'linear-gradient(135deg,#2E1065,#6D28D9,#C084FC)', rtp: '96.50', maxWin: '10000x', volatility: 'high', bonusBuy: true, order: 104, active: true },
+  { id: 'g_bbarnhouse', name: 'Bigger Barn House Bonanza', symbol: 'vswaysbbarnh', provider: 'Pragmatic Play', tag: 'new', icon: '🚜', image: 'https://www.pragmaticplay.com/wp-content/uploads/2025/09/Bigger-Barn-House-Bonanza_339x180_EN.png', gradient: 'linear-gradient(135deg,#2E1065,#6D28D9,#C084FC)', rtp: '96.50', maxWin: '10000x', volatility: 'high', bonusBuy: true, order: 104, active: true },
   { id: 'g_mummy100', name: 'Mummy\'s Jewels 100', symbol: 'vswaysmjwl2', url: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol=vswaysmjwl2&websiteUrl=https%3A%2F%2Fdemogamesfree.pragmaticplay.net&jurisdiction=99&lobby_url=https%3A%2F%2Fwww.pragmaticplay.com%2Fen%2F&lang={lang}&cur={currency}', provider: 'Pragmatic Play', tag: 'new', icon: '💎', image: 'https://www.pragmaticplay.com/wp-content/uploads/2026/02/Mummys-Jewels-100_339x180_EN.png', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.50', maxWin: '5000x', volatility: 'high', bonusBuy: true, order: 105, active: true },
-  { id: 'g_osiris', name: 'Treasures of Osiris', symbol: 'vs25tripleps', provider: 'Pragmatic Play', tag: 'new', icon: '⚱️', image: '', gradient: 'linear-gradient(135deg,#08051A,#3730A3,#A78BFA)', rtp: '96.50', maxWin: '5000x', volatility: 'high', bonusBuy: true, order: 106, active: true }
+  { id: 'g_osiris', name: 'Treasures of Osiris', symbol: 'vs25tripleps', provider: 'Pragmatic Play', tag: 'new', icon: '⚱️', image: 'https://www.pragmaticplay.com/wp-content/uploads/2026/02/Treasures-of-Osiris_339x180_EN.png', gradient: 'linear-gradient(135deg,#08051A,#3730A3,#A78BFA)', rtp: '96.50', maxWin: '5000x', volatility: 'high', bonusBuy: true, order: 106, active: true }
 ];
 
 var GAME_ICONS = {};
@@ -234,7 +234,7 @@ var DEFAULT_SETTINGS = {
   currencyCode: 'RUB',
   demoUrlTemplate: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol={symbol}&jurisdiction=99&lang={lang}&cur={currency}',
   gameImageUrlTemplate: '',
-  dataVersion: 102
+  dataVersion: 105
 };
 
 /* ============================================
@@ -325,18 +325,18 @@ var DataStore = {
     var savedSettings = await Storage.get('settings', null);
     this.favorites = await Storage.get('favorites', []);
 
-    var savedVersion = (savedSettings && savedSettings.dataVersion) ? savedSettings.dataVersion : 0;
-    var needsReset = savedVersion < DEFAULT_SETTINGS.dataVersion;
+    this.games = savedGames || JSON.parse(JSON.stringify(DEFAULT_GAMES));
+    this.casinos = savedCasinos || JSON.parse(JSON.stringify(DEFAULT_CASINOS));
+    this.settings = savedSettings || JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
 
-    if (needsReset) {
-      this.games = JSON.parse(JSON.stringify(DEFAULT_GAMES));
-      this.casinos = JSON.parse(JSON.stringify(DEFAULT_CASINOS));
-      this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-      await Storage.remove('banners');
-    } else {
-      this.games = savedGames || JSON.parse(JSON.stringify(DEFAULT_GAMES));
-      this.casinos = savedCasinos || JSON.parse(JSON.stringify(DEFAULT_CASINOS));
-      this.settings = savedSettings || JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    /* Force sync of official Pragmatic Play images to local cache */
+    for (var ei = 0; ei < this.games.length; ei++) {
+      var g = this.games[ei];
+      var def = null;
+      for (var di = 0; di < DEFAULT_GAMES.length; di++) { if (DEFAULT_GAMES[di].id === g.id) { def = DEFAULT_GAMES[di]; break; } }
+      if (def && def.image && def.image.indexOf('pragmaticplay.com') !== -1) {
+        g.image = def.image;
+      }
     }
 
     if (!this.settings.currencyCode) this.settings.currencyCode = 'RUB';
