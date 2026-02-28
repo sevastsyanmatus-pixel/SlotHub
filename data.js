@@ -105,7 +105,6 @@ var DEFAULT_GAMES = [
   { id: 'g_grhino', name: 'Great Rhino', symbol: 'vs20rhino', provider: 'Pragmatic Play', tag: 'top', icon: '🦏', image: 'https://www.pragmaticplay.com/wp-content/uploads/2018/04/new-thumbs-1.png', gradient: 'linear-gradient(135deg,#08051A,#2E1065,#7C3AED)', rtp: '96.53', maxWin: '900x', volatility: 'medium', bonusBuy: false, order: 42, active: true },
   { id: 'g_fstrike', name: 'Fire Strike', symbol: 'vs10firestrike', provider: 'Pragmatic Play', tag: 'popular', icon: '🔥', image: 'https://www.pragmaticplay.com/wp-content/uploads/2019/09/Firestrike™_339x180-1.png', gradient: 'linear-gradient(135deg,#2E1065,#7C3AED,#A78BFA)', rtp: '96.50', maxWin: '25000x', volatility: 'medium', bonusBuy: false, order: 43, active: true },
   { id: 'g_voodoo', name: 'Voodoo Magic', symbol: 'vs40voodoo', provider: 'Pragmatic Play', tag: 'top', icon: '💀', image: 'https://www.pragmaticplay.com/wp-content/uploads/2020/12/Voodoo_Magic_EN_339x180.png', gradient: 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)', rtp: '96.50', maxWin: '1000x', volatility: 'high', bonusBuy: true, order: 44, active: true },
-  { id: 'g_booktut', name: 'Book of the Fallen', symbol: 'vs10bookfallen', provider: 'Pragmatic Play', tag: 'top', icon: '📙', image: 'https://www.pragmaticplay.com/wp-content/uploads/2021/11/Book-of-Fallen_339x180-1.png', gradient: 'linear-gradient(135deg,#120833,#3730A3,#7C3AED)', rtp: '96.50', maxWin: '5000x', volatility: 'high', bonusBuy: true, order: 45, active: true },
   { id: 'g_ebank', name: 'Empty the Bank', symbol: 'vs20emptybank', provider: 'Pragmatic Play', tag: 'popular', icon: '🏦', image: 'https://www.pragmaticplay.com/wp-content/uploads/2021/06/Empty_The_Bank_EN_339x180.png', gradient: 'linear-gradient(135deg,#08051A,#3730A3,#A78BFA)', rtp: '96.48', maxWin: '10000x', volatility: 'high', bonusBuy: true, order: 46, active: true },
   { id: 'g_5lionsmw', name: '5 Lions Megaways', symbol: 'vswayslions', provider: 'Pragmatic Play', tag: 'top', icon: '🦁', image: 'https://www.pragmaticplay.com/wp-content/uploads/2021/06/5_Lions_Megaways_EN_339x180-1.png', gradient: 'linear-gradient(135deg,#2E1065,#6D28D9,#C084FC)', rtp: '96.50', maxWin: '5000x', volatility: 'high', bonusBuy: true, order: 47, active: true },
   { id: 'g_5lions', name: '5 Lions', symbol: 'vs243lions', provider: 'Pragmatic Play', tag: 'popular', icon: '🦁', image: 'https://www.pragmaticplay.com/wp-content/uploads/2018/05/thumbs_5_lions_330x140px.png', gradient: 'linear-gradient(135deg,#1E0A4B,#4338CA,#A78BFA)', rtp: '96.50', maxWin: '3520x', volatility: 'high', bonusBuy: false, order: 48, active: true },
@@ -229,7 +228,7 @@ var DEFAULT_SETTINGS = {
   currencyCode: 'RUB',
   demoUrlTemplate: 'https://demogamesfree.pragmaticplay.net/gs2c/openGame.do?gameSymbol={symbol}&jurisdiction=99&lang={lang}&cur={currency}',
   gameImageUrlTemplate: '',
-  dataVersion: 106
+  dataVersion: 107
 };
 
 /* ============================================
