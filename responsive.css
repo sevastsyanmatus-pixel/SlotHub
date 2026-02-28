@@ -44,21 +44,22 @@
 .screen-xs .section-header { padding: 0 16px; margin-top: 18px; margin-bottom: 10px; }
 .screen-xs .section-title { font-size: 14px; gap: 6px; }
 .screen-xs .section-icon { width: 26px; height: 26px; font-size: 14px; }
-.screen-xs .section-link { font-size: 11px; padding: 4px 10px; }
+.screen-xs .section-link { font-size: 10px; padding: 4px 10px; }
 .screen-xs .section-count { font-size: 10px; padding: 2px 8px; }
 
 .screen-xs .promo-timer { padding: 10px 12px; gap: 8px; }
 .screen-xs .timer-icon { font-size: 22px; }
-.screen-xs .timer-title { font-size: 11px; }
+.screen-xs .timer-title { font-size: 10px; }
 .screen-xs .timer-digit { width: 22px; height: 26px; font-size: 10px; }
 
 .screen-xs .scroll-row { gap: 10px; padding: 0 16px; }
 .screen-xs .game-card { border-radius: 14px; }
-.screen-xs .card-name { font-size: 9px; }
+.screen-xs .card-name { font-size: 9.5px; }
 .screen-xs .card-play-btn { width: 26px; height: 26px; }
 .screen-xs .card-play-btn i { font-size: 8px; }
 .screen-xs .card-heart { width: 16px; height: 16px; min-width: 16px; min-height: 16px; }
-.screen-xs .card-content { padding: 4px 6px; }
+.screen-xs .card-heart i { font-size: 7.5px; }
+.screen-xs .card-content { padding: 5px 6px; gap: 0px; }
 .screen-xs .card-emoji { font-size: 36px; }
 
 .screen-xs .chip { font-size: 12px; padding: 7px 14px; min-height: 36px; }
@@ -69,8 +70,8 @@
 .screen-xs .cta-mid-card { padding: 16px; }
 .screen-xs .cta-mid-icon { font-size: 32px; }
 
-.screen-xs .recent-card { width: 100px; height: 58px; }
-.screen-xs .recent-name { font-size: 8px; }
+.screen-xs .recent-card { width: 100px;}
+.screen-xs .recent-name { font-size: 7.5px; }
 
 .screen-xs .stat-card { padding: 12px 10px; }
 .screen-xs .stat-icon { font-size: 22px; }
@@ -93,7 +94,7 @@
 
 .screen-sm .section-title { font-size: 15px; }
 .screen-sm .card-name { font-size: 10px; }
-.screen-sm .recent-card { width: 108px; height: 60px; }
+.screen-sm .recent-card { width: 108px;}
 
 /* ============================================
    SCREEN-MD — 390-413px (iPhone 14, Pixel 7) — BASE SIZE
@@ -112,12 +113,12 @@
 .screen-lg .section-icon { width: 34px; height: 34px; font-size: 20px; }
 
 .screen-lg .card-emoji { font-size: 52px; }
-.screen-lg .card-name { font-size: 12px; }
+.screen-lg .card-name { font-size: 11.5px; }
 .screen-lg .card-play-btn { width: 34px; height: 34px; }
-.screen-lg .card-content { padding: 6px 8px; }
+.screen-lg .card-content { padding: 8px 10px; gap: 2px; }
 
-.screen-lg .recent-card { width: 130px; height: 72px; }
-.screen-lg .recent-name { font-size: 10px; }
+.screen-lg .recent-card { width: 130px;}
+.screen-lg .recent-name { font-size: 8.5px; }
 
 .screen-lg .postgame-emoji { font-size: 76px; }
 .screen-lg .postgame-title { font-size: 22px; }
@@ -131,7 +132,7 @@
 
 .screen-xl .section-title { font-size: 18px; }
 .screen-xl .scroll-row { gap: 14px; }
-.screen-xl .recent-card { width: 140px; height: 78px; }
+.screen-xl .recent-card { width: 140px;}
 
 .screen-xl .stat-card { padding: 22px 18px; }
 .screen-xl .stat-icon { font-size: 32px; }
@@ -155,7 +156,7 @@
 .screen-xxl .section-title { font-size: 20px; }
 
 .screen-xxl .scroll-row { max-width: 900px; margin: 0 auto; padding: 0 24px; gap: 16px; }
-.screen-xxl .recent-card { width: 160px; height: 90px; }
+.screen-xxl .recent-card { width: 160px;}
 
 .screen-xxl #games-grid { max-width: 900px; margin: 0 auto; gap: 16px; padding: 0 24px; }
 .screen-xxl #chips-row { max-width: 900px; margin: 0 auto; padding: 0 24px; }
