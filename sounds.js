@@ -6,7 +6,9 @@ var SoundFX = (function() {
   var ctx = null;
   var enabled = true;
   var _initialized = false;
+  var _interacted = false;
   var masterVolume = 0.35; /* Global volume scale */
+  var _suppress = false;
 
   function getCtx() {
     if (ctx) return ctx;
@@ -32,6 +34,7 @@ var SoundFX = (function() {
     } catch(e) {}
 
     var resumeHandler = function() {
+      _interacted = true;
       ensureResumed();
       document.removeEventListener('touchstart', resumeHandler);
       document.removeEventListener('click', resumeHandler);
@@ -87,9 +90,11 @@ var SoundFX = (function() {
 
   /* ---- Sound generators ---- */
   function play(type) {
-    if (!enabled) return;
+    if (!enabled || _suppress) { _suppress = false; return; }
     var c = getCtx();
     if (!c) return;
+    /* Don't schedule sounds if AudioContext is suspended — they'd buffer and play later on resume */
+    if (c.state === 'suspended') return;
     ensureResumed();
 
     try {
@@ -216,56 +221,49 @@ var SoundFX = (function() {
     }
   }
 
-  /* Notification — soft bell ding, warm and gentle */
+  /* Notification — Muffled power-up "Пау!" behind wall ~0.15s */
   function playNotification(c) {
     var t = c.currentTime;
 
-    /* Main bell tone */
+    /* Low-pass filter — "behind a wall" effect */
+    var wall = c.createBiquadFilter();
+    wall.type = 'lowpass';
+    wall.frequency.value = 600;
+    wall.Q.value = 1.0;
+
+    /* Ascending sweep — square wave, muffled */
     var osc = c.createOscillator();
     var gain = c.createGain();
-    var filter = warmFilter(c, 2400);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(698, t); /* F5 */
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(vol(0.06), t + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
-    osc.connect(filter);
-    filter.connect(gain);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(300, t);
+    osc.frequency.exponentialRampToValueAtTime(1800, t + 0.1);
+    gain.gain.setValueAtTime(vol(0.05), t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    osc.connect(wall);
+    wall.connect(gain);
     gain.connect(c.destination);
     osc.start(t);
-    osc.stop(t + 0.55);
+    osc.stop(t + 0.16);
 
-    /* Soft harmonic overtone */
+    /* Soft thud instead of bright snap */
     var osc2 = c.createOscillator();
     var gain2 = c.createGain();
-    var filter2 = warmFilter(c, 1800);
+    var wall2 = c.createBiquadFilter();
+    wall2.type = 'lowpass';
+    wall2.frequency.value = 800;
+    wall2.Q.value = 0.7;
     osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(1047, t); /* C6 — octave above */
-    gain2.gain.setValueAtTime(0, t);
-    gain2.gain.linearRampToValueAtTime(vol(0.025), t + 0.008);
-    gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-    osc2.connect(filter2);
-    filter2.connect(gain2);
+    osc2.frequency.setValueAtTime(400, t + 0.06);
+    osc2.frequency.exponentialRampToValueAtTime(200, t + 0.12);
+    gain2.gain.setValueAtTime(vol(0.04), t + 0.06);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
+    osc2.connect(wall2);
+    wall2.connect(gain2);
     gain2.connect(c.destination);
-    osc2.start(t);
-    osc2.stop(t + 0.4);
-
-    /* Second gentle note */
-    var osc3 = c.createOscillator();
-    var gain3 = c.createGain();
-    var filter3 = warmFilter(c, 2200);
-    osc3.type = 'sine';
-    osc3.frequency.setValueAtTime(880, t + 0.15); /* A5 */
-    gain3.gain.setValueAtTime(0, t + 0.15);
-    gain3.gain.linearRampToValueAtTime(vol(0.04), t + 0.16);
-    gain3.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-    osc3.connect(filter3);
-    filter3.connect(gain3);
-    gain3.connect(c.destination);
-    osc3.start(t + 0.15);
-    osc3.stop(t + 0.6);
+    osc2.start(t + 0.06);
+    osc2.stop(t + 0.14);
   }
-
+  
   /* Open game — gentle whoosh rising, like opening a magic box */
   function playOpenGame(c) {
     var t = c.currentTime;
@@ -355,6 +353,8 @@ var SoundFX = (function() {
     init: init,
     play: play,
     toggle: toggle,
-    isEnabled: isEnabled
+    isEnabled: isEnabled,
+    isInteracted: function() { return _interacted; },
+    suppress: function() { _suppress = true; }
   };
 })();
