@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var banner = document.createElement('div'); banner.className = 'card-banner';
     var bg = document.createElement('div'); bg.className = 'card-banner-bg';
-    bg.style.background = game.gradient || GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
+    bg.style.background = 'transparent';
     banner.appendChild(bg);
     buildGameImage(game, banner);
     var overlay = document.createElement('div'); overlay.className = 'card-play-overlay';
@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var banner = document.createElement('div'); banner.className = 'card-banner';
     var bg = document.createElement('div'); bg.className = 'card-banner-bg';
-    bg.style.background = game.gradient || GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
+    bg.style.background = 'transparent';
     banner.appendChild(bg);
     buildGameImage(game, banner);
     var overlay = document.createElement('div'); overlay.className = 'card-play-overlay';
@@ -308,24 +308,42 @@ document.addEventListener('DOMContentLoaded', function() {
   function buildRecentCard(game, delay) {
     var el = document.createElement('div');
     el.className = 'recent-card row-card-animated';
-    el.style.background = game.gradient || GRADIENTS[0];
     if (delay) el.style.animationDelay = delay + 'ms';
+
+    var banner = document.createElement('div');
+    banner.className = 'recent-banner';
 
     var url = DataStore.getGameImageUrl(game);
     if (url) {
       var img = document.createElement('img');
-      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;';
+      img.className = 'recent-img';
       img.src = url; img.loading = 'lazy'; img.setAttribute('referrerpolicy', 'no-referrer');
-      img.onerror = function() { this.style.display = 'none'; };
-      el.appendChild(img);
+      img.onerror = function() { 
+        this.style.display = 'none'; 
+        if (game.icon && !banner.querySelector('.recent-emoji')) {
+          var e = document.createElement('div');
+          e.className = 'recent-emoji';
+          e.textContent = game.icon;
+          banner.appendChild(e);
+        }
+      };
+      banner.appendChild(img);
     } else if (game.icon) {
       var emoji = document.createElement('div');
-      emoji.style.cssText = 'position:absolute;top:45%;left:50%;transform:translate(-50%,-55%);font-size:20px;animation:emojiFloat 3s ease-in-out infinite;';
-      emoji.textContent = game.icon; el.appendChild(emoji);
+      emoji.className = 'recent-emoji';
+      emoji.textContent = game.icon;
+      banner.appendChild(emoji);
     }
+    el.appendChild(banner);
 
-    var nm = document.createElement('div'); nm.className = 'recent-name'; nm.textContent = game.name;
-    el.appendChild(nm);
+    var content = document.createElement('div');
+    content.className = 'recent-content';
+    var nm = document.createElement('div');
+    nm.className = 'recent-name';
+    nm.textContent = game.name;
+    content.appendChild(nm);
+    el.appendChild(content);
+
     el.addEventListener('click', function() { TG.haptic.heavy(); App.playSound('click'); App.openGame(game); });
     return el;
   }
@@ -451,7 +469,9 @@ document.addEventListener('DOMContentLoaded', function() {
       renderRow('top-row', games.filter(function(g) { return g.tag === 'top'; }).slice(0, 8));
     });
     safeRender('new-row', function() {
-      renderRow('new-row', games.filter(function(g) { return g.tag === 'new'; }).slice(0, 8));
+      var newGames = games.filter(function(g) { return g.tag === 'new'; });
+      newGames.sort(function(a, b) { return b.order - a.order; });
+      renderRow('new-row', newGames.slice(0, 8));
     });
     safeRender('renderBonusBuy', renderBonusBuy);
     safeRender('renderHomeCasinos', renderHomeCasinos);
@@ -559,6 +579,17 @@ document.addEventListener('DOMContentLoaded', function() {
       var matchName = !query || g.name.toLowerCase().indexOf(query.toLowerCase()) !== -1;
       return matchTag && matchName;
     });
+
+    if (filter === 'all' && !query) {
+      filtered.sort(function(a, b) {
+        if (a.tag === 'new' && b.tag !== 'new') return -1;
+        if (b.tag === 'new' && a.tag !== 'new') return 1;
+        if (a.tag === 'new' && b.tag === 'new') return b.order - a.order;
+        return a.order - b.order;
+      });
+    } else if (filter === 'new' && !query) {
+      filtered.sort(function(a, b) { return b.order - a.order; });
+    }
 
     if (filtered.length === 0) {
       empty.style.display = '';
@@ -719,7 +750,7 @@ document.addEventListener('DOMContentLoaded', function() {
       var amt = base.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
       var mult = multipliers[Math.floor(Math.random() * multipliers.length)];
       var isHuge = base > 50000;
-      items.push('<span class="wf-chip' + (isHuge ? ' wf-mega' : '') + '"><span class="wf-icon">' + (g.icon || '🎰') + '</span><span class="wf-name">' + esc(n) + '</span><span class="wf-sep">→</span><span class="wf-amt">' + amt + ' ' + esc(cur.symbol) + '</span><span class="wf-mult">' + mult + '</span></span>');
+      items.push('<span class="wf-chip' + (isHuge ? ' wf-mega' : '') + '"><span class="wf-icon">' + (g.icon || '🎰') + '</span><span class="wf-name">' + esc(n) + '</span><span class="wf-sep\">→</span><span class="wf-amt">' + amt + ' ' + esc(cur.symbol) + '</span><span class="wf-mult">' + mult + '</span></span>');
     }
     el.innerHTML = items.join('') + items.join('');
 
