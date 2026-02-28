@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ['buildWinFeed', buildWinFeed],
       ['initTimer', initTimer],
       ['initOnlineCounter', initOnlineCounter],
-      ['initScrollAnimations', initScrollAnimations],
+      /* scroll animations disabled */
       ['initBannerSwipe', initBannerSwipe],
       ['initKeyboardHandling', initKeyboardHandling]
     ];
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var el = document.createElement('div');
     el.className = 'game-card row-card-animated flex-shrink-0';
     el.style.width = w + 'px';
-    if (delay) el.style.animationDelay = delay + 'ms';
+    /* animation delay disabled */
 
     var banner = document.createElement('div'); banner.className = 'card-banner';
     var bg = document.createElement('div'); bg.className = 'card-banner-bg';
@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function buildGridCard(game, delay) {
     var el = document.createElement('div');
     el.className = 'game-card grid-card-animated';
-    if (delay) el.style.animationDelay = delay + 'ms';
+    /* animation delay disabled */
 
     var banner = document.createElement('div'); banner.className = 'card-banner';
     var bg = document.createElement('div'); bg.className = 'card-banner-bg';
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function buildRecentCard(game, delay) {
     var el = document.createElement('div');
     el.className = 'recent-card row-card-animated';
-    if (delay) el.style.animationDelay = delay + 'ms';
+    /* animation delay disabled */
 
     var banner = document.createElement('div');
     banner.className = 'recent-banner';
@@ -889,7 +889,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function showNotifPopup(icon, title, text) {
     var el = $('notification-popup'); if (!el) return;
-    App.playSound('notification');
+    /* Only play sound if AudioContext is already unlocked (user interacted) */
+    if (window.SoundFX && SoundFX.isInteracted()) App.playSound('notification');
     $('notif-icon').textContent = icon;
     $('notif-title').textContent = title;
     $('notif-text').textContent = text;
@@ -901,6 +902,19 @@ document.addEventListener('DOMContentLoaded', function() {
   var nc = $('notif-close');
   if (nc) nc.addEventListener('click', function(e) { e.stopPropagation(); $('notification-popup').classList.remove('show'); });
   var np = $('notification-popup');
-  if (np) np.addEventListener('click', function() { np.classList.remove('show'); App.switchTab('casinos'); });
+  if (np) np.addEventListener('click', function() {
+    np.classList.remove('show');
+    /* Suppress any sound that might trigger from AudioContext resuming on this tap */
+    if (window.SoundFX) SoundFX.suppress();
+    /* Switch to casinos tab silently (no sound) */
+    var tabs = document.querySelectorAll('#bottom-nav .nav-btn');
+    for (var ti = 0; ti < tabs.length; ti++) tabs[ti].classList.toggle('active', tabs[ti].getAttribute('data-tab') === 'casinos');
+    $('tab-home').style.display = 'none';
+    $('tab-games').style.display = 'none';
+    $('tab-casinos').style.display = '';
+    $('tab-profile').style.display = 'none';
+    $('content-area').scrollTop = 0;
+    safeRender('renderCasinos', renderCasinos);
+  });
 
 });
