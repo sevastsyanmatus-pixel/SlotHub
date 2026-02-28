@@ -641,7 +641,7 @@ body {
 
 /* === PROFILE === */
 .profile-card {
-  display: flex; align-items: center; gap: 16px; padding: 20px;
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
   border-radius: var(--radius-xl);
   background: linear-gradient(145deg, rgba(20,14,46,0.8), rgba(8,5,18,0.88));
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -653,12 +653,12 @@ body {
     0 1px 0 rgba(255,255,255,0.05) inset,
     0 -1px 0 rgba(0,0,0,0.2) inset;
 }
-.profile-avatar { width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #2E1065, #6D28D9, #4338CA, #818CF8); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 4px 16px rgba(124,58,237,0.4); border: 2px solid rgba(139,92,246,0.35); }
-.profile-avatar span { font-size: 28px; }
+.profile-avatar { width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #2E1065, #6D28D9, #4338CA, #818CF8); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 3px 12px rgba(124,58,237,0.35); border: 2px solid rgba(139,92,246,0.3); }
+.profile-avatar span { font-size: 22px; }
 .profile-info { flex: 1; min-width: 0; position: relative; z-index: 2; }
-.profile-name { font-weight: 900; font-size: 20px; color: #fff; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.profile-username { font-size: 13px; color: var(--text-secondary); margin-top: 3px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.profile-level-badge { position: absolute; top: 12px; right: 14px; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: var(--radius-full); background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(192,132,252,0.08)); border: 1px solid rgba(139,92,246,0.15); color: #C084FC; z-index: 2; white-space: nowrap; }
+.profile-name { font-weight: 900; font-size: 17px; color: #fff; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-username { font-size: 12px; color: var(--text-secondary); margin-top: 2px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-level-badge { position: absolute; top: 10px; right: 12px; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: var(--radius-full); background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(192,132,252,0.08)); border: 1px solid rgba(139,92,246,0.15); color: #C084FC; z-index: 2; white-space: nowrap; }
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .stat-card {
   padding: 18px 14px; border-radius: var(--radius-xl);
