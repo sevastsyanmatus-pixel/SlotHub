@@ -661,6 +661,14 @@ var TG = (function() {
     get: function() { var u = api.user; return u ? !!u.is_premium : false; }
   });
 
+  Object.defineProperty(api, 'startParam', {
+    get: function() {
+      if (!_ensureTgWebApp()) return '';
+      var idu = _tgWebApp.initDataUnsafe;
+      return (idu && idu.start_param) ? idu.start_param : '';
+    }
+  });
+
   Object.defineProperty(api, 'initData', {
     get: function() { return _tgWebApp ? (_tgWebApp.initData || '') : ''; }
   });
