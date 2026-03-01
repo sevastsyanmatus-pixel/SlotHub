@@ -830,6 +830,14 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function getLevel(played) {
+    if (played >= 100) return '👑';
+    if (played >= 50) return '💎';
+    if (played >= 20) return '⭐';
+    if (played >= 5) return '🎮';
+    return '🆕';
+  }
+
+  function getLevelFull(played) {
     if (played >= 100) return '👑 Легенда';
     if (played >= 50) return '💎 Мастер';
     if (played >= 20) return '⭐ Профи';
@@ -845,7 +853,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var m = Math.floor(timeMs / 60000);
     el = $('stat-time'); if (el) el.textContent = m < 60 ? m + 'м' : Math.floor(m / 60) + 'ч ' + (m % 60) + 'м';
     el = $('stat-level'); if (el) el.textContent = getLevel(stats.played);
-    el = $('profile-level-badge'); if (el) el.textContent = getLevel(stats.played);
+    el = $('profile-level-badge'); if (el) el.textContent = getLevelFull(stats.played);
   }
 
   /* ============================================
