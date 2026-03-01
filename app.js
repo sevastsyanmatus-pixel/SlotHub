@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /* Greeting */
     var greeting = $('header-greeting');
     if (greeting) {
-      greeting.textContent = 'Демо-слоты бесплатно';
+      greeting.textContent = window.I18n ? I18n.t('header.subtitle', 'Демо-слоты бесплатно') : 'Демо-слоты бесплатно';
     }
 
     /* Profile card */
@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
-    var mc = $('modal-currency'), mp = $('modal-postgame'), ma = $('modal-admin-pass');
+    var mc = $('modal-currency'), mp = $('modal-postgame'), ma = $('modal-admin-pass'), ml = $('modal-language');
     if (mc && mc.classList.contains('active')) {
       TG.showBack(function() { hideModal(mc); });
     }
@@ -98,6 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     if (ma && ma.classList.contains('active')) {
       TG.showBack(function() { hideModal(ma); });
+    }
+    if (ml && ml.classList.contains('active')) {
+      TG.showBack(function() { hideModal(ml); });
     }
 
     var sv = $('story-viewer');
@@ -173,10 +176,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     saveRecent(game.id);
     if (window.UI) UI.trackGamePlayed(game.id);
+    if (window.Features) { Features.addToHistory(game.id, game.name); Features.startGameSession(game.id); }
     DataStore.trackGamePlay(game.id);
   }
 
   function closeGame() {
+    if (window.Features) Features.endGameSession();
     playSound('close-game');
     $('game-iframe').src = '';
     $('game-iframe').onload = null;
@@ -344,6 +349,40 @@ document.addEventListener('DOMContentLoaded', function() {
   $('search-input').addEventListener('input', function() { searchQuery = this.value.trim(); if (window.UI) UI.renderGamesGrid(); });
 
   $('btn-currency').addEventListener('click', function() { TG.haptic.light(); $('currency-search').value = ''; if (window.UI) UI.renderCurrencyList(''); showModal($('modal-currency')); });
+
+  /* Language button */
+  var langBtn = $('btn-language');
+  if (langBtn) langBtn.addEventListener('click', function() {
+    TG.haptic.light();
+    renderLanguageList();
+    showModal($('modal-language'));
+  });
+
+  function renderLanguageList() {
+    var list = $('language-list');
+    if (!list || !window.I18n) return;
+    list.innerHTML = '';
+    var langs = I18n.getLangs();
+    var cur = I18n.getLang();
+    for (var i = 0; i < langs.length; i++) {
+      var l = langs[i];
+      var item = document.createElement('div');
+      item.className = 'currency-item' + (l.code === cur ? ' selected' : '');
+      item.innerHTML = '<span class="text-xl flex-shrink-0" style="width:32px;text-align:center;">' + l.flag + '</span>' +
+        '<div style="flex:1;min-width:0;"><p style="font-weight:600;font-size:14px;color:var(--text-primary);">' + escHtml(l.nativeName) + '</p></div>' +
+        (l.code === cur ? '<i class="fa-solid fa-check text-sm flex-shrink-0" style="color:var(--accent-green);margin-left:8px;"></i>' : '');
+      (function(lang) {
+        item.addEventListener('click', function() {
+          TG.haptic.medium();
+          I18n.setLang(lang.code);
+          hideModal($('modal-language'));
+          if (window.UI) UI.renderProfile();
+          showToast('🌐', lang.nativeName);
+        });
+      })(l);
+      list.appendChild(item);
+    }
+  }
   $('currency-search').addEventListener('input', function() { if (window.UI) UI.renderCurrencyList(this.value); });
 
   $('btn-admin-profile').addEventListener('click', function() { TG.haptic.medium(); tryOpenAdmin(); });
@@ -388,6 +427,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
       $('modal-currency').addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
+    var mlang = $('modal-language');
+    if (mlang) mlang.addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
     $('toast').addEventListener('click', function() { openAffiliate(); });
   window.addEventListener('resize', function() { if (window.UI) UI.updateBannerPosition(); });
   window.addEventListener('popstate', function() { if ($('game-view').style.display !== 'none') closeGame(); });
@@ -401,6 +442,13 @@ document.addEventListener('DOMContentLoaded', function() {
   /* === Init === */
   async function init() {
     if (window.SoundFX) SoundFX.init();
+    if (window.ThemeManager) ThemeManager.init();
+    if (window.I18n) I18n.init();
+    if (window.Features) {
+      Features.checkDailyLogin();
+      Features.processIncomingReferral();
+      setTimeout(function() { Features.checkPendingReferrals(); }, 2000);
+    }
     await DataStore.init();
     await DataStore.trackSession();
 
@@ -417,7 +465,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* Hide modals initially */
     $('modal-currency').style.display = 'none';
-        $('modal-admin-pass').style.display = 'none';
+    $('modal-admin-pass').style.display = 'none';
+    var _mlang = $('modal-language');
+    if (_mlang) _mlang.style.display = 'none';
 
     var firstName = TG.userFirstName;
     if (firstName) {
