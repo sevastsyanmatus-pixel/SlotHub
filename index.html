@@ -98,7 +98,22 @@
   <link rel="stylesheet" href="responsive.css?v=20260302a">
   <link rel="stylesheet" href="theme-light.css?v=20260302a">
 
-  <!-- INLINE CRITICAL FIX: Ensure bottom nav is always visible -->
+  <!-- INLINE CRITICAL FIX -->
+  <style>
+    .pcard{border-radius:12px;background:linear-gradient(145deg,rgba(20,14,46,0.55),rgba(8,5,18,0.65));border:1px solid rgba(255,255,255,0.04)}
+    .profile-hero{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:linear-gradient(145deg,rgba(46,16,101,0.2),rgba(20,14,46,0.6));border:1px solid rgba(139,92,246,0.12)}
+    .profile-hero .profile-avatar{width:44px;height:44px;flex-shrink:0}
+    .profile-hero .profile-name{font-size:15px;font-weight:800;color:#fff;margin:0;line-height:1.2}
+    .profile-hero .profile-username{font-size:11px;color:var(--text-muted);margin:2px 0 0}
+    .profile-hero .profile-level-badge{font-size:9px;padding:3px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0}
+    .psetting-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:10px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.04);font-family:inherit;cursor:pointer;transition:background 0.2s}
+    .psetting-btn:active{background:rgba(109,40,217,0.1)}
+    .psetting-lbl{font-size:9px;font-weight:700;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+    .pcollapse-header{display:flex;align-items:center;gap:6px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .pcollapse-title{font-size:11px;font-weight:700;color:var(--text-primary);flex:1}
+    .pcollapse-badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:12px;background:rgba(109,40,217,0.1);color:#C084FC}
+    .pcollapse-chev{font-size:9px;color:var(--text-muted);transition:transform 0.3s;flex-shrink:0}
+  </style>
   <style>
     #bottom-nav-wrap {
       display: block !important;
@@ -154,8 +169,8 @@
 
     <!-- HOME -->
     <section id="tab-home">
-      <div class="mt-3 anim-on-scroll">
-        <div id="banner-carousel" class="banner-carousel"><div id="banner-track" class="banner-track"></div></div>
+      <div class="anim-on-scroll" style="margin-top:12px;">
+        <div class="px-5"><div id="banner-carousel" class="banner-carousel"><div id="banner-track" class="banner-track"></div></div></div>
         <div id="banner-dots" class="flex items-center justify-center gap-1.5 mt-2.5 px-5"></div>
       </div>
 
@@ -207,6 +222,14 @@
 
       <div class="anim-on-scroll">
         <div class="section-header">
+          <span class="section-title"><span class="section-icon si-purple">✨</span> Новинки <span class="section-count" id="new-count">0</span></span>
+          <span id="link-new" class="section-link interactive">Все →</span>
+        </div>
+        <div id="new-row" class="scroll-row hide-scrollbar pb-2"></div>
+      </div>
+
+      <div class="anim-on-scroll">
+        <div class="section-header">
           <span class="section-title"><span class="section-icon si-gold">🏆</span> Топ выигрышей</span>
           <div class="flex gap-1"><button class="lb-tab active" data-lb="day">Сегодня</button><button class="lb-tab" data-lb="week">Неделя</button></div>
         </div>
@@ -225,22 +248,6 @@
             <div class="cta-mid-arrow"><i class="fa-solid fa-chevron-right text-xs"></i></div>
           </div>
         </div>
-      </div>
-
-      <div class="anim-on-scroll">
-        <div class="section-header">
-          <span class="section-title"><span class="section-icon si-purple">✨</span> Новинки <span class="section-count" id="new-count">0</span></span>
-          <span id="link-new" class="section-link interactive">Все →</span>
-        </div>
-        <div id="new-row" class="scroll-row hide-scrollbar pb-2"></div>
-      </div>
-
-      <div class="anim-on-scroll">
-        <div class="section-header">
-          <span class="section-title"><span class="section-icon si-cyan">💎</span> Лучшие казино</span>
-          <span id="link-casinos" class="section-link interactive">Все →</span>
-        </div>
-        <div id="home-casino-row" class="scroll-row hide-scrollbar pb-2"></div>
       </div>
       <div style="height:24px;"></div>
     </section>
@@ -271,148 +278,129 @@
     <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
       <div class="px-5 pt-4 pb-6">
-        <div class="profile-card mb-4">
+
+        <!-- Profile header: avatar + name + level in one row -->
+        <div class="profile-hero mb-3">
           <div class="profile-avatar" id="profile-avatar">
             <span id="profile-avatar-emoji">👤</span>
             <img id="profile-avatar-img" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" referrerpolicy="no-referrer">
           </div>
-          <div class="profile-info">
+          <div style="flex:1;min-width:0;">
             <p class="profile-name" id="profile-name">Гость</p>
             <p class="profile-username" id="profile-username">Добро пожаловать!</p>
           </div>
           <div class="profile-level-badge" id="profile-level-badge">🆕 Новичок</div>
         </div>
-        <!-- 💰 Wins Summary — always visible at top -->
+
+        <!-- XP bar minimal -->
+        <div class="pcard mb-3" style="padding:10px 14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span id="xp-level-text" style="font-size:11px;font-weight:800;color:#C084FC;">🆕 Новичок</span>
+            <span id="xp-amount" style="font-size:11px;font-weight:900;color:#fff;">0 XP</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:4px;height:6px;overflow:hidden;">
+            <div id="xp-progress" style="width:0%;height:100%;background:linear-gradient(90deg,#2E1065,#6D28D9,#C084FC);border-radius:4px;transition:width 0.8s ease;"></div>
+          </div>
+          <div id="xp-next" style="font-size:8px;color:var(--text-muted);margin-top:3px;text-align:right;"></div>
+        </div>
+
+        <!-- 💰 Wins Summary -->
         <div id="wins-hero" class="mb-3" style="display:none;">
-          <div style="padding:14px 16px;border-radius:16px;background:linear-gradient(145deg,rgba(109,40,217,0.12),rgba(20,14,46,0.7));border:1px solid rgba(139,92,246,0.15);position:relative;overflow:hidden;">
-            <div style="position:absolute;top:-15px;right:-15px;font-size:60px;opacity:0.06;">💰</div>
+          <div class="pcard" style="padding:12px 14px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-12px;right:-12px;font-size:50px;opacity:0.05;">💰</div>
             <div id="wins-hero-content"></div>
           </div>
         </div>
 
-        <!-- XP Progress Bar -->
-        <div id="xp-bar-section" class="mb-3" style="padding:12px 14px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span id="xp-level-text" style="font-size:12px;font-weight:800;color:#C084FC;">🆕 Новичок</span>
-            <span id="xp-amount" style="font-size:12px;font-weight:900;color:#fff;">0 XP</span>
-          </div>
-          <div style="background:rgba(255,255,255,0.06);border-radius:6px;height:8px;overflow:hidden;">
-            <div id="xp-progress" style="width:0%;height:100%;background:linear-gradient(90deg,#2E1065,#6D28D9,#C084FC);border-radius:6px;transition:width 0.8s ease;"></div>
-          </div>
-          <div id="xp-next" style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:right;"></div>
-        </div>
-
-        <!-- Stats row compact -->
-        <div class="stats-grid-compact mb-3">
-          <div class="stat-mini"><span class="stat-mini-val" id="stat-played">0</span><span class="stat-mini-lbl">🎮 <span data-i18n="profile.games">Игр</span></span></div>
-          <div class="stat-mini"><span class="stat-mini-val" id="stat-favorites">0</span><span class="stat-mini-lbl">❤️ <span data-i18n="profile.favs">Избр.</span></span></div>
-          <div class="stat-mini"><span class="stat-mini-val" id="stat-time">0м</span><span class="stat-mini-lbl">⏱ <span data-i18n="profile.time">Время</span></span></div>
-          <div class="stat-mini"><span class="stat-mini-val stat-mini-val-sm" id="stat-level">🆕</span><span class="stat-mini-lbl" data-i18n="profile.level">Уровень</span></div>
-        </div>
-
-        <!-- Theme toggle -->
-        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <span style="font-size:14px;">🎨</span>
-            <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="theme.title">Тема</span>
-          </div>
-          <div id="theme-toggle-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-            <button class="theme-btn interactive" data-theme="dark" style="padding:8px 4px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:11px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">🌙 <span data-i18n="theme.dark">Тёмная</span></button>
-            <button class="theme-btn interactive" data-theme="light" style="padding:8px 4px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:11px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">☀️ <span data-i18n="theme.light">Светлая</span></button>
-            <button class="theme-btn interactive" data-theme="auto" style="padding:8px 4px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:11px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">⚙️ <span data-i18n="theme.auto">Авто</span></button>
-          </div>
-        </div>
-
-        <!-- Compact settings row -->
-        <div class="compact-settings mb-3">
-          <button id="sound-toggle" class="compact-setting-btn interactive sound-toggle active">
-            <span class="text-base">🔊</span>
-            <span class="font-semibold text-xs text-white" id="sound-label">Звук вкл</span>
-            <i class="fa-solid fa-volume-high text-xs" style="color:#C084FC;"></i>
-          </button>
-          <button id="btn-currency" class="compact-setting-btn interactive">
-            <span id="currency-flag" class="text-base">🇷🇺</span>
-            <span class="font-semibold text-xs text-white"><span id="currency-code">RUB</span> <span id="currency-symbol-display" style="color:#22C55E;">₽</span></span>
-            <i class="fa-solid fa-chevron-right text-xs" style="color:var(--text-muted);"></i>
-          </button>
-        </div>
-        <span id="currency-name" style="display:none;">Российский рубль</span>
-
-        <!-- Language selector -->
-        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex;align-items:center;justify-content:space-between;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:14px;">🌐</span>
-              <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="lang.title">Язык</span>
+        <!-- Quick Settings: Theme + Sound + Currency + Language in compact grid -->
+        <div class="pcard mb-3" style="padding:10px;">
+          <!-- Theme row -->
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <span style="font-size:13px;">🎨</span>
+            <span style="font-size:11px;font-weight:700;color:var(--text-secondary);flex:1;" data-i18n="theme.title">Тема</span>
+            <div id="theme-toggle-row" style="display:flex;gap:4px;">
+              <button class="theme-btn interactive" data-theme="dark" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:10px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">🌙</button>
+              <button class="theme-btn interactive" data-theme="light" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:10px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">☀️</button>
+              <button class="theme-btn interactive" data-theme="auto" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:10px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">⚙️</button>
             </div>
-            <button id="btn-language" class="interactive" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;background:rgba(109,40,217,0.08);border:1px solid rgba(109,40,217,0.12);font-family:inherit;cursor:pointer;">
+          </div>
+          <!-- Settings row: Sound, Currency, Language -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+            <button id="sound-toggle" class="psetting-btn interactive sound-toggle active">
+              <span style="font-size:14px;">🔊</span>
+              <span class="psetting-lbl" id="sound-label">Вкл</span>
+            </button>
+            <button id="btn-currency" class="psetting-btn interactive">
+              <span id="currency-flag" style="font-size:14px;">🇷🇺</span>
+              <span class="psetting-lbl"><span id="currency-code">RUB</span> <span id="currency-symbol-display" style="color:#22C55E;">₽</span></span>
+            </button>
+            <button id="btn-language" class="psetting-btn interactive">
               <span id="lang-flag" style="font-size:14px;">🇷🇺</span>
-              <span id="lang-name" style="font-size:11px;font-weight:700;color:#C084FC;">Русский</span>
-              <i class="fa-solid fa-chevron-right" style="font-size:8px;color:var(--text-muted);"></i>
+              <span id="lang-name" class="psetting-lbl">Русский</span>
             </button>
           </div>
         </div>
+        <span id="currency-name" style="display:none;">Российский рубль</span>
 
+        <!-- Collapsible sections -->
         <!-- XP Leaderboard -->
-        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleCollapse('xp-leaderboard-container','lb-chev')">
-            <span style="font-size:14px;">🏅</span>
-            <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="lb.title">Рейтинг XP</span>
-            <i class="fa-solid fa-chevron-down" id="lb-chev" style="font-size:10px;color:var(--text-muted);margin-left:auto;transition:transform 0.3s;"></i>
+        <div class="pcard mb-2" style="padding:10px 12px;">
+          <div class="pcollapse-header" onclick="toggleCollapse('xp-leaderboard-container','lb-chev')">
+            <span style="font-size:13px;">🏅</span>
+            <span class="pcollapse-title" data-i18n="lb.title">Рейтинг XP</span>
+            <i class="fa-solid fa-chevron-down pcollapse-chev" id="lb-chev"></i>
           </div>
           <div id="xp-leaderboard-container" style="display:none"></div>
         </div>
 
         <!-- Achievements -->
-        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleCollapse('achievements-container','ach-chev')">
-            <span style="font-size:14px;">🏆</span>
-            <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="achievements.title">Достижения</span>
-            <span id="ach-counter" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(109,40,217,0.1);color:#C084FC;">0/22</span>
-            <i class="fa-solid fa-chevron-down" id="ach-chev" style="font-size:10px;color:var(--text-muted);margin-left:auto;transition:transform 0.3s;"></i>
+        <div class="pcard mb-2" style="padding:10px 12px;">
+          <div class="pcollapse-header" onclick="toggleCollapse('achievements-container','ach-chev')">
+            <span style="font-size:13px;">🏆</span>
+            <span class="pcollapse-title" data-i18n="achievements.title">Достижения</span>
+            <span id="ach-counter" class="pcollapse-badge">0/22</span>
+            <i class="fa-solid fa-chevron-down pcollapse-chev" id="ach-chev"></i>
           </div>
           <div id="achievements-container" style="display:none"></div>
         </div>
 
-        <!-- My Games (unified wins + history) -->
-        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleCollapse('gamelog-container','gamelog-chev')">
-            <span style="font-size:14px;">🎰</span>
-            <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Мои игры</span>
-            <span id="gamelog-counter" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(109,40,217,0.1);color:#C084FC;"></span>
-            <i class="fa-solid fa-chevron-down" id="gamelog-chev" style="font-size:10px;color:var(--text-muted);margin-left:auto;transition:transform 0.3s;"></i>
+        <!-- My Games -->
+        <div class="pcard mb-2" style="padding:10px 12px;">
+          <div class="pcollapse-header" onclick="toggleCollapse('gamelog-container','gamelog-chev')">
+            <span style="font-size:13px;">🎰</span>
+            <span class="pcollapse-title">Мои игры</span>
+            <span id="gamelog-counter" class="pcollapse-badge"></span>
+            <i class="fa-solid fa-chevron-down pcollapse-chev" id="gamelog-chev"></i>
           </div>
           <div id="gamelog-container" style="display:none"></div>
         </div>
 
         <!-- Referral -->
-        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <span style="font-size:14px;">🤝</span>
-            <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="referral.title">Пригласить друга</span>
+        <div class="pcard mb-2" style="padding:10px 12px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+            <span style="font-size:13px;">🤝</span>
+            <span style="font-size:11px;font-weight:700;color:var(--text-primary);" data-i18n="referral.title">Пригласить друга</span>
           </div>
           <div id="referral-container"></div>
         </div>
 
         <!-- CTA compact -->
-        <a id="btn-real-play" href="https://1wzaig.com/v3/aggressive-casino?p=akqd" target="_blank" rel="noopener noreferrer" class="cta-compact interactive mb-3" style="display:block;text-decoration:none;color:inherit;">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl">🎰</span>
-            <div class="flex-1 min-w-0">
-              <p class="font-bold text-sm text-white" data-i18n="profile.playReal">Играйте на реальные!</p>
-              <p class="text-xs" style="color:var(--text-secondary);" data-i18n="profile.bonusDeposit">Бонус до 500% на депозит</p>
-            </div>
-            <div class="cta-compact-arrow"><i class="fa-solid fa-arrow-right text-xs"></i></div>
+        <a id="btn-real-play" href="https://1wzaig.com/v3/aggressive-casino?p=akqd" target="_blank" rel="noopener noreferrer" class="pcard interactive mb-2" style="display:flex;align-items:center;gap:10px;padding:10px 14px;text-decoration:none;color:inherit;background:linear-gradient(135deg,rgba(109,40,217,0.15),rgba(67,56,202,0.1));border-color:rgba(139,92,246,0.2);">
+          <span style="font-size:22px;">🎰</span>
+          <div style="flex:1;min-width:0;">
+            <p style="font-weight:700;font-size:13px;color:#fff;" data-i18n="profile.playReal">Играйте на реальные!</p>
+            <p style="font-size:10px;color:var(--text-muted);margin-top:1px;" data-i18n="profile.bonusDeposit">Бонус до 500% на депозит</p>
           </div>
+          <i class="fa-solid fa-arrow-right" style="font-size:12px;color:#C084FC;"></i>
         </a>
 
-        <button id="btn-admin-profile" style="display:none;" class="btn-ghost interactive w-full py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
+        <button id="btn-admin-profile" style="display:none;" class="btn-ghost interactive w-full py-2 rounded-xl text-xs flex items-center justify-center gap-2 mt-1">
           <i class="fa-solid fa-gear text-xs"></i> <span data-i18n="profile.adminPanel">Админ-панель</span>
         </button>
       </div>
     </section>
 
-  </div>
+    </div>
 
   <!-- BOTTOM NAV -->
   <nav id="bottom-nav-wrap">
@@ -492,6 +480,26 @@
     <input id="admin-pass-input" type="password" class="form-input" style="width:100%;margin-bottom:12px;" placeholder="Введите пароль">
     <p id="admin-pass-error" style="display:none;color:#EF4444;font-size:12px;margin-bottom:12px;">Неверный пароль</p>
     <button id="admin-pass-submit" class="w-full py-3 rounded-xl text-sm font-bold interactive" style="background:var(--cta-gradient);color:#fff;">Войти</button>
+  </div>
+</div>
+
+<!-- FORTUNE WHEEL MODAL -->
+<div id="modal-wheel" class="modal-overlay">
+  <div class="modal-body glass" style="max-width:380px;width:calc(100% - 32px);border-radius:var(--radius-xl);padding:20px;text-align:center;">
+    <div class="flex items-center justify-between mb-4">
+      <p class="font-bold text-lg text-white">🎡 Колесо Фортуны</p>
+      <button class="modal-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+    <div style="position:relative;margin:0 auto;width:260px;height:260px;">
+      <canvas id="wheel-canvas" width="260" height="260" style="width:260px;height:260px;"></canvas>
+    </div>
+    <div id="wheel-result" style="display:none;margin:12px 0;"></div>
+    <div style="margin-top:12px;">
+      <button id="btn-spin-wheel" class="interactive w-full py-3 rounded-xl text-sm font-bold" style="background:linear-gradient(135deg,#F97316,#C2410C);color:#fff;border:none;font-family:inherit;cursor:pointer;">
+        🎡 Крутить! <span style="opacity:0.7;font-size:11px;">(осталось: <span id="wheel-spins-count">0</span>)</span>
+      </button>
+    </div>
+    <p style="font-size:10px;color:var(--text-muted);margin-top:8px;">Каждый приглашённый друг = 1 спин! 🎁</p>
   </div>
 </div>
 
@@ -585,6 +593,8 @@ function toggleCollapse(id, chevId) {
 <script src="data.js?v=20260302a"></script>
 <script src="i18n.js?v=20260302d"></script>
 <script src="theme.js?v=20260302a"></script>
+<script src="firebase-service.js?v=20260302a"></script>
+<script src="referral.js?v=20260302a"></script>
 <script src="features.js?v=20260302g"></script>
 <script src="leaderboard.js?v=20260302d"></script>
 <script src="app.js?v=20260302d"></script>
