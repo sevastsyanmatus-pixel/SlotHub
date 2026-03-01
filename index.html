@@ -93,9 +93,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="tg-core.css?v=20260301f">
-  <link rel="stylesheet" href="styles.css?v=20260301f">
-  <link rel="stylesheet" href="responsive.css?v=20260301f">
+  <link rel="stylesheet" href="tg-core.css?v=20260302a">
+  <link rel="stylesheet" href="styles.css?v=20260302b">
+  <link rel="stylesheet" href="responsive.css?v=20260302a">
+  <link rel="stylesheet" href="theme-light.css?v=20260302a">
 
   <!-- INLINE CRITICAL FIX: Ensure bottom nav is always visible -->
   <style>
@@ -153,9 +154,9 @@
 
     <!-- HOME -->
     <section id="tab-home">
-      <div class="px-5 mt-3 anim-on-scroll">
+      <div class="mt-3 anim-on-scroll">
         <div id="banner-carousel" class="banner-carousel"><div id="banner-track" class="banner-track"></div></div>
-        <div id="banner-dots" class="flex items-center justify-center gap-1.5 mt-2.5"></div>
+        <div id="banner-dots" class="flex items-center justify-center gap-1.5 mt-2.5 px-5"></div>
       </div>
 
       <div class="px-5 mt-4 anim-on-scroll">
@@ -270,7 +271,7 @@
     <!-- PROFILE -->
     <section id="tab-profile" style="display:none;">
       <div class="px-5 pt-4 pb-6">
-        <div class="profile-card mb-5">
+        <div class="profile-card mb-4">
           <div class="profile-avatar" id="profile-avatar">
             <span id="profile-avatar-emoji">👤</span>
             <img id="profile-avatar-img" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;" referrerpolicy="no-referrer">
@@ -281,13 +282,45 @@
           </div>
           <div class="profile-level-badge" id="profile-level-badge">🆕 Новичок</div>
         </div>
+        <!-- 💰 Wins Summary — always visible at top -->
+        <div id="wins-hero" class="mb-3" style="display:none;">
+          <div style="padding:14px 16px;border-radius:16px;background:linear-gradient(145deg,rgba(109,40,217,0.12),rgba(20,14,46,0.7));border:1px solid rgba(139,92,246,0.15);position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-15px;right:-15px;font-size:60px;opacity:0.06;">💰</div>
+            <div id="wins-hero-content"></div>
+          </div>
+        </div>
+
+        <!-- XP Progress Bar -->
+        <div id="xp-bar-section" class="mb-3" style="padding:12px 14px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span id="xp-level-text" style="font-size:12px;font-weight:800;color:#C084FC;">🆕 Новичок</span>
+            <span id="xp-amount" style="font-size:12px;font-weight:900;color:#fff;">0 XP</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.06);border-radius:6px;height:8px;overflow:hidden;">
+            <div id="xp-progress" style="width:0%;height:100%;background:linear-gradient(90deg,#2E1065,#6D28D9,#C084FC);border-radius:6px;transition:width 0.8s ease;"></div>
+          </div>
+          <div id="xp-next" style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:right;"></div>
+        </div>
 
         <!-- Stats row compact -->
         <div class="stats-grid-compact mb-3">
-          <div class="stat-mini"><span class="stat-mini-val" id="stat-played">0</span><span class="stat-mini-lbl">🎮 Игр</span></div>
-          <div class="stat-mini"><span class="stat-mini-val" id="stat-favorites">0</span><span class="stat-mini-lbl">❤️ Избр.</span></div>
-          <div class="stat-mini"><span class="stat-mini-val" id="stat-time">0м</span><span class="stat-mini-lbl">⏱ Время</span></div>
-          <div class="stat-mini"><span class="stat-mini-val stat-mini-val-sm" id="stat-level">🆕</span><span class="stat-mini-lbl">Уровень</span></div>
+          <div class="stat-mini"><span class="stat-mini-val" id="stat-played">0</span><span class="stat-mini-lbl">🎮 <span data-i18n="profile.games">Игр</span></span></div>
+          <div class="stat-mini"><span class="stat-mini-val" id="stat-favorites">0</span><span class="stat-mini-lbl">❤️ <span data-i18n="profile.favs">Избр.</span></span></div>
+          <div class="stat-mini"><span class="stat-mini-val" id="stat-time">0м</span><span class="stat-mini-lbl">⏱ <span data-i18n="profile.time">Время</span></span></div>
+          <div class="stat-mini"><span class="stat-mini-val stat-mini-val-sm" id="stat-level">🆕</span><span class="stat-mini-lbl" data-i18n="profile.level">Уровень</span></div>
+        </div>
+
+        <!-- Theme toggle -->
+        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:14px;">🎨</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="theme.title">Тема</span>
+          </div>
+          <div id="theme-toggle-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+            <button class="theme-btn interactive" data-theme="dark" style="padding:8px 4px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:11px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">🌙 <span data-i18n="theme.dark">Тёмная</span></button>
+            <button class="theme-btn interactive" data-theme="light" style="padding:8px 4px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:11px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">☀️ <span data-i18n="theme.light">Светлая</span></button>
+            <button class="theme-btn interactive" data-theme="auto" style="padding:8px 4px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);font-size:11px;font-weight:700;color:var(--text-secondary);font-family:inherit;cursor:pointer;">⚙️ <span data-i18n="theme.auto">Авто</span></button>
+          </div>
         </div>
 
         <!-- Compact settings row -->
@@ -305,20 +338,76 @@
         </div>
         <span id="currency-name" style="display:none;">Российский рубль</span>
 
+        <!-- Language selector -->
+        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:14px;">🌐</span>
+              <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="lang.title">Язык</span>
+            </div>
+            <button id="btn-language" class="interactive" style="display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;background:rgba(109,40,217,0.08);border:1px solid rgba(109,40,217,0.12);font-family:inherit;cursor:pointer;">
+              <span id="lang-flag" style="font-size:14px;">🇷🇺</span>
+              <span id="lang-name" style="font-size:11px;font-weight:700;color:#C084FC;">Русский</span>
+              <i class="fa-solid fa-chevron-right" style="font-size:8px;color:var(--text-muted);"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- XP Leaderboard -->
+        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleCollapse('xp-leaderboard-container','lb-chev')">
+            <span style="font-size:14px;">🏅</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="lb.title">Рейтинг XP</span>
+            <i class="fa-solid fa-chevron-down" id="lb-chev" style="font-size:10px;color:var(--text-muted);margin-left:auto;transition:transform 0.3s;"></i>
+          </div>
+          <div id="xp-leaderboard-container" style="display:none"></div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleCollapse('achievements-container','ach-chev')">
+            <span style="font-size:14px;">🏆</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="achievements.title">Достижения</span>
+            <span id="ach-counter" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(109,40,217,0.1);color:#C084FC;">0/22</span>
+            <i class="fa-solid fa-chevron-down" id="ach-chev" style="font-size:10px;color:var(--text-muted);margin-left:auto;transition:transform 0.3s;"></i>
+          </div>
+          <div id="achievements-container" style="display:none"></div>
+        </div>
+
+        <!-- My Games (unified wins + history) -->
+        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleCollapse('gamelog-container','gamelog-chev')">
+            <span style="font-size:14px;">🎰</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text-primary);">Мои игры</span>
+            <span id="gamelog-counter" style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(109,40,217,0.1);color:#C084FC;"></span>
+            <i class="fa-solid fa-chevron-down" id="gamelog-chev" style="font-size:10px;color:var(--text-muted);margin-left:auto;transition:transform 0.3s;"></i>
+          </div>
+          <div id="gamelog-container" style="display:none"></div>
+        </div>
+
+        <!-- Referral -->
+        <div class="profile-section-card mb-3" style="padding:12px;border-radius:14px;background:linear-gradient(145deg,rgba(20,14,46,0.6),rgba(8,5,18,0.7));border:1px solid rgba(255,255,255,0.05);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <span style="font-size:14px;">🤝</span>
+            <span style="font-size:12px;font-weight:700;color:var(--text-primary);" data-i18n="referral.title">Пригласить друга</span>
+          </div>
+          <div id="referral-container"></div>
+        </div>
+
         <!-- CTA compact -->
         <a id="btn-real-play" href="https://1wzaig.com/v3/aggressive-casino?p=akqd" target="_blank" rel="noopener noreferrer" class="cta-compact interactive mb-3" style="display:block;text-decoration:none;color:inherit;">
           <div class="flex items-center gap-3">
             <span class="text-2xl">🎰</span>
             <div class="flex-1 min-w-0">
-              <p class="font-bold text-sm text-white">Играйте на реальные!</p>
-              <p class="text-xs" style="color:var(--text-secondary);">Бонус до 500% на депозит</p>
+              <p class="font-bold text-sm text-white" data-i18n="profile.playReal">Играйте на реальные!</p>
+              <p class="text-xs" style="color:var(--text-secondary);" data-i18n="profile.bonusDeposit">Бонус до 500% на депозит</p>
             </div>
             <div class="cta-compact-arrow"><i class="fa-solid fa-arrow-right text-xs"></i></div>
           </div>
         </a>
 
         <button id="btn-admin-profile" style="display:none;" class="btn-ghost interactive w-full py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
-          <i class="fa-solid fa-gear text-xs"></i> Админ-панель
+          <i class="fa-solid fa-gear text-xs"></i> <span data-i18n="profile.adminPanel">Админ-панель</span>
         </button>
       </div>
     </section>
@@ -379,6 +468,18 @@
     </div>
     <div id="currency-list" class="flex-1 overflow-y-auto p-2 hide-scrollbar"></div>
     <div class="p-3 flex-shrink-0 text-center" style="border-top:1px solid rgba(255,255,255,0.06);"><p class="text-xs" style="color:var(--text-muted);">49 валют • Демо-режим</p></div>
+  </div>
+</div>
+
+<div id="modal-language" class="modal-overlay">
+  <div class="modal-body glass" style="max-width:420px;width:calc(100% - 32px);max-height:75vh;display:flex;flex-direction:column;border-radius:var(--radius-xl);overflow:hidden;">
+    <div class="p-4 flex-shrink-0" style="border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div class="flex items-center justify-between mb-3">
+        <p class="font-bold text-lg text-white">🌐 <span data-i18n="lang.title">Язык</span></p>
+        <button class="modal-close w-8 h-8 flex items-center justify-center rounded-full interactive" style="background:rgba(255,255,255,0.08);color:var(--text-muted);"><i class="fa-solid fa-xmark text-sm"></i></button>
+      </div>
+    </div>
+    <div id="language-list" class="flex-1 overflow-y-auto p-2 hide-scrollbar"></div>
   </div>
 </div>
 
@@ -454,6 +555,19 @@
   <div class="flex-1 overflow-y-auto p-4 hide-scrollbar" id="admin-form-body"></div>
 </div>
 
+<!-- Collapsible toggle -->
+<script>
+function toggleCollapse(id, chevId) {
+  var el = document.getElementById(id);
+  var ch = document.getElementById(chevId);
+  if (!el) return;
+  var hide = el.style.display !== 'none';
+  el.style.display = hide ? 'none' : '';
+  if (ch) ch.style.transform = hide ? '' : 'rotate(180deg)';
+  try { TG.haptic.light(); } catch(e) {}
+}
+</script>
+
 <!-- SCRIPTS -->
 <!-- Conditional SDK loading -->
 <script>
@@ -465,13 +579,17 @@
   }
 })();
 </script>
-<script src="tg-core.js?v=20260301f"></script>
+<script src="tg-core.js?v=20260302c"></script>
 <script>TG.init({ headerColor: '#030510', bgColor: '#030510', bottomColor: '#030510', fullscreen: true, closingConfirmation: true, disableSwipeClose: true });</script>
-<script src="sounds.js?v=20260301f"></script>
-<script src="data.js?v=20260301f"></script>
-<script src="app.js?v=20260301f"></script>
-<script src="ui.js?v=20260301f"></script>
-<script src="admin.js?v=20260301f"></script>
+<script src="sounds.js?v=20260302a"></script>
+<script src="data.js?v=20260302a"></script>
+<script src="i18n.js?v=20260302d"></script>
+<script src="theme.js?v=20260302a"></script>
+<script src="features.js?v=20260302g"></script>
+<script src="leaderboard.js?v=20260302d"></script>
+<script src="app.js?v=20260302d"></script>
+<script src="ui.js?v=20260302g"></script>
+<script src="admin.js?v=20260302a"></script>
 
 <!-- Debug panel removed for production -->
 
