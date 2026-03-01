@@ -299,7 +299,7 @@
 
 /* Dynamic Island — needs more top space */
 .is-telegram.has-dynamic-island #main-header {
-  padding-top: calc(var(--top-offset, 0px) + 48px) !important;
+  padding-top: calc(var(--top-offset, 0px) + 18px) !important;
 }
 .is-telegram.has-dynamic-island .win-feed {
   margin-top: 4px;
@@ -307,12 +307,12 @@
 
 /* Notch phones (iPhone X/XS/11/12/13/14) */
 .is-telegram.has-notch #main-header {
-  padding-top: calc(var(--top-offset, 0px) + 44px) !important;
+  padding-top: calc(var(--top-offset, 0px) + 18px) !important;
 }
 
 /* iPhone SE in TG */
 .is-telegram.is-iphone-se #main-header {
-  padding-top: calc(var(--top-offset, 0px) + 40px) !important;
+  padding-top: calc(var(--top-offset, 0px) + 16px) !important;
 }
 
 /* ============================================
