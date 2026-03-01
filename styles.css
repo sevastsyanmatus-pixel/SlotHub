@@ -348,16 +348,19 @@ body {
 @keyframes pbadge { 0%,100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.4), 0 0 0 2px rgba(8,5,18,0.9); } 50% { box-shadow: 0 0 0 8px rgba(124,58,237,0), 0 0 0 2px rgba(8,5,18,0.9); } }
 
 /* === BANNERS === */
-.banner-carousel { overflow: hidden; position: relative; border-radius: 0; }
+.banner-carousel { overflow: hidden; position: relative; border-radius: var(--radius-xl); }
 .banner-carousel::after { display: none; }
-.banner-carousel::before { display: none; }
 .banner-track { display: flex; gap: 0; transition: transform 0.6s var(--ease-out-expo); }
 .banner-slide {
-  min-width: 100%; width: 100%; height: 160px; flex-shrink: 0; position: relative;
+  min-width: 100%; height: 150px; position: relative;
   overflow: hidden; cursor: pointer; flex-shrink: 0;
-  border-radius: 16px;
-  border: none;
-  box-shadow: none;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-top-color: rgba(255,255,255,0.12);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.4),
+    0 2px 0 rgba(255,255,255,0.05) inset,
+    0 -1px 0 rgba(0,0,0,0.3) inset;
   display: block; text-decoration: none; color: inherit;
 }
 .banner-slide:active { transform: scale(0.97); }
@@ -893,4 +896,11 @@ body.is-telegram { overflow: hidden; }
 
 @media (orientation: landscape) and (max-height: 500px) {
   .is-telegram #game-view { padding-top: 0 !important; }
+}
+
+
+/* Friend online status pulse */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.4); }
 }
