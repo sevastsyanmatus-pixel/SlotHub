@@ -475,7 +475,6 @@ document.addEventListener('DOMContentLoaded', function() {
       renderRow('new-row', newGames.slice(0, 8));
     });
     safeRender('renderBonusBuy', renderBonusBuy);
-    safeRender('renderHomeCasinos', renderHomeCasinos);
     safeRender('renderRecent', renderRecent);
     safeRender('renderLeaderboard', function() { renderLeaderboard('day'); });
   }
@@ -726,7 +725,6 @@ document.addEventListener('DOMContentLoaded', function() {
      ============================================ */
   function renderProfile() {
     safeRender('renderWinsHero', renderWinsHero);
-    safeRender('updateStats', updateStats);
     safeRender('updateXPBar', updateXPBar);
     safeRender('renderXPLeaderboard', function() {
       var c = $('xp-leaderboard-container');
@@ -778,6 +776,7 @@ document.addEventListener('DOMContentLoaded', function() {
     safeRender('renderReferral', function() {
       var c = $('referral-container');
       if (c && window.Features) Features.renderReferral(c);
+
     });
   }
 
@@ -1155,14 +1154,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function updateStats() {
+    /* Stats block removed — only update level badge */
     var stats = App.getLocal('gameStats', { played: 0, games: {} });
-    var el = $('stat-played'); if (el) el.textContent = stats.played;
-    el = $('stat-favorites'); if (el) el.textContent = DataStore.favorites.length;
-    var timeMs = App.getLocal('timeInApp', 0);
-    var m = Math.floor(timeMs / 60000);
-    el = $('stat-time'); if (el) el.textContent = m < 60 ? m + 'м' : Math.floor(m / 60) + 'ч ' + (m % 60) + 'м';
-    el = $('stat-level'); if (el) el.textContent = getLevel(stats.played);
-    el = $('profile-level-badge'); if (el) el.textContent = getLevelFull(stats.played);
+    var el = $('profile-level-badge'); if (el) el.textContent = getLevelFull(stats.played);
   }
 
   /* ============================================
