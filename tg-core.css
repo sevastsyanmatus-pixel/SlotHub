@@ -260,15 +260,7 @@ html.tg-app input, html.tg-app select, html.tg-app textarea {
 }
 
 /* === TELEGRAM HEADER OFFSET === */
-/* Push header below TG system buttons (back, close, menu) */
-html.tg-app #main-header {
-  padding-top: calc(var(--top-offset, 54px) + 40px) !important;
-}
-
-/* Win feed also needs offset */
-html.tg-app .win-feed {
-  top: calc(var(--top-offset, 54px) + 78px);
-}
+/* Managed in styles.css (.is-telegram rules) to avoid duplication */
 
 /* === TEXT HELPERS === */
 .tg-text { color: var(--tg-text, #fff); }
