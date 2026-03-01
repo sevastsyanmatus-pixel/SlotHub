@@ -223,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
       heart.classList.add('pop');
       setTimeout(function() { heart.classList.remove('pop'); }, 400);
       if (nowFav) {
+        if (window.Features) Features.addFavoriteXP();
         App.showToast('❤️', esc(game.name) + ' добавлено в избранное');
         var r = heart.getBoundingClientRect();
         App.fireConfetti(r.left + r.width / 2, r.top + r.height / 2);
@@ -423,8 +424,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!track) return;
     var slides = track.querySelectorAll('.banner-slide');
     if (slides.length > 0) {
-      var w = slides[0].offsetWidth, gap = 10;
-      track.style.transform = 'translateX(-' + (bannerIdx * (w + gap)) + 'px)';
+      var w = slides[0].offsetWidth;
+      track.style.transform = 'translateX(-' + (bannerIdx * w) + 'px)';
     }
     var dots = $('banner-dots');
     if (dots) {
@@ -640,16 +641,191 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /* ============================================
+     WINS HERO (top of profile)
+     ============================================ */
+  function renderWinsHero() {
+    var hero = $('wins-hero');
+    var content = $('wins-hero-content');
+    if (!hero || !content || !window.Features) { if (hero) hero.style.display = 'none'; return; }
+
+    var d = Features.getData();
+    var wins = d.wins || [];
+    var best = d.biggestWin || 0;
+    var totalWon = d.totalWon || 0;
+    var totalBet = d.totalBet || 0;
+    var cur = DataStore.getCurrencySymbol();
+
+    /* Show only if there's at least some data */
+    if (wins.length === 0 && totalWon === 0) {
+      hero.style.display = 'none';
+      return;
+    }
+    hero.style.display = '';
+
+    var fmt = function(n) { return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
+    var fmtShort = function(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+      return n.toFixed(0);
+    };
+
+    var html = '';
+
+    /* Big best win */
+    if (best > 0) {
+      html += '<div style="text-align:center;margin-bottom:10px;">';
+      html += '<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">\uD83C\uDFC6 Лучший выигрыш</div>';
+      html += '<div style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#C084FC,#F97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;">' + fmt(best) + ' ' + esc(cur) + '</div>';
+      html += '</div>';
+    }
+
+    /* Stats row */
+    html += '<div style="display:flex;gap:6px;">';
+    if (totalWon > 0) {
+      html += '<div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:rgba(255,255,255,0.03);">';
+      html += '<div style="font-size:15px;font-weight:900;color:#A78BFA;">' + fmtShort(totalWon) + ' ' + esc(cur) + '</div>';
+      html += '<div style="font-size:8px;color:var(--text-muted);font-weight:600;margin-top:2px;">\uD83D\uDCB0 Всего</div></div>';
+    }
+    html += '<div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:rgba(255,255,255,0.03);">';
+    html += '<div style="font-size:15px;font-weight:900;color:#8B5CF6;">' + wins.length + '</div>';
+    html += '<div style="font-size:8px;color:var(--text-muted);font-weight:600;margin-top:2px;">\uD83C\uDFB0 Сессий</div></div>';
+    /* ROI removed */
+    html += '</div>';
+
+    /* Last big win highlight */
+    if (wins.length > 0) {
+      var last = wins[0];
+      var ago = _timeAgo(last.ts);
+      html += '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);">';
+      html += '<span style="font-size:18px;">' + (last.gameIcon || '\uD83C\uDFB0') + '</span>';
+      html += '<div style="flex:1;min-width:0;">';
+      html += '<div style="font-size:11px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(last.gameName || '') + '</div>';
+      html += '<div style="font-size:8px;color:var(--text-muted);">' + ago + '</div></div>';
+      html += '<div style="text-align:right;">';
+      html += '<div style="font-size:13px;font-weight:900;color:#C084FC;">' + fmt(last.amount) + ' ' + esc(cur) + '</div>';
+      if (last.mult > 0) html += '<div style="font-size:8px;font-weight:700;color:#A78BFA;">x' + last.mult + '</div>';
+      html += '</div></div>';
+    }
+
+    content.innerHTML = html;
+  }
+
+  function _timeAgo(ts) {
+    var diff = Date.now() - (ts || 0);
+    var m = Math.floor(diff / 60000);
+    if (m < 1) return 'только что';
+    if (m < 60) return m + ' мин назад';
+    var h = Math.floor(m / 60);
+    if (h < 24) return h + ' ч назад';
+    var d = Math.floor(h / 24);
+    return d + ' дн назад';
+  }
+
+  /* ============================================
      PROFILE TAB
      ============================================ */
   function renderProfile() {
+    safeRender('renderWinsHero', renderWinsHero);
     safeRender('updateStats', updateStats);
+    safeRender('updateXPBar', updateXPBar);
+    safeRender('renderXPLeaderboard', function() {
+      var c = $('xp-leaderboard-container');
+      if (c && window.Leaderboard) Leaderboard.render(c, 10);
+    });
     /* Currency display */
     var cur = DataStore.getCurrency();
     $('currency-flag').textContent = cur.flag;
     $('currency-code').textContent = cur.code;
     $('currency-name').textContent = cur.name;
     $('currency-symbol-display').textContent = cur.symbol;
+
+    /* Theme toggle */
+    safeRender('initThemeToggle', initThemeToggle);
+    /* Language display */
+    safeRender('updateLangDisplay', updateLangDisplay);
+    /* Achievements */
+    safeRender('renderAchievements', function() {
+      var c = $('achievements-container');
+      if (c && window.Features) {
+        Features.checkNewAchievements();
+        Features.renderAchievements(c);
+        var unlocked = Features.getUnlocked();
+        var counter = $('ach-counter');
+        if (counter) counter.textContent = unlocked.length + '/' + Features.ACHIEVEMENTS.length;
+      }
+    });
+    /* My Games (unified log) */
+    safeRender('renderGameLog', function() {
+      var c = $('gamelog-container');
+      if (c && window.Features) {
+        var result = Features.renderGameLog(c);
+        var counter = $('gamelog-counter');
+        if (counter && result) {
+          var d = Features.getData();
+          var winsCount = (d.wins || []).length;
+          var histCount = (d.history || []).length;
+          if (winsCount > 0) {
+            counter.textContent = winsCount + ' выигр.';
+            counter.style.background = 'rgba(249,115,22,0.1)';
+            counter.style.color = '#F97316';
+          } else if (histCount > 0) {
+            counter.textContent = histCount + ' сесс.';
+          }
+        }
+      }
+    });
+    /* Referral */
+    safeRender('renderReferral', function() {
+      var c = $('referral-container');
+      if (c && window.Features) Features.renderReferral(c);
+    });
+  }
+
+  /* Theme toggle binding */
+  var _themeInitialized = false;
+  function initThemeToggle() {
+    var btns = document.querySelectorAll('.theme-btn');
+    var curTheme = window.ThemeManager ? ThemeManager.getTheme() : 'dark';
+    for (var i = 0; i < btns.length; i++) {
+      var t = btns[i].getAttribute('data-theme');
+      btns[i].classList.toggle('theme-btn-active', t === curTheme);
+      if (t === curTheme) {
+        btns[i].style.background = 'linear-gradient(135deg,#2E1065,#6D28D9,#4338CA)';
+        btns[i].style.color = '#fff';
+        btns[i].style.borderColor = 'transparent';
+      } else {
+        btns[i].style.background = 'rgba(255,255,255,0.03)';
+        btns[i].style.color = 'var(--text-secondary)';
+        btns[i].style.borderColor = 'rgba(255,255,255,0.05)';
+      }
+      if (!_themeInitialized) {
+        (function(btn) {
+          btn.addEventListener('click', function() {
+            TG.haptic.light(); App.playSound('click');
+            var theme = btn.getAttribute('data-theme');
+            if (window.ThemeManager) ThemeManager.setTheme(theme);
+            initThemeToggle();
+          });
+        })(btns[i]);
+      }
+    }
+    _themeInitialized = true;
+  }
+
+  /* Language display */
+  function updateLangDisplay() {
+    if (!window.I18n) return;
+    var langs = I18n.getLangs();
+    var cur = I18n.getLang();
+    for (var i = 0; i < langs.length; i++) {
+      if (langs[i].code === cur) {
+        var fl = $('lang-flag');
+        var nm = $('lang-name');
+        if (fl) fl.textContent = langs[i].flag;
+        if (nm) nm.textContent = langs[i].nativeName;
+        break;
+      }
+    }
   }
 
   function renderCurrencyList(query) {
@@ -695,24 +871,97 @@ document.addEventListener('DOMContentLoaded', function() {
     var cur = DataStore.getCurrency();
     var seed = period === 'day' ? Math.floor(Date.now() / 86400000) : Math.floor(Date.now() / 604800000);
 
+    /* Get user data */
+    var userBestWin = 0;
+    var uName = (window.TG && TG.userFirstName) ? TG.userFirstName : 'You';
+    if (window.Features) {
+      var d = Features.getData();
+      userBestWin = d.biggestWin || 0;
+    }
+
     var entries = [];
-    for (var i = 0; i < 8; i++) {
+
+    /* Top 3 bots: always BIG wins from 100k to millions (realistic casino) */
+    var topRanges = period === 'week'
+      ? [{ min: 800000, max: 3000000 }, { min: 400000, max: 1200000 }, { min: 200000, max: 600000 }]
+      : [{ min: 500000, max: 2000000 }, { min: 250000, max: 800000 }, { min: 100000, max: 400000 }];
+
+    for (var t = 0; t < topRanges.length; t++) {
+      var ht = simpleHash('home_elite_' + period + '_' + seed + '_' + t);
+      var topAmt = topRanges[t].min + (ht % (topRanges[t].max - topRanges[t].min));
+      var topGame = games.length > 0 ? games[ht % games.length] : { name: 'Sweet Bonanza', icon: '🍬' };
+      var topMult = 100 + (ht % 900);
+      entries.push({ name: names[ht % names.length], game: topGame, amount: topAmt, mult: 'x' + topMult, self: false });
+    }
+
+    /* 2-3 mid-range bots (above user level but not millions) */
+    var midCount = 2 + (simpleHash('home_mid_' + seed + period) % 2);
+    for (var m = 0; m < midCount; m++) {
+      var hm = simpleHash('home_mid_' + period + '_' + seed + '_' + m);
+      var midMin = period === 'week' ? 50000 : 20000;
+      var midMax = period === 'week' ? 250000 : 100000;
+      /* Also ensure above user */
+      var midAmt = Math.max(midMin + (hm % (midMax - midMin)), userBestWin * 1.2 + 5000);
+      var midGame = games.length > 0 ? games[hm % games.length] : { name: 'Gates of Olympus', icon: '⚡' };
+      entries.push({ name: names[(hm + 7) % names.length], game: midGame, amount: Math.round(midAmt), mult: 'x' + (20 + (hm % 480)), self: false });
+    }
+
+    /* 4-5 regular bots (lower range) */
+    for (var i = 0; i < 5; i++) {
       var hash = simpleHash(period + '_lb_' + seed + '_' + i);
       var game = games.length > 0 ? games[hash % games.length] : { name: 'Sweet Bonanza', icon: '🍬' };
-      var amt = period === 'week' ? 100000 + (hash % 4000000) : 10000 + (hash % 800000);
-      entries.push({ name: names[hash % names.length], game: game, amount: amt, mult: 'x' + (5 + (hash % 995)) });
+      var amt = period === 'week' ? 5000 + (hash % 50000) : 1000 + (hash % 20000);
+      entries.push({ name: names[hash % names.length], game: game, amount: amt, mult: 'x' + (5 + (hash % 200)), self: false });
     }
+
+    /* Insert real user if they have wins */
+    if (userBestWin > 0) {
+      var bestGame = null;
+      if (window.Features) {
+        var wins = Features.getData().wins || [];
+        for (var bw = 0; bw < wins.length; bw++) {
+          if (wins[bw].amount === userBestWin) { bestGame = DataStore.getGameById(wins[bw].gameId); break; }
+        }
+      }
+      if (!bestGame && games.length > 0) bestGame = games[0];
+      entries.push({
+        name: uName,
+        game: bestGame || { name: 'SlotX', icon: '🎰' },
+        amount: userBestWin,
+        mult: '',
+        self: true
+      });
+    }
+
     entries.sort(function(a, b) { return b.amount - a.amount; });
 
+    /* Safety: ensure user is never in top 3 */
+    for (var s = 0; s < 5; s++) {
+      var uIdx = -1;
+      for (var si = 0; si < entries.length; si++) { if (entries[si].self) { uIdx = si; break; } }
+      if (uIdx >= 0 && uIdx < 3) {
+        var u = entries.splice(uIdx, 1)[0];
+        var pos = Math.min(3 + (simpleHash('hpos_' + seed) % 3), entries.length);
+        entries.splice(pos, 0, u);
+      } else break;
+    }
+
+    var fmtMoney = function(n) {
+      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+      return n.toFixed(0);
+    };
+
     var h = '';
-    for (var j = 0; j < entries.length; j++) {
+    for (var j = 0; j < Math.min(entries.length, 10); j++) {
       var e = entries[j];
       var medal = j === 0 ? '🥇' : j === 1 ? '🥈' : j === 2 ? '🥉' : '<span class="lb-rank-num">' + (j + 1) + '</span>';
-      var amtStr = e.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-      h += '<div class="lb-row' + (j < 3 ? ' lb-top' : '') + '">';
+      var amtStr = fmtMoney(e.amount) + ' ' + esc(cur.symbol);
+      var rowCls = 'lb-row' + (j < 3 ? ' lb-top' : '') + (e.self ? ' lb-self' : '');
+      h += '<div class="' + rowCls + '">';
       h += '<div class="lb-medal">' + medal + '</div>';
-      h += '<div class="lb-player"><span class="lb-name">' + esc(e.name) + '</span><span class="lb-game">' + (e.game.icon || '🎰') + ' ' + esc(e.game.name) + '</span></div>';
-      h += '<div class="lb-win"><span class="lb-amount">' + amtStr + ' ' + esc(cur.symbol) + '</span><span class="lb-mult">' + e.mult + '</span></div>';
+      h += '<div class="lb-player"><span class="lb-name">' + (e.self ? '⭐ ' : '') + esc(e.name) + '</span><span class="lb-game">' + (e.game.icon || '🎰') + ' ' + esc(e.game.name) + '</span></div>';
+      h += '<div class="lb-win"><span class="lb-amount">' + amtStr + '</span>' + (e.mult ? '<span class="lb-mult">' + e.mult + '</span>' : '') + '</div>';
       h += '</div>';
     }
     el.innerHTML = h;
@@ -742,6 +991,21 @@ document.addEventListener('DOMContentLoaded', function() {
     var multipliers = ['x2.1','x3.5','x5.8','x12','x24','x48','x87','x150','x320','x500','x1200'];
     var items = [];
 
+    /* Mix in REAL user wins from Features */
+    var realWins = [];
+    if (window.Features) {
+      var d = Features.getData();
+      var w = d.wins || [];
+      var uName = (window.TG && TG.userFirstName) ? TG.userFirstName.substring(0,4) + '***' : 'You***';
+      for (var rw = 0; rw < Math.min(w.length, 5); rw++) {
+        var rWin = w[rw];
+        var rAmt = rWin.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        var rMult = rWin.mult > 0 ? 'x' + rWin.mult : '';
+        var isHuge = rWin.amount > 5000 || rWin.mult >= 100;
+        realWins.push('<span class="wf-chip' + (isHuge ? ' wf-mega' : ' wf-real') + '"><span class="wf-icon">' + (rWin.gameIcon || '🎰') + '</span><span class="wf-name">' + esc(uName) + '</span><span class="wf-sep">→</span><span class="wf-amt">' + rAmt + ' ' + esc(cur.symbol) + '</span>' + (rMult ? '<span class="wf-mult">' + rMult + '</span>' : '') + '</span>');
+      }
+    }
+
     for (var i = 0; i < 25; i++) {
       var n = names[Math.floor(Math.random() * names.length)];
       var g = games.length > 0 ? games[Math.floor(Math.random() * games.length)] : { name: 'Sweet Bonanza', icon: '🍬' };
@@ -749,9 +1013,17 @@ document.addEventListener('DOMContentLoaded', function() {
       var base = r < 0.4 ? 10 + Math.random() * 990 : r < 0.7 ? 1000 + Math.random() * 9000 : r < 0.88 ? 10000 + Math.random() * 90000 : 100000 + Math.random() * 900000;
       var amt = base.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
       var mult = multipliers[Math.floor(Math.random() * multipliers.length)];
-      var isHuge = base > 50000;
-      items.push('<span class="wf-chip' + (isHuge ? ' wf-mega' : '') + '"><span class="wf-icon">' + (g.icon || '🎰') + '</span><span class="wf-name">' + esc(n) + '</span><span class="wf-sep\">→</span><span class="wf-amt">' + amt + ' ' + esc(cur.symbol) + '</span><span class="wf-mult">' + mult + '</span></span>');
+      var isHuge2 = base > 50000;
+      items.push('<span class="wf-chip' + (isHuge2 ? ' wf-mega' : '') + '"><span class="wf-icon">' + (g.icon || '🎰') + '</span><span class="wf-name">' + esc(n) + '</span><span class="wf-sep">→</span><span class="wf-amt">' + amt + ' ' + esc(cur.symbol) + '</span><span class="wf-mult">' + mult + '</span></span>');
+
+      /* Insert a real win every 5 fake ones */
+      if (realWins.length > 0 && i % 5 === 4) {
+        items.push(realWins.shift());
+      }
     }
+    /* Append remaining real wins */
+    while (realWins.length > 0) items.push(realWins.shift());
+
     el.innerHTML = items.join('') + items.join('');
 
     /* Force reflow for TG WebView animation restart (ARTHOLST pattern) */
@@ -797,10 +1069,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function updateOnline() {
     var el = $('online-count'); if (!el) return;
-    var fiveMin = Math.floor(Date.now() / 300000);
-    var base = 800 + (simpleHash('global_online_' + fiveMin) % 1200);
-    var val = base + Math.floor((Math.random() - 0.5) * 30);
-    el.textContent = val.toLocaleString('ru-RU');
+    /* Sum of all individual game online counts = total players */
+    var games = DataStore.getActiveGames();
+    var total = 0;
+    for (var i = 0; i < games.length; i++) {
+      total += getGameOnline(games[i].id);
+    }
+    /* Add small random jitter so it feels alive */
+    total += Math.floor((Math.random() - 0.5) * 50);
+    el.textContent = total.toLocaleString('ru-RU');
   }
 
   /* ============================================
@@ -843,6 +1120,38 @@ document.addEventListener('DOMContentLoaded', function() {
     if (played >= 20) return '⭐ Профи';
     if (played >= 5) return '🎮 Игрок';
     return '🆕 Новичок';
+  }
+
+  function updateXPBar() {
+    if (!window.Features) return;
+    Features.checkNewAchievements();
+    var d = Features.getData();
+    var xp = d.xp || 0;
+    var lvl = Features.getLevel(xp);
+    var next = Features.getNextLevel(xp);
+    var lvlName = Features.getLevelName(lvl);
+
+    var el = $('xp-level-text');
+    if (el) el.innerHTML = lvl.icon + ' ' + App.escHtml(lvlName);
+    el = $('xp-amount');
+    if (el) el.textContent = xp + ' XP';
+
+    if (next) {
+      var pct = Math.min(((xp - lvl.min) / (next.min - lvl.min)) * 100, 100);
+      el = $('xp-progress');
+      if (el) el.style.width = pct + '%';
+      el = $('xp-next');
+      if (el) el.textContent = (next.min - xp) + ' XP ' + (window.I18n ? I18n.t('xp.toNext', 'до') : 'до') + ' ' + Features.getLevelName(next);
+    } else {
+      el = $('xp-progress');
+      if (el) el.style.width = '100%';
+      el = $('xp-next');
+      if (el) el.textContent = 'MAX LEVEL!';
+    }
+
+    /* Update badge */
+    el = $('profile-level-badge');
+    if (el) el.textContent = lvl.icon + ' ' + lvlName;
   }
 
   function updateStats() {
