@@ -658,6 +658,54 @@ body {
 .profile-name { font-weight: 900; font-size: 17px; color: #fff; letter-spacing: -0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profile-username { font-size: 12px; color: var(--text-secondary); margin-top: 2px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .profile-level-badge { position: absolute; top: 10px; right: 12px; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: var(--radius-full); background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(192,132,252,0.08)); border: 1px solid rgba(139,92,246,0.15); color: #C084FC; z-index: 2; white-space: nowrap; }
+/* === COMPACT STATS (Profile tab) === */
+.stats-grid-compact {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.stat-mini {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 10px 4px; border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgba(20,14,46,0.6), rgba(8,5,18,0.7));
+  border: 1px solid rgba(255,255,255,0.05);
+  border-top-color: rgba(255,255,255,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(255,255,255,0.03) inset;
+}
+.stat-mini-val { font-size: 18px; font-weight: 900; color: #fff; line-height: 1.1; }
+.stat-mini-val-sm { font-size: 14px; }
+.stat-mini-lbl { font-size: 8px; font-weight: 700; color: var(--text-muted); text-align: center; white-space: nowrap; }
+
+/* === COMPACT SETTINGS ROW === */
+.compact-settings {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.compact-setting-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: var(--radius-md);
+  background: linear-gradient(145deg, rgba(20,14,46,0.6), rgba(8,5,18,0.7));
+  border: 1px solid rgba(255,255,255,0.05);
+  border-top-color: rgba(255,255,255,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(255,255,255,0.03) inset;
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.compact-setting-btn:active { transform: scale(0.96); opacity: 0.8; }
+
+/* === COMPACT CTA === */
+.cta-compact {
+  padding: 14px 16px; border-radius: var(--radius-xl);
+  background: linear-gradient(145deg, rgba(46,16,101,0.15), rgba(109,40,217,0.08), rgba(67,56,202,0.05));
+  border: 1px solid rgba(109,40,217,0.12);
+  position: relative; overflow: hidden;
+}
+.cta-compact:active { transform: scale(0.97); opacity: 0.85; }
+.cta-compact-arrow {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--cta-gradient); background-size: 200% 200%; animation: btn-shift 3s ease infinite;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff;
+}
+
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .stat-card {
   padding: 18px 14px; border-radius: var(--radius-xl);
