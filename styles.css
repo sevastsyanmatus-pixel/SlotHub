@@ -235,7 +235,7 @@ body {
 /* === HEADER === */
 #main-header {
   position: sticky; top: 0; z-index: 30;
-  padding: calc(var(--top-offset, 0px) + 8px) 20px 0;
+  padding: var(--top-offset, 0px) 20px 0;
   background: #030510;
   border-bottom: 1px solid rgba(46,16,101,0.12);
   flex-shrink: 0;
@@ -602,7 +602,7 @@ body {
 
 /* === NOTIFICATION === */
 .notification-popup {
-  position: fixed; top: calc(var(--top-offset, 0px) + 8px); left: 0; right: 0; z-index: 150;
+  position: fixed; top: calc(var(--top-offset, 0px) + 52px); left: 0; right: 0; z-index: 150;
   display: flex; align-items: center; gap: 10px; padding: 12px 14px;
   margin: 0 16px;
   background: linear-gradient(145deg, rgba(24,18,50,0.72), rgba(12,8,28,0.78));
@@ -777,7 +777,7 @@ body {
 body.is-telegram { overflow: hidden; }
 
 .is-telegram .notification-popup {
-  top: calc(var(--top-offset, 0px) + 8px);
+  top: calc(var(--top-offset, 0px) + 52px);
 }
 
 .is-telegram #bottom-nav-wrap {
