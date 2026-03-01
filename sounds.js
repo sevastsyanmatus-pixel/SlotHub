@@ -61,15 +61,15 @@ var SoundFX = (function() {
     var emoji = btn.querySelector('.text-xl');
     if (enabled) {
       btn.classList.add('active');
-      if (icon) icon.className = 'fa-solid fa-volume-high flex-shrink-0';
+      if (icon) icon.className = 'fa-solid fa-volume-high text-xs';
       if (icon) icon.style.color = '#C084FC';
-      if (label) label.textContent = 'Звук включен';
+      if (label) label.textContent = 'Звук вкл';
       if (emoji) emoji.textContent = '🔊';
     } else {
       btn.classList.remove('active');
-      if (icon) icon.className = 'fa-solid fa-volume-xmark flex-shrink-0';
+      if (icon) icon.className = 'fa-solid fa-volume-xmark text-xs';
       if (icon) icon.style.color = 'var(--text-muted)';
-      if (label) label.textContent = 'Звук выключен';
+      if (label) label.textContent = 'Звук выкл';
       if (emoji) emoji.textContent = '🔇';
     }
   }
