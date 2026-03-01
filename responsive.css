@@ -299,17 +299,17 @@
 
 /* Dynamic Island — needs more top space */
 .is-telegram.has-dynamic-island #main-header {
-  padding-top: calc(var(--top-offset, 0px) + 8px);
+  padding-top: var(--top-offset, 0px);
 }
 
 /* Notch phones — standard offset */
 .is-telegram.has-notch #main-header {
-  padding-top: calc(var(--top-offset, 0px) + 10px);
+  padding-top: var(--top-offset, 0px);
 }
 
 /* iPhone SE in TG — less header padding needed */
 .is-telegram.is-iphone-se #main-header {
-  padding-top: calc(var(--top-offset, 0px) + 6px);
+  padding-top: var(--top-offset, 0px);
 }
 
 /* ============================================
