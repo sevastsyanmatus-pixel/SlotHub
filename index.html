@@ -44,11 +44,11 @@
         var finalTop;
 
         if (contentTop > 0) {
-          finalTop = Math.max(contentTop + 20, deviceTop + 20, 58);
+          finalTop = Math.max(contentTop + 54, deviceTop + 54, 90);
         } else if (deviceTop > 0) {
-          finalTop = Math.max(deviceTop + 20, 58);
+          finalTop = Math.max(deviceTop + 54, 90);
         } else {
-          finalTop = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 60 : 58;
+          finalTop = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 94 : 90;
         }
 
         root.style.setProperty('--top-offset', finalTop + 'px');
@@ -93,9 +93,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="tg-core.css?v=20260301a">
-  <link rel="stylesheet" href="styles.css?v=20260301a">
-  <link rel="stylesheet" href="responsive.css?v=20260301a">
+  <link rel="stylesheet" href="tg-core.css?v=20260301b">
+  <link rel="stylesheet" href="styles.css?v=20260301b">
+  <link rel="stylesheet" href="responsive.css?v=20260301b">
 
   <!-- INLINE CRITICAL FIX: Ensure bottom nav is always visible -->
   <style>
@@ -474,13 +474,13 @@
   }
 })();
 </script>
-<script src="tg-core.js?v=20260301a"></script>
+<script src="tg-core.js?v=20260301b"></script>
 <script>TG.init({ headerColor: '#030510', bgColor: '#030510', bottomColor: '#030510', fullscreen: true, closingConfirmation: true, disableSwipeClose: true });</script>
-<script src="sounds.js?v=20260301a"></script>
-<script src="data.js?v=20260301a"></script>
-<script src="app.js?v=20260301a"></script>
-<script src="ui.js?v=20260301a"></script>
-<script src="admin.js?v=20260301a"></script>
+<script src="sounds.js?v=20260301b"></script>
+<script src="data.js?v=20260301b"></script>
+<script src="app.js?v=20260301b"></script>
+<script src="ui.js?v=20260301b"></script>
+<script src="admin.js?v=20260301b"></script>
 
 <!-- Debug panel removed for production -->
 
