@@ -284,15 +284,15 @@ var TG = (function() {
 
       if (isFullscreen) {
         /* contentTop + generous buffer for TG overlay buttons */
-        var buffered = contentTop + 54;
+        var buffered = contentTop + 20;
         /* Also ensure at least deviceTop + generous buffer */
-        var minFromDevice = deviceTop + 54;
+        var minFromDevice = deviceTop + 20;
         /* And absolute minimum — enough space below TG buttons */
-        finalTop = Math.max(buffered, minFromDevice, 90);
+        finalTop = Math.max(buffered, minFromDevice, 54);
       } else if (contentTop === 0 && deviceTop === 0) {
         finalTop = 0;
       } else if (contentTop === 0 && deviceTop > 0) {
-        finalTop = Math.max(deviceTop + 54, 90);
+        finalTop = Math.max(deviceTop + 20, 54);
       }
 
       root.style.setProperty('--tg-content-safe-top', finalTop + 'px');
