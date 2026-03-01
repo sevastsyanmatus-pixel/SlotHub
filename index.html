@@ -44,11 +44,11 @@
         var finalTop;
 
         if (contentTop > 0) {
-          finalTop = Math.max(contentTop + 14, deviceTop + 14, 50);
+          finalTop = Math.max(contentTop + 20, deviceTop + 20, 58);
         } else if (deviceTop > 0) {
-          finalTop = Math.max(deviceTop + 14, 50);
+          finalTop = Math.max(deviceTop + 20, 58);
         } else {
-          finalTop = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 52 : 50;
+          finalTop = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 60 : 58;
         }
 
         root.style.setProperty('--top-offset', finalTop + 'px');
