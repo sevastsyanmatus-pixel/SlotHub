@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
     $('game-iframe').src = '';
     $('game-iframe').onload = null;
     $('game-view').classList.remove('game-fs');
-    try { TG.exitFullscreen(); } catch(e) {}
+    /* NOTE: Do NOT call TG.exitFullscreen() here — that would collapse the whole Mini App */
     if (gameLoadTimeout) { clearTimeout(gameLoadTimeout); gameLoadTimeout = null; }
 
     $('game-view').style.display = 'none';
