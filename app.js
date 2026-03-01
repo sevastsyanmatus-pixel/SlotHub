@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
     $('game-iframe').src = '';
     $('game-iframe').onload = null;
     $('game-view').classList.remove('game-fs');
-    try { if (window.Telegram && Telegram.WebApp.exitFullscreen) Telegram.WebApp.exitFullscreen(); } catch(e) {}
+    try { TG.exitFullscreen(); } catch(e) {}
     if (gameLoadTimeout) { clearTimeout(gameLoadTimeout); gameLoadTimeout = null; }
 
     $('game-view').style.display = 'none';
