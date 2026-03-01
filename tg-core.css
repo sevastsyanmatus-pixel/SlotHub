@@ -259,6 +259,17 @@ html.tg-app input, html.tg-app select, html.tg-app textarea {
   font-size: 16px !important;
 }
 
+/* === TELEGRAM HEADER OFFSET === */
+/* Push header below TG system buttons (back, close, menu) */
+html.tg-app #main-header {
+  padding-top: calc(var(--top-offset, 54px) + 40px) !important;
+}
+
+/* Win feed also needs offset */
+html.tg-app .win-feed {
+  top: calc(var(--top-offset, 54px) + 78px);
+}
+
 /* === TEXT HELPERS === */
 .tg-text { color: var(--tg-text, #fff); }
 .tg-hint { color: var(--tg-hint, #999); }
