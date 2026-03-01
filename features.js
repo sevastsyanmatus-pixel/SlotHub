@@ -72,6 +72,16 @@ var Features = (function() {
     _sessionBiggestWin = 0;
     _sessionWins = [];
 
+    /* Firebase: broadcast "playing" to friends */
+    if (window.FirebaseService && FirebaseService.isReady()) {
+      var game = window.DataStore ? DataStore.getGameById(gameId) : null;
+      FirebaseService.setPlaying(
+        gameId,
+        game ? game.name : '',
+        game ? (game.icon || '🎰') : '🎰'
+      );
+    }
+
     if (!_messageListenerActive) {
       _messageListenerActive = true;
       window.addEventListener('message', _handleGameMessage);
@@ -156,12 +166,22 @@ var Features = (function() {
       saveData(d);
       checkNewAchievements(d);
 
-      /* Win notifications removed — wins shown in ticker + leaderboard */
+      /* Broadcast big win to friends via Firebase */
+      if (window.FirebaseService && FirebaseService.isReady()) {
+        FirebaseService.reportWin(
+          _currentGameId, gameName, gameIcon, amount, Math.round(mult * 10) / 10
+        );
+      }
     }
   }
 
   function endGameSession() {
     if (!_currentGameId) return;
+
+    /* Firebase: broadcast "idle" */
+    if (window.FirebaseService && FirebaseService.isReady()) {
+      FirebaseService.setIdle();
+    }
     var d = getData();
     var sessionProfit = _sessionCurrentBalance - _sessionStartBalance;
 
@@ -453,9 +473,16 @@ var Features = (function() {
     }, 3000);
 
     trackReferralForInviter(referrerId, myId);
+
+    /* Firebase: register referral for real-time sync */
+    if (window.FirebaseService && FirebaseService.isReady()) {
+      FirebaseService.registerReferral(referrerId, myId);
+    }
   }
 
   function trackReferralForInviter(referrerId, newUserId) {
+    /* Award wheel spin to inviter */
+    if (window.Referral) Referral.addWheelSpin();
     if (!window.miniappsAI || !miniappsAI.storage) return;
     var key = 'ref_pending_' + referrerId;
     miniappsAI.storage.getItem(key).then(function(raw) {
@@ -490,6 +517,8 @@ var Features = (function() {
           if (!d.xpLog) d.xpLog = [];
           d.xpLog.unshift({ amount: XP.REFERRAL_INVITE, reason: 'referral_reward', ts: Date.now() });
           newCount++;
+          /* Award wheel spin + track weekly */
+          if (window.Referral) Referral.addWheelSpin();
         }
       }
       if (newCount > 0) {
@@ -543,8 +572,13 @@ var Features = (function() {
     if (window.App) App.showToast('🔗', '✅ Ссылка скопирована!');
   }
 
-  /* Render referral — mysterious/enticing version */
+  /* Render referral — delegates to Referral module if available */
   function renderReferral(container) {
+    /* Use new Referral module if loaded */
+    if (window.Referral && Referral.renderFull) {
+      return Referral.renderFull(container);
+    }
+    /* Fallback to old basic version */
     var t = window.I18n ? I18n.t : function(k,f){return f||k;};
     var d = getData();
     var refs = d.referrals || 0;
