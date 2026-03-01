@@ -76,6 +76,11 @@
 .screen-xs .stat-card { padding: 12px 10px; }
 .screen-xs .stat-icon { font-size: 22px; }
 .screen-xs .stat-value { font-size: 20px; }
+.screen-xs .stat-mini { padding: 8px 2px; }
+.screen-xs .stat-mini-val { font-size: 15px; }
+.screen-xs .stat-mini-lbl { font-size: 7px; }
+.screen-xs .compact-setting-btn { padding: 8px 10px; gap: 6px; }
+.screen-xs .cta-compact { padding: 12px 14px; }
 
 .screen-xs .nav-btn { padding: 5px 12px; }
 .screen-xs .nav-label { font-size: 8px; }
