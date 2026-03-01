@@ -103,6 +103,11 @@ document.addEventListener('DOMContentLoaded', function() {
       TG.showBack(function() { hideModal(ml); });
     }
 
+    var mw = $('modal-wheel');
+    if (mw && mw.classList.contains('active')) {
+      TG.showBack(function() { hideModal(mw); });
+    }
+
     var sv = $('story-viewer');
     if (sv && sv.style.display === 'flex') {
       TG.showBack(function() { $('story-close').click(); });
@@ -344,7 +349,8 @@ document.addEventListener('DOMContentLoaded', function() {
   $('link-popular').addEventListener('click', function() { switchTab('games'); setTimeout(function() { if (window.UI) UI.setFilter('popular'); }, 50); });
   $('link-top').addEventListener('click', function() { switchTab('games'); setTimeout(function() { if (window.UI) UI.setFilter('top'); }, 50); });
   $('link-new').addEventListener('click', function() { switchTab('games'); setTimeout(function() { if (window.UI) UI.setFilter('new'); }, 50); });
-  $('link-casinos').addEventListener('click', function() { switchTab('casinos'); });
+  var linkCasinos = $('link-casinos');
+  if (linkCasinos) linkCasinos.addEventListener('click', function() { switchTab('casinos'); });
 
   $('search-input').addEventListener('input', function() { searchQuery = this.value.trim(); if (window.UI) UI.renderGamesGrid(); });
 
@@ -427,6 +433,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
       $('modal-currency').addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
+    var mwheel = $('modal-wheel');
+    if (mwheel) mwheel.addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
     var mlang = $('modal-language');
     if (mlang) mlang.addEventListener('click', function(e) { if (e.target === this) hideModal(this); });
     $('toast').addEventListener('click', function() { openAffiliate(); });
@@ -449,6 +457,11 @@ document.addEventListener('DOMContentLoaded', function() {
       Features.processIncomingReferral();
       setTimeout(function() { Features.checkPendingReferrals(); }, 2000);
     }
+
+    /* Firebase: auto-connect for real-time friend activity */
+    if (window.FirebaseService) {
+      setTimeout(function() { FirebaseService.autoStart(); }, 3000);
+    }
     await DataStore.init();
     await DataStore.trackSession();
 
@@ -466,6 +479,8 @@ document.addEventListener('DOMContentLoaded', function() {
     /* Hide modals initially */
     $('modal-currency').style.display = 'none';
     $('modal-admin-pass').style.display = 'none';
+    var _mwheel = $('modal-wheel');
+    if (_mwheel) _mwheel.style.display = 'none';
     var _mlang = $('modal-language');
     if (_mlang) _mlang.style.display = 'none';
 
