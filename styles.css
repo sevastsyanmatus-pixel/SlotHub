@@ -776,6 +776,10 @@ body {
 .is-telegram { height: var(--tg-viewport-height, 100dvh) !important; }
 body.is-telegram { overflow: hidden; }
 
+.is-telegram #main-header {
+  padding-top: calc(var(--top-offset, 0px) + 40px) !important;
+}
+
 .is-telegram .notification-popup {
   top: calc(var(--top-offset, 0px) + 20px);
 }
