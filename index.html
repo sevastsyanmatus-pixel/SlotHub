@@ -93,9 +93,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="tg-core.css?v=20260301e">
-  <link rel="stylesheet" href="styles.css?v=20260301e">
-  <link rel="stylesheet" href="responsive.css?v=20260301e">
+  <link rel="stylesheet" href="tg-core.css?v=20260301f">
+  <link rel="stylesheet" href="styles.css?v=20260301f">
+  <link rel="stylesheet" href="responsive.css?v=20260301f">
 
   <!-- INLINE CRITICAL FIX: Ensure bottom nav is always visible -->
   <style>
@@ -282,51 +282,42 @@
           <div class="profile-level-badge" id="profile-level-badge">🆕 Новичок</div>
         </div>
 
-        <p class="font-bold text-lg text-white mb-1">⚙️ Настройки</p>
-        <p class="text-sm mb-5" style="color:var(--text-muted);">Параметры демо-режима</p>
+        <!-- Stats row compact -->
+        <div class="stats-grid-compact mb-3">
+          <div class="stat-mini"><span class="stat-mini-val" id="stat-played">0</span><span class="stat-mini-lbl">🎮 Игр</span></div>
+          <div class="stat-mini"><span class="stat-mini-val" id="stat-favorites">0</span><span class="stat-mini-lbl">❤️ Избр.</span></div>
+          <div class="stat-mini"><span class="stat-mini-val" id="stat-time">0м</span><span class="stat-mini-lbl">⏱ Время</span></div>
+          <div class="stat-mini"><span class="stat-mini-val stat-mini-val-sm" id="stat-level">🆕</span><span class="stat-mini-lbl">Уровень</span></div>
+        </div>
 
-        <div class="mb-4">
-          <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-muted);">Звук</p>
-          <button id="sound-toggle" class="btn-ghost interactive w-full py-3.5 px-4 rounded-xl text-sm flex items-center gap-3 sound-toggle active">
-            <span class="text-xl flex-shrink-0">🔊</span>
-            <div class="flex-1 text-left" style="min-width:0;">
-              <span class="font-bold text-white" id="sound-label">Звук включен</span>
-              <p class="text-xs mt-0.5" style="color:var(--text-muted);">Эффекты и уведомления</p>
-            </div>
-            <i class="fa-solid fa-volume-high flex-shrink-0" style="color:#C084FC;"></i>
+        <!-- Compact settings row -->
+        <div class="compact-settings mb-3">
+          <button id="sound-toggle" class="compact-setting-btn interactive sound-toggle active">
+            <span class="text-base">🔊</span>
+            <span class="font-semibold text-xs text-white" id="sound-label">Звук вкл</span>
+            <i class="fa-solid fa-volume-high text-xs" style="color:#C084FC;"></i>
+          </button>
+          <button id="btn-currency" class="compact-setting-btn interactive">
+            <span id="currency-flag" class="text-base">🇷🇺</span>
+            <span class="font-semibold text-xs text-white"><span id="currency-code">RUB</span> <span id="currency-symbol-display" style="color:#22C55E;">₽</span></span>
+            <i class="fa-solid fa-chevron-right text-xs" style="color:var(--text-muted);"></i>
           </button>
         </div>
+        <span id="currency-name" style="display:none;">Российский рубль</span>
 
-        <div class="stats-grid mb-5">
-          <div class="stat-card"><div class="stat-icon">🎮</div><div class="stat-value" id="stat-played">0</div><div class="stat-label">Игр сыграно</div></div>
-          <div class="stat-card"><div class="stat-icon">❤️</div><div class="stat-value" id="stat-favorites">0</div><div class="stat-label">В избранном</div></div>
-          <div class="stat-card"><div class="stat-icon">⏱</div><div class="stat-value" id="stat-time">0м</div><div class="stat-label">В приложении</div></div>
-          <div class="stat-card"><div class="stat-icon">🏅</div><div class="stat-value stat-value-sm" id="stat-level">🆕 Новичок</div><div class="stat-label">Уровень</div></div>
-        </div>
-
-        <div class="mb-4">
-          <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:var(--text-muted);">Валюта демо-игр</p>
-          <button id="btn-currency" class="btn-ghost interactive w-full py-3.5 px-4 rounded-xl text-sm flex items-center gap-3">
-            <span id="currency-flag" class="text-xl flex-shrink-0">🇷🇺</span>
-            <div class="flex-1 text-left" style="min-width:0;">
-              <span id="currency-code" class="font-bold text-white">RUB</span>
-              <span id="currency-symbol-display" class="ml-1 font-semibold" style="color:#22C55E;">₽</span>
-              <p id="currency-name" class="text-xs mt-0.5 truncate" style="color:var(--text-muted);">Российский рубль</p>
+        <!-- CTA compact -->
+        <a id="btn-real-play" href="https://1wzaig.com/v3/aggressive-casino?p=akqd" target="_blank" rel="noopener noreferrer" class="cta-compact interactive mb-3" style="display:block;text-decoration:none;color:inherit;">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🎰</span>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-sm text-white">Играйте на реальные!</p>
+              <p class="text-xs" style="color:var(--text-secondary);">Бонус до 500% на депозит</p>
             </div>
-            <i class="fa-solid fa-chevron-right text-xs flex-shrink-0" style="color:var(--text-muted);"></i>
-          </button>
-        </div>
+            <div class="cta-compact-arrow"><i class="fa-solid fa-arrow-right text-xs"></i></div>
+          </div>
+        </a>
 
-        <div class="mt-5 p-5 rounded-2xl relative overflow-hidden" style="background:linear-gradient(135deg,rgba(46,16,101,0.15),rgba(109,40,217,0.08),rgba(67,56,202,0.05));border:1px solid rgba(109,40,217,0.12);">
-          <div class="text-3xl mb-3">🎰</div>
-          <p class="font-bold text-lg text-white">Играйте на реальные деньги!</p>
-          <p class="text-sm mt-2" style="color:var(--text-secondary);">Получите бонус до 500% и выигрывайте</p>
-          <a id="btn-real-play" href="https://1wzaig.com/v3/aggressive-casino?p=akqd" target="_blank" rel="noopener noreferrer" class="btn-cta interactive w-full py-3 rounded-xl text-sm font-bold mt-4" style="display:block;text-align:center;text-decoration:none;color:#fff;">
-            <i class="fa-solid fa-arrow-right mr-1"></i> Перейти в казино
-          </a>
-        </div>
-
-        <button id="btn-admin-profile" style="display:none;" class="btn-ghost interactive w-full py-3 rounded-xl text-sm flex items-center justify-center gap-2 mt-4">
+        <button id="btn-admin-profile" style="display:none;" class="btn-ghost interactive w-full py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
           <i class="fa-solid fa-gear text-xs"></i> Админ-панель
         </button>
       </div>
@@ -474,13 +465,13 @@
   }
 })();
 </script>
-<script src="tg-core.js?v=20260301e"></script>
+<script src="tg-core.js?v=20260301f"></script>
 <script>TG.init({ headerColor: '#030510', bgColor: '#030510', bottomColor: '#030510', fullscreen: true, closingConfirmation: true, disableSwipeClose: true });</script>
-<script src="sounds.js?v=20260301e"></script>
-<script src="data.js?v=20260301e"></script>
-<script src="app.js?v=20260301e"></script>
-<script src="ui.js?v=20260301e"></script>
-<script src="admin.js?v=20260301e"></script>
+<script src="sounds.js?v=20260301f"></script>
+<script src="data.js?v=20260301f"></script>
+<script src="app.js?v=20260301f"></script>
+<script src="ui.js?v=20260301f"></script>
+<script src="admin.js?v=20260301f"></script>
 
 <!-- Debug panel removed for production -->
 
