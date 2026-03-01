@@ -799,7 +799,7 @@ body.is-telegram { overflow: hidden; }
 }
 
 .is-telegram #game-view { padding-top: 0 !important; }
-.is-telegram #game-topbar { padding-top: calc(var(--top-offset, 0px) + 6px) !important; }
+.is-telegram #game-topbar { padding-top: calc(var(--top-offset, 0px) + 40px) !important; }
 .is-telegram #game-fs-restore { top: calc(var(--top-offset, 0px) + 10px); }
 
 
