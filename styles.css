@@ -350,7 +350,7 @@ body {
 /* === BANNERS === */
 .banner-carousel { overflow: visible; position: relative; border-radius: 0; }
 .banner-carousel::after { display: none; }
-.banner-track { display: flex; gap: 10px; padding: 0 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+.banner-track { display: flex; gap: 10px; padding: 0 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .banner-track::-webkit-scrollbar { display: none; }
 .banner-track { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -370,7 +370,7 @@ body {
   border-top-color: rgba(255,255,255,0.14);
   box-shadow: 0 4px 16px rgba(0,0,0,0.3);
   display: block; text-decoration: none; color: inherit;
-  scroll-snap-align: start;
+  /* scroll-snap removed for TG compat */
 }
 .banner-slide:active { transform: scale(0.96); }
 .banner-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.9) 100%); z-index: 1; pointer-events: none; }
