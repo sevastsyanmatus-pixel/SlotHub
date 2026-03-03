@@ -371,8 +371,9 @@ document.addEventListener('DOMContentLoaded', function() {
     track.innerHTML = ''; dots.innerHTML = '';
     var casinos = DataStore.getActiveCasinos();
 
-    if (casinos.length === 0) { carousel.style.display = 'none'; dots.style.display = 'none'; return; }
-    carousel.style.display = ''; dots.style.display = '';
+    if (casinos.length === 0) { carousel.style.display = 'none'; return; }
+    carousel.style.display = '';
+    if (dots) dots.style.display = 'none';
 
     var decoEmojis = ['🎰','💎','🎁','⚡','🏆','🔥','💰','🃏','🎲'];
 
@@ -401,14 +402,39 @@ document.addEventListener('DOMContentLoaded', function() {
       dots.appendChild(dot);
     }
 
-    bannerIdx = 0;
-    updateBannerPosition();
-    startBannerAuto();
+    /* Scroll hint under banners */
+    var hintEl = document.createElement('div');
+    hintEl.className = 'banner-scroll-hint';
+    hintEl.innerHTML = '<div class="banner-scroll-bar"><div class="banner-scroll-fill" id="banner-scroll-fill"></div></div>';
+    carousel.appendChild(hintEl);
 
-    /* Force reflow for TG WebView animation fix (ARTHOLST pattern) */
-    track.style.animation = 'none';
-    void track.offsetHeight;
-    track.style.animation = '';
+    /* Update scroll indicator on scroll */
+    track.addEventListener('scroll', function() {
+      var maxScroll = track.scrollWidth - track.clientWidth;
+      if (maxScroll <= 0) return;
+      var pct = track.scrollLeft / maxScroll;
+      var fill = document.getElementById('banner-scroll-fill');
+      if (!fill) return;
+      /* Fill width = portion visible, position = scroll progress */
+      var barWidth = Math.max(25, (track.clientWidth / track.scrollWidth) * 100);
+      fill.style.width = barWidth + '%';
+      fill.style.left = (pct * (100 - barWidth)) + '%';
+
+      /* Toggle right fade when scrolled to end */
+      if (pct > 0.95) carousel.classList.add('scrolled-end');
+      else carousel.classList.remove('scrolled-end');
+    }, { passive: true });
+
+    /* Set initial fill */
+    setTimeout(function() {
+      var maxScroll = track.scrollWidth - track.clientWidth;
+      var fill = document.getElementById('banner-scroll-fill');
+      if (fill && maxScroll > 0) {
+        var barWidth = Math.max(25, (track.clientWidth / track.scrollWidth) * 100);
+        fill.style.width = barWidth + '%';
+        fill.style.left = '0%';
+      }
+    }, 100);
   }
 
   function goToBanner(idx) {
@@ -608,30 +634,40 @@ document.addEventListener('DOMContentLoaded', function() {
     var list = $('casinos-list'); list.innerHTML = '';
     var casinos = DataStore.getActiveCasinos();
 
+    /* Grid wrapper for responsive columns */
+    var grid = document.createElement('div');
+    grid.className = 'casinos-grid';
+
     for (var i = 0; i < casinos.length; i++) {
       var c = casinos[i];
-      var el = document.createElement('div');
-      el.className = 'casino-card mb-4 grid-card-animated';
-      el.style.background = c.color || 'var(--glass-bg)';
+      var el = document.createElement('a');
+      el.href = c.url || '#';
+      el.target = '_blank';
+      el.rel = 'noopener noreferrer';
+      el.className = 'casino-card-square grid-card-animated';
       el.style.animationDelay = (i * 80) + 'ms';
 
       var h = '';
-      if (c.badge) h += '<span class="casino-badge">' + esc(c.badge) + '</span>';
-      h += '<div class="flex items-center gap-3" style="position:relative;z-index:2;">';
-      if (c.logo) h += '<img src="' + esc(c.logo) + '" style="width:48px;height:48px;border-radius:12px;object-fit:cover;border:1px solid rgba(67,56,202,0.12);" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">';
-      else h += '<div style="width:48px;height:48px;border-radius:12px;background:rgba(67,56,202,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;">' + esc(c.name.charAt(0)) + '</div>';
-      h += '<div style="flex:1;min-width:0;">';
-      h += '<p style="font-weight:700;font-size:16px;color:#fff;">' + esc(c.name) + '</p>';
-      h += '<p style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:2px;">' + esc(c.bonus) + '</p>';
+      /* Background: image or gradient */
+      h += '<div class="casino-sq-bg" style="background:' + esc(c.color || 'linear-gradient(135deg,#2E1065,#4338CA,#7C3AED)') + ';">';
+      if (c.logo) h += '<img src="' + esc(c.logo) + '" class="casino-sq-img" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">';
+      h += '</div>';
+      /* Overlay content */
+      h += '<div class="casino-sq-overlay">';
+      if (c.badge) h += '<span class="casino-sq-badge">' + esc(c.badge) + '</span>';
+      h += '<div class="casino-sq-bottom">';
+      h += '<p class="casino-sq-name">' + esc(c.name) + '</p>';
+      h += '<p class="casino-sq-bonus">' + esc(c.bonus) + '</p>';
+      h += '<div class="casino-sq-cta">Получить бонус →</div>';
       h += '</div></div>';
-      h += '<p style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:12px;line-height:1.5;position:relative;z-index:2;">' + esc(c.description) + '</p>';
-      h += '<a href="' + esc(c.url) + '" target="_blank" rel="noopener noreferrer" class="btn-cta interactive w-full py-3 rounded-xl text-sm font-bold mt-4" style="position:relative;z-index:2;display:block;text-align:center;text-decoration:none;color:#fff;"><span class="cta-glow"></span>Получить бонус →</a>';
+
       el.innerHTML = h;
-      el.querySelector('.btn-cta').addEventListener('click', function(e) { e.stopPropagation(); TG.haptic.heavy(); });
-      list.appendChild(el);
+      el.addEventListener('click', function(e) { TG.haptic.heavy(); });
+      grid.appendChild(el);
     }
 
     if (casinos.length === 0) list.innerHTML = '<div class="empty-state"><i class="fa-solid fa-crown text-3xl mb-3" style="color:var(--text-muted);"></i><p>Казино не добавлены</p></div>';
+    else list.appendChild(grid);
 
     var disc = document.createElement('p');
     disc.style.cssText = 'text-align:center;font-size:11px;color:var(--text-muted);padding:16px 0 32px;';
@@ -650,63 +686,70 @@ document.addEventListener('DOMContentLoaded', function() {
     var d = Features.getData();
     var wins = d.wins || [];
     var best = d.biggestWin || 0;
-    var totalWon = d.totalWon || 0;
-    var totalBet = d.totalBet || 0;
     var cur = DataStore.getCurrencySymbol();
 
-    /* Show only if there's at least some data */
-    if (wins.length === 0 && totalWon === 0) {
+    /* Show only if there's at least some win data */
+    if (wins.length === 0 || best <= 0) {
       hero.style.display = 'none';
       return;
     }
     hero.style.display = '';
 
     var fmt = function(n) { return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); };
-    var fmtShort = function(n) {
-      if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-      if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
-      return n.toFixed(0);
-    };
+
+    /* Find the best win entry for game info */
+    var bestWinEntry = null;
+    for (var i = 0; i < wins.length; i++) {
+      if (wins[i].amount === best) { bestWinEntry = wins[i]; break; }
+    }
+    if (!bestWinEntry && wins.length > 0) bestWinEntry = wins[0];
+
+    var gameName = bestWinEntry ? (bestWinEntry.gameName || '') : '';
+    var gameIcon = bestWinEntry ? (bestWinEntry.gameIcon || '\uD83C\uDFB0') : '\uD83C\uDFB0';
+    var mult = bestWinEntry ? (bestWinEntry.mult || 0) : 0;
+    var isMega = (mult >= 100) || (best >= 5000);
+    var isBig = (mult >= 50) || (best >= 1000);
 
     var html = '';
 
     /* Big best win */
-    if (best > 0) {
-      html += '<div style="text-align:center;margin-bottom:10px;">';
-      html += '<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">\uD83C\uDFC6 Лучший выигрыш</div>';
-      html += '<div style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#C084FC,#F97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;">' + fmt(best) + ' ' + esc(cur) + '</div>';
+    html += '<div style="text-align:center;">';
+    html += '<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">\uD83C\uDFC6 Лучший выигрыш</div>';
+    html += '<div style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#C084FC,#F97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2;">' + fmt(best) + ' ' + esc(cur) + '</div>';
+
+    /* Game name + mult */
+    if (gameName) {
+      html += '<div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:6px;">';
+      html += '<span style="font-size:16px;">' + gameIcon + '</span>';
+      html += '<span style="font-size:12px;font-weight:700;color:var(--text-secondary);">' + esc(gameName) + '</span>';
+      if (mult > 0) {
+        var multColor = isMega ? '#F97316' : '#C084FC';
+        html += '<span style="font-size:10px;font-weight:800;color:' + multColor + ';padding:1px 6px;border-radius:6px;background:' + (isMega ? 'rgba(249,115,22,0.12)' : 'rgba(192,132,252,0.1)') + ';">x' + mult + '</span>';
+      }
       html += '</div>';
     }
-
-    /* Stats row */
-    html += '<div style="display:flex;gap:6px;">';
-    if (totalWon > 0) {
-      html += '<div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:rgba(255,255,255,0.03);">';
-      html += '<div style="font-size:15px;font-weight:900;color:#A78BFA;">' + fmtShort(totalWon) + ' ' + esc(cur) + '</div>';
-      html += '<div style="font-size:8px;color:var(--text-muted);font-weight:600;margin-top:2px;">\uD83D\uDCB0 Всего</div></div>';
-    }
-    html += '<div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:rgba(255,255,255,0.03);">';
-    html += '<div style="font-size:15px;font-weight:900;color:#8B5CF6;">' + wins.length + '</div>';
-    html += '<div style="font-size:8px;color:var(--text-muted);font-weight:600;margin-top:2px;">\uD83C\uDFB0 Сессий</div></div>';
-    /* ROI removed */
     html += '</div>';
 
-    /* Last big win highlight */
-    if (wins.length > 0) {
-      var last = wins[0];
-      var ago = _timeAgo(last.ts);
-      html += '<div style="margin-top:8px;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);">';
-      html += '<span style="font-size:18px;">' + (last.gameIcon || '\uD83C\uDFB0') + '</span>';
-      html += '<div style="flex:1;min-width:0;">';
-      html += '<div style="font-size:11px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(last.gameName || '') + '</div>';
-      html += '<div style="font-size:8px;color:var(--text-muted);">' + ago + '</div></div>';
-      html += '<div style="text-align:right;">';
-      html += '<div style="font-size:13px;font-weight:900;color:#C084FC;">' + fmt(last.amount) + ' ' + esc(cur) + '</div>';
-      if (last.mult > 0) html += '<div style="font-size:8px;font-weight:700;color:#A78BFA;">x' + last.mult + '</div>';
-      html += '</div></div>';
-    }
+    /* Share button */
+    html += '<button id="btn-share-best-win" class="interactive" style="margin-top:10px;width:100%;padding:10px;border-radius:12px;background:linear-gradient(135deg,rgba(109,40,217,0.12),rgba(67,56,202,0.06));border:1px solid rgba(139,92,246,0.2);color:#C084FC;font-weight:700;font-size:12px;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">';
+    html += '<i class="fa-solid fa-share-nodes"></i> Поделиться выигрышем';
+    html += '</button>';
 
     content.innerHTML = html;
+
+    /* Bind share */
+    var shareBtn = content.querySelector('#btn-share-best-win');
+    if (shareBtn && bestWinEntry) {
+      shareBtn.addEventListener('click', function() {
+        TG.haptic.medium();
+        if (window.App) App.playSound('click');
+        if (window.Referral && Referral.shareWin) {
+          Referral.shareWin(bestWinEntry);
+        } else if (window.Features) {
+          Features.shareReferral();
+        }
+      });
+    }
   }
 
   function _timeAgo(ts) {
