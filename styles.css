@@ -350,7 +350,7 @@ body {
 /* === BANNERS === */
 .banner-carousel { overflow: visible; position: relative; border-radius: 0; }
 .banner-carousel::after { display: none; }
-.banner-track { display: flex; gap: 10px; padding: 0 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; transition: none; }
+.banner-track { display: flex; gap: 10px; padding: 0 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
 .banner-track::-webkit-scrollbar { display: none; }
 .banner-track { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -363,7 +363,7 @@ body {
 }
 .banner-carousel.scrolled-end::before { opacity: 0; }
 .banner-slide {
-  width: 150px; flex-shrink: 0; aspect-ratio: 1/1; position: relative; flex-shrink: 0; aspect-ratio: 1/1; position: relative;
+  width: 150px; flex-shrink: 0; aspect-ratio: 1/1; position: relative;
   overflow: hidden; cursor: pointer;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255,255,255,0.08);
@@ -407,8 +407,6 @@ body {
   border-radius: 3px;
   background: linear-gradient(90deg, #6D28D9, #C084FC);
   transition: width 0.15s ease, left 0.15s ease;
-}
-  50% { opacity: 0.9; transform: translateX(3px); }
 }
 
 /* === GAME CARDS === */
