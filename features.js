@@ -4,16 +4,16 @@
    ============================================ */
 var Features = (function() {
 
-  var XP = { GAME_PLAY: 10, UNIQUE_GAME: 25, FAVORITE_ADD: 5, DAILY_LOGIN: 20, STREAK_DAY: 15, REFERRAL_INVITE: 200, REFERRAL_WELCOME: 50, BIG_WIN: 50 };
+  var XP = { GAME_PLAY: 3, UNIQUE_GAME: 8, FAVORITE_ADD: 2, DAILY_LOGIN: 10, STREAK_DAY: 5, REFERRAL_INVITE: 100, REFERRAL_WELCOME: 25, BIG_WIN: 15 };
 
   var LEVELS = [
     { min: 0, name: { ru:'Новичок', en:'Newbie', uk:'Новачок', tr:'Çaylak', de:'Neuling', fr:'Débutant', es:'Novato', pt:'Novato' }, icon:'🆕', color:'#6B7280' },
-    { min: 100, name: { ru:'Игрок', en:'Player', uk:'Гравець', tr:'Oyuncu', de:'Spieler', fr:'Joueur', es:'Jugador', pt:'Jogador' }, icon:'🎮', color:'#8B5CF6' },
-    { min: 500, name: { ru:'Профи', en:'Pro', uk:'Профі', tr:'Profesyonel', de:'Profi', fr:'Pro', es:'Pro', pt:'Pro' }, icon:'⭐', color:'#6366F1' },
-    { min: 1500, name: { ru:'Мастер', en:'Master', uk:'Майстер', tr:'Usta', de:'Meister', fr:'Maître', es:'Maestro', pt:'Mestre' }, icon:'👑', color:'#A855F7' },
-    { min: 5000, name: { ru:'Легенда', en:'Legend', uk:'Легенда', tr:'Efsane', de:'Legende', fr:'Légende', es:'Leyenda', pt:'Lenda' }, icon:'💎', color:'#C084FC' },
-    { min: 15000, name: { ru:'Миф', en:'Myth', uk:'Міф', tr:'Efsane', de:'Mythos', fr:'Mythe', es:'Mito', pt:'Mito' }, icon:'🌟', color:'#E879F9' },
-    { min: 50000, name: { ru:'Бог Слотов', en:'Slot God', uk:'Бог Слотів', tr:'Slot Tanrısı', de:'Slot Gott', fr:'Dieu des Slots', es:'Dios de Slots', pt:'Deus dos Slots' }, icon:'🔥', color:'#F97316' }
+    { min: 250, name: { ru:'Игрок', en:'Player', uk:'Гравець', tr:'Oyuncu', de:'Spieler', fr:'Joueur', es:'Jugador', pt:'Jogador' }, icon:'🎮', color:'#8B5CF6' },
+    { min: 1500, name: { ru:'Профи', en:'Pro', uk:'Профі', tr:'Profesyonel', de:'Profi', fr:'Pro', es:'Pro', pt:'Pro' }, icon:'⭐', color:'#6366F1' },
+    { min: 5000, name: { ru:'Мастер', en:'Master', uk:'Майстер', tr:'Usta', de:'Meister', fr:'Maître', es:'Maestro', pt:'Mestre' }, icon:'👑', color:'#A855F7' },
+    { min: 15000, name: { ru:'Легенда', en:'Legend', uk:'Легенда', tr:'Efsane', de:'Legende', fr:'Légende', es:'Leyenda', pt:'Lenda' }, icon:'💎', color:'#C084FC' },
+    { min: 50000, name: { ru:'Миф', en:'Myth', uk:'Міф', tr:'Efsane', de:'Mythos', fr:'Mythe', es:'Mito', pt:'Mito' }, icon:'🌟', color:'#E879F9' },
+    { min: 150000, name: { ru:'Бог Слотов', en:'Slot God', uk:'Бог Слотів', tr:'Slot Tanrısı', de:'Slot Gott', fr:'Dieu des Slots', es:'Dios de Slots', pt:'Deus dos Slots' }, icon:'🔥', color:'#F97316' }
   ];
 
   function getLevel(xp) { for (var i = LEVELS.length - 1; i >= 0; i--) { if (xp >= LEVELS[i].min) return LEVELS[i]; } return LEVELS[0]; }
@@ -42,7 +42,7 @@ var Features = (function() {
     var yesterday = new Date(Date.now() - 86400000).toDateString();
     d.streak = (d.lastLoginDate === yesterday) ? (d.streak||0) + 1 : 1;
     d.lastLoginDate = today;
-    var bonus = Math.min(XP.DAILY_LOGIN + (d.streak-1) * XP.STREAK_DAY, 200);
+    var bonus = Math.min(XP.DAILY_LOGIN + (d.streak-1) * XP.STREAK_DAY, 50);
     d.xp = (d.xp||0) + bonus;
     if (!d.xpLog) d.xpLog = [];
     d.xpLog.unshift({ amount:bonus, reason:'daily_streak_'+d.streak, ts:Date.now() });
@@ -265,6 +265,13 @@ var Features = (function() {
     return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   }
 
+  function formatMoneyCompact(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    if (n >= 10000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+    if (n >= 1000) return (n / 1000).toFixed(2).replace(/0$/, '').replace(/\.$/, '') + 'K';
+    return n.toFixed(0);
+  }
+
   /* Get best wins */
   function getBestWins(limit) {
     var d = getData();
@@ -290,61 +297,43 @@ var Features = (function() {
       return;
     }
 
-    /* Build unified timeline: merge history entries with win data */
-    var winsMap = {};
-    for (var wi = 0; wi < wins.length; wi++) {
-      var w = wins[wi];
-      /* Key by gameId + approximate timestamp (within 2min window) */
-      var wKey = (w.gameId || '') + '_' + Math.floor((w.ts || 0) / 120000);
-      if (!winsMap[wKey] || w.amount > winsMap[wKey].amount) winsMap[wKey] = w;
-    }
-
-    /* Also collect standalone wins not in history */
-    var usedWinKeys = {};
-
-    /* Build timeline entries from history */
+    /* Match each history entry to the closest win for the same game
+       within 30 minutes AFTER the game was opened (history.ts) */
+    var usedWinIdx = {};
     var timeline = [];
+
     for (var hi = 0; hi < history.length; hi++) {
       var h = history[hi];
       var game = window.DataStore ? DataStore.getGameById(h.id) : null;
       var icon = game ? (game.icon || '\ud83c\udfb0') : '\ud83c\udfb0';
       var name = game ? game.name : (h.name || h.id);
 
-      /* Find matching win within 2min window */
-      var hKey = (h.id || '') + '_' + Math.floor((h.ts || 0) / 120000);
-      var matchedWin = winsMap[hKey] || null;
-      if (matchedWin) usedWinKeys[hKey] = true;
+      /* Find best matching win: same gameId, within [-5s, +30min] of history ts */
+      var bestWin = null;
+      var bestDiff = Infinity;
+      var bestIdx = -1;
 
-      /* Also try adjacent time windows */
-      if (!matchedWin) {
-        var hKey2 = (h.id || '') + '_' + (Math.floor((h.ts || 0) / 120000) + 1);
-        var hKey3 = (h.id || '') + '_' + (Math.floor((h.ts || 0) / 120000) - 1);
-        if (winsMap[hKey2]) { matchedWin = winsMap[hKey2]; usedWinKeys[hKey2] = true; }
-        else if (winsMap[hKey3]) { matchedWin = winsMap[hKey3]; usedWinKeys[hKey3] = true; }
+      for (var wi = 0; wi < wins.length; wi++) {
+        if (usedWinIdx[wi]) continue;
+        var w = wins[wi];
+        if ((w.gameId || '') !== h.id) continue;
+        var diff = (w.ts || 0) - (h.ts || 0);
+        if (diff >= -5000 && diff <= 1800000 && Math.abs(diff) < bestDiff) {
+          bestWin = w;
+          bestDiff = Math.abs(diff);
+          bestIdx = wi;
+        }
       }
+
+      if (bestIdx >= 0) usedWinIdx[bestIdx] = true;
 
       timeline.push({
         ts: h.ts || 0,
         gameId: h.id,
         gameName: name,
         gameIcon: icon,
-        win: matchedWin
+        win: bestWin
       });
-    }
-
-    /* Add standalone wins not matched to history */
-    for (var wj = 0; wj < wins.length; wj++) {
-      var ww = wins[wj];
-      var wwKey = (ww.gameId || '') + '_' + Math.floor((ww.ts || 0) / 120000);
-      if (!usedWinKeys[wwKey]) {
-        timeline.push({
-          ts: ww.ts || 0,
-          gameId: ww.gameId,
-          gameName: ww.gameName || ww.gameId,
-          gameIcon: ww.gameIcon || '\ud83c\udfb0',
-          win: ww
-        });
-      }
     }
 
     /* Sort by time descending */
@@ -355,24 +344,22 @@ var Features = (function() {
     /* Summary stats */
     var best = d.biggestWin || 0;
     var totalWon = d.totalWon || 0;
-    var totalBet = d.totalBet || 0;
     var sessCount = timeline.length;
-    var profitPct = totalBet > 0 ? Math.round(((totalWon / totalBet) - 1) * 100) : 0;
 
-    html += '<div style="display:flex;gap:6px;margin:10px 0 8px;">';
+    html += '<div style="display:flex;gap:8px;margin:10px 0 8px;">';
     if (best > 0) {
-      html += '<div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.1);">';
-      html += '<div style="font-size:14px;font-weight:900;color:#C084FC;">' + formatMoney(best) + '</div>';
-      html += '<div style="font-size:7px;color:var(--text-muted);font-weight:600;">\ud83c\udfc6 ' + t('wins.best', '\u0420\u0435\u043a\u043e\u0440\u0434') + ' ' + cur + '</div></div>';
+      html += '<div style="flex:1;min-width:0;text-align:center;padding:10px 6px;border-radius:12px;background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.1);overflow:hidden;">';
+      html += '<div style="font-size:16px;font-weight:900;color:#C084FC;white-space:nowrap;">' + formatMoneyCompact(best) + '</div>';
+      html += '<div style="font-size:8px;color:var(--text-muted);font-weight:600;margin-top:2px;">\ud83c\udfc6 ' + t('wins.best', '\u0420\u0435\u043a\u043e\u0440\u0434') + ' ' + cur + '</div></div>';
     }
     if (totalWon > 0) {
-      html += '<div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.1);">';
-      html += '<div style="font-size:14px;font-weight:900;color:#A78BFA;">' + formatMoney(totalWon) + '</div>';
-      html += '<div style="font-size:7px;color:var(--text-muted);font-weight:600;">\ud83d\udcb0 ' + t('wins.total', '\u0412\u0441\u0435\u0433\u043e') + ' ' + cur + '</div></div>';
+      html += '<div style="flex:1;min-width:0;text-align:center;padding:10px 6px;border-radius:12px;background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.1);overflow:hidden;">';
+      html += '<div style="font-size:16px;font-weight:900;color:#A78BFA;white-space:nowrap;">' + formatMoneyCompact(totalWon) + '</div>';
+      html += '<div style="font-size:8px;color:var(--text-muted);font-weight:600;margin-top:2px;">\ud83d\udcb0 ' + t('wins.total', '\u0412\u0441\u0435\u0433\u043e') + ' ' + cur + '</div></div>';
     }
-    html += '<div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.1);">';
-    html += '<div style="font-size:14px;font-weight:900;color:#8B5CF6;">' + sessCount + '</div>';
-    html += '<div style="font-size:7px;color:var(--text-muted);font-weight:600;">\ud83c\udfae ' + t('wins.sessions', '\u0421\u0435\u0441\u0441\u0438\u0439') + '</div></div>';
+    html += '<div style="flex:1;min-width:0;text-align:center;padding:10px 6px;border-radius:12px;background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.1);">';
+    html += '<div style="font-size:16px;font-weight:900;color:#8B5CF6;">' + sessCount + '</div>';
+    html += '<div style="font-size:8px;color:var(--text-muted);font-weight:600;margin-top:2px;">\ud83c\udfae ' + t('wins.sessions', '\u0421\u0435\u0441\u0441\u0438\u0439') + '</div></div>';
     html += '</div>';
 
     /* Timeline */
@@ -434,7 +421,7 @@ var Features = (function() {
     var items = container.querySelectorAll('.gamelog-item');
     for (var j = 0; j < items.length; j++) {
       (function(item) {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function(e) {
           var g = window.DataStore ? DataStore.getGameById(item.getAttribute('data-game-id')) : null;
           if (g && window.App) App.openGame(g);
         });
@@ -552,8 +539,13 @@ var Features = (function() {
   }
 
   function shareReferral() {
+    /* Delegate to beautiful referral messages if available */
+    if (window.Referral && Referral.shareReferralBeautiful) {
+      Referral.shareReferralBeautiful();
+      return;
+    }
+    /* Fallback */
     var link = getReferralLink();
-    var t = window.I18n ? I18n.t : function(k,f){return f||k;};
     var text = '🎰 Я нашёл кое-что крутое — зацени! Секретный бонус для нас обоих 🎁';
     try {
       var tg = window.Telegram && Telegram.WebApp;
@@ -711,29 +703,29 @@ var Features = (function() {
 
   /* --- Achievements --- */
   var ACHIEVEMENTS = [
-    { id: 'first_game', icon: '🎮', xp: 50, check: function(d) { return d.totalPlayed >= 1; } },
-    { id: 'five_games', icon: '🎯', xp: 100, check: function(d) { return d.totalPlayed >= 5; } },
-    { id: 'twenty_games', icon: '🏅', xp: 200, check: function(d) { return d.totalPlayed >= 20; } },
-    { id: 'fifty_games', icon: '🏆', xp: 500, check: function(d) { return d.totalPlayed >= 50; } },
-    { id: 'hundred_games', icon: '👑', xp: 1000, check: function(d) { return d.totalPlayed >= 100; } },
-    { id: 'three_unique', icon: '🎰', xp: 75, check: function(d) { return Object.keys(d.gamesPlayed || {}).length >= 3; } },
-    { id: 'ten_unique', icon: '🌟', xp: 200, check: function(d) { return Object.keys(d.gamesPlayed || {}).length >= 10; } },
-    { id: 'twenty_unique', icon: '💎', xp: 500, check: function(d) { return Object.keys(d.gamesPlayed || {}).length >= 20; } },
-    { id: 'fifty_unique', icon: '🔮', xp: 1000, check: function(d) { return Object.keys(d.gamesPlayed || {}).length >= 50; } },
-    { id: 'first_fav', icon: '❤️', xp: 30, check: function(d) { return (window.DataStore ? DataStore.favorites.length : 0) >= 1; } },
-    { id: 'five_favs', icon: '💕', xp: 100, check: function(d) { return (window.DataStore ? DataStore.favorites.length : 0) >= 5; } },
-    { id: 'ten_favs', icon: '💖', xp: 250, check: function(d) { return (window.DataStore ? DataStore.favorites.length : 0) >= 10; } },
-    { id: 'first_ref', icon: '🤝', xp: 300, check: function(d) { return (d.referrals || 0) >= 1; } },
-    { id: 'five_refs', icon: '🔗', xp: 750, check: function(d) { return (d.referrals || 0) >= 5; } },
-    { id: 'ten_refs', icon: '🚀', xp: 1500, check: function(d) { return (d.referrals || 0) >= 10; } },
-    { id: 'fifty_refs', icon: '🏰', xp: 5000, check: function(d) { return (d.referrals || 0) >= 50; } },
-    { id: 'streak_3', icon: '🔥', xp: 100, check: function(d) { return (d.streak || 0) >= 3; } },
-    { id: 'streak_7', icon: '⚡', xp: 300, check: function(d) { return (d.streak || 0) >= 7; } },
-    { id: 'streak_30', icon: '💫', xp: 1500, check: function(d) { return (d.streak || 0) >= 30; } },
-    { id: 'first_win', icon: '🤑', xp: 50, check: function(d) { return (d.wins || []).length >= 1; } },
-    { id: 'ten_wins', icon: '💰', xp: 200, check: function(d) { return (d.wins || []).length >= 10; } },
-    { id: 'big_winner', icon: '🏆', xp: 500, check: function(d) { return (d.biggestWin || 0) >= 1000; } },
-    { id: 'whale', icon: '🐋', xp: 1500, check: function(d) { return (d.totalWon || 0) >= 50000; } }
+    { id: 'first_game', icon: '🎮', xp: 25, check: function(d) { return d.totalPlayed >= 1; } },
+    { id: 'five_games', icon: '🎯', xp: 40, check: function(d) { return d.totalPlayed >= 5; } },
+    { id: 'twenty_games', icon: '🏅', xp: 80, check: function(d) { return d.totalPlayed >= 20; } },
+    { id: 'fifty_games', icon: '🏆', xp: 200, check: function(d) { return d.totalPlayed >= 50; } },
+    { id: 'hundred_games', icon: '👑', xp: 500, check: function(d) { return d.totalPlayed >= 100; } },
+    { id: 'three_unique', icon: '🎰', xp: 30, check: function(d) { return Object.keys(d.gamesPlayed || {}).length >= 3; } },
+    { id: 'ten_unique', icon: '🌟', xp: 80, check: function(d) { return Object.keys(d.gamesPlayed || {}).length >= 10; } },
+    { id: 'twenty_unique', icon: '💎', xp: 200, check: function(d) { return Object.keys(d.gamesPlayed || {}).length >= 20; } },
+    { id: 'fifty_unique', icon: '🔮', xp: 500, check: function(d) { return Object.keys(d.gamesPlayed || {}).length >= 50; } },
+    { id: 'first_fav', icon: '❤️', xp: 10, check: function(d) { return (window.DataStore ? DataStore.favorites.length : 0) >= 1; } },
+    { id: 'five_favs', icon: '💕', xp: 40, check: function(d) { return (window.DataStore ? DataStore.favorites.length : 0) >= 5; } },
+    { id: 'ten_favs', icon: '💖', xp: 100, check: function(d) { return (window.DataStore ? DataStore.favorites.length : 0) >= 10; } },
+    { id: 'first_ref', icon: '🤝', xp: 150, check: function(d) { return (d.referrals || 0) >= 1; } },
+    { id: 'five_refs', icon: '🔗', xp: 350, check: function(d) { return (d.referrals || 0) >= 5; } },
+    { id: 'ten_refs', icon: '🚀', xp: 700, check: function(d) { return (d.referrals || 0) >= 10; } },
+    { id: 'fifty_refs', icon: '🏰', xp: 2500, check: function(d) { return (d.referrals || 0) >= 50; } },
+    { id: 'streak_3', icon: '🔥', xp: 40, check: function(d) { return (d.streak || 0) >= 3; } },
+    { id: 'streak_7', icon: '⚡', xp: 120, check: function(d) { return (d.streak || 0) >= 7; } },
+    { id: 'streak_30', icon: '💫', xp: 600, check: function(d) { return (d.streak || 0) >= 30; } },
+    { id: 'first_win', icon: '🤑', xp: 25, check: function(d) { return (d.wins || []).length >= 1; } },
+    { id: 'ten_wins', icon: '💰', xp: 80, check: function(d) { return (d.wins || []).length >= 10; } },
+    { id: 'big_winner', icon: '🏆', xp: 200, check: function(d) { return (d.biggestWin || 0) >= 1000; } },
+    { id: 'whale', icon: '🐋', xp: 700, check: function(d) { return (d.totalWon || 0) >= 50000; } }
   ];
 
   var AN = {
