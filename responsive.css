@@ -33,13 +33,10 @@
 
 /* sound toggle moved to profile */
 
-.screen-xs .banner-slide { height: 130px; }
-.screen-xs .banner-title { font-size: 14px; }
-.screen-xs .banner-subtitle { font-size: 10px; }
-.screen-xs .banner-deco { font-size: 40px; right: 8px; }
-.screen-xs .banner-slide-content { padding: 10px 12px; max-width: 70%; }
-.screen-xs .banner-badge { font-size: 8px; padding: 2px 6px; }
-.screen-xs .banner-cta { font-size: 10px; padding: 4px 10px; }
+.screen-xs .banner-slide { width: 120px; }
+.screen-xs .banner-title { font-size: 9px; }
+.screen-xs .banner-slide-content { padding: 8px; }
+.screen-xs .banner-cta { font-size: 7px; padding: 3px 8px; }
 
 .screen-xs .section-header { padding: 0 16px; margin-top: 18px; margin-bottom: 10px; }
 .screen-xs .section-title { font-size: 14px; gap: 6px; }
@@ -92,10 +89,8 @@
 /* ============================================
    SCREEN-SM — 361-389px (iPhone 12/13 mini, Pixel 5)
    ============================================ */
-.screen-sm .banner-slide { height: 140px; }
-.screen-sm .banner-title { font-size: 15px; }
-.screen-sm .banner-deco { font-size: 44px; }
-.screen-sm .banner-slide-content { max-width: 72%; }
+.screen-sm .banner-slide { width: 135px; }
+.screen-sm .banner-title { font-size: 10px; }
 
 .screen-sm .section-title { font-size: 15px; }
 .screen-sm .card-name { font-size: 10px; }
@@ -109,10 +104,8 @@
 /* ============================================
    SCREEN-LG — 414-479px (iPhone Plus/Max, Galaxy S Ultra)
    ============================================ */
-.screen-lg .banner-slide { height: 160px; }
-.screen-lg .banner-title { font-size: 19px; }
-.screen-lg .banner-deco { font-size: 60px; }
-.screen-lg .banner-slide-content { max-width: 68%; }
+.screen-lg .banner-slide { width: 160px; }
+.screen-lg .banner-title { font-size: 12px; }
 
 .screen-lg .section-title { font-size: 18px; }
 .screen-lg .section-icon { width: 34px; height: 34px; font-size: 20px; }
@@ -131,9 +124,8 @@
 /* ============================================
    SCREEN-XL — 480-767px (Landscape phones, small tablets)
    ============================================ */
-.screen-xl .banner-slide { height: 170px; }
-.screen-xl .banner-title { font-size: 20px; }
-.screen-xl .banner-deco { font-size: 64px; }
+.screen-xl .banner-slide { width: 170px; }
+.screen-xl .banner-title { font-size: 13px; }
 
 .screen-xl .section-title { font-size: 18px; }
 .screen-xl .scroll-row { gap: 14px; }
@@ -153,9 +145,8 @@
    SCREEN-XXL — ≥768px (Tablets, Desktop)
    ============================================ */
 .screen-xxl .banner-carousel { max-width: 720px; margin: 0 auto; }
-.screen-xxl .banner-slide { height: 200px; }
-.screen-xxl .banner-title { font-size: 24px; }
-.screen-xxl .banner-deco { font-size: 72px; }
+.screen-xxl .banner-slide { width: 190px; }
+.screen-xxl .banner-title { font-size: 14px; }
 
 .screen-xxl .section-header { max-width: 900px; margin-left: auto; margin-right: auto; padding: 0 24px; }
 .screen-xxl .section-title { font-size: 20px; }
@@ -188,10 +179,9 @@
 /* ============================================
    HEIGHT — Short screens (≤667px, iPhone SE, old phones)
    ============================================ */
-.screen-short .banner-slide { height: 120px; }
-.screen-short .banner-title { font-size: 14px; }
-.screen-short .banner-deco { font-size: 36px; }
-.screen-short .banner-slide-content { padding: 10px 12px; }
+.screen-short .banner-slide { width: 120px; }
+.screen-short .banner-title { font-size: 9px; }
+.screen-short .banner-slide-content { padding: 8px; }
 
 .screen-short .section-header { margin-top: 14px; margin-bottom: 8px; }
 .screen-short .promo-timer { padding: 8px 10px; }
@@ -213,7 +203,7 @@
 /* ============================================
    HEIGHT — Tall screens (≥812px, modern phones)
    ============================================ */
-.screen-tall .banner-slide { min-height: 150px; }
+.screen-tall .banner-slide { width: 160px; }
 .screen-tall .section-header { margin-top: 26px; }
 
 /* ============================================
@@ -226,7 +216,7 @@
 .device-ios .admin-btn-sm { min-width: 44px; min-height: 44px; }
 
 /* iPhone SE specific */
-.is-iphone-se .banner-slide { height: 115px; }
+.is-iphone-se .banner-slide { width: 120px; }
 .is-iphone-se .logo-title { font-size: 17px; }
 .is-iphone-se .header-inner { height: 36px; }
 .is-iphone-se .section-header { margin-top: 14px; margin-bottom: 8px; }
@@ -327,7 +317,7 @@
   #main-header { padding: 4px 16px 0 !important; }
   .header-inner { height: 40px; }
   .win-feed { height: 32px; }
-  .banner-slide { height: 100px; }
+  .banner-slide { width: 135px; }
   .section-header { margin-top: 10px; margin-bottom: 6px; }
   #bottom-nav-wrap { padding: 0 16px 4px !important; }
   #bottom-nav { padding: 2px 8px; }
