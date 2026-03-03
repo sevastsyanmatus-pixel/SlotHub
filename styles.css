@@ -348,65 +348,79 @@ body {
 @keyframes pbadge { 0%,100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.4), 0 0 0 2px rgba(8,5,18,0.9); } 50% { box-shadow: 0 0 0 8px rgba(124,58,237,0), 0 0 0 2px rgba(8,5,18,0.9); } }
 
 /* === BANNERS === */
-.banner-carousel { overflow: visible; position: relative; border-radius: 0; }
+.banner-carousel { overflow: visible; position: relative; border-radius: 0; padding-bottom: 4px; }
 .banner-carousel::after { display: none; }
-.banner-track { display: flex; gap: 10px; padding: 0 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.banner-track {
+  display: flex; gap: 12px; padding: 0 20px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
 .banner-track::-webkit-scrollbar { display: none; }
 .banner-track { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* Right fade: hints that more banners exist off-screen */
+/* Right fade hint */
 .banner-carousel::before {
-  content: ''; position: absolute; top: 0; right: 0; bottom: 0;
-  width: 32px; z-index: 5; pointer-events: none;
+  content: ''; position: absolute; top: 0; right: 0; bottom: 20px;
+  width: 40px; z-index: 5; pointer-events: none;
   background: linear-gradient(to left, var(--bg-primary), transparent);
   transition: opacity 0.3s ease;
 }
 .banner-carousel.scrolled-end::before { opacity: 0; }
+
 .banner-slide {
-  width: 150px; flex-shrink: 0; aspect-ratio: 1/1; position: relative;
+  width: calc(100vw - 72px); flex-shrink: 0;
+  aspect-ratio: 1 / 1; position: relative;
   overflow: hidden; cursor: pointer;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   border: 1px solid rgba(255,255,255,0.08);
   border-top-color: rgba(255,255,255,0.14);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
   display: block; text-decoration: none; color: inherit;
-  /* scroll-snap removed for TG compat */
+  scroll-snap-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.banner-slide:active { transform: scale(0.96); }
-.banner-slide::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.9) 100%); z-index: 1; pointer-events: none; }
+.banner-slide:active { transform: scale(0.97); }
+.banner-slide::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.65) 75%, rgba(0,0,0,0.92) 100%);
+  z-index: 1; pointer-events: none;
+}
 .banner-slide-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 1; z-index: 0; }
-.banner-slide-content { position: relative; z-index: 2; padding: 10px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
-.banner-badge { display: inline-block; width: fit-content; font-size: 7px; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: var(--radius-full); background: rgba(0,0,0,0.5); color: #fff; margin-bottom: 4px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); flex-shrink: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-.banner-title { font-weight: 900; font-size: 11px; color: #fff; line-height: 1.2; text-shadow: 0 1px 4px rgba(0,0,0,1); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.banner-subtitle { font-size: 8px; color: rgba(255,255,255,0.85); margin-top: 2px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.8); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
-.banner-cta { display: inline-flex; align-items: center; gap: 3px; font-size: 8px; font-weight: 800; padding: 5px 10px; border-radius: var(--radius-full); background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #fff; width: fit-content; margin-top: 6px; flex-shrink: 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.banner-slide-content { position: relative; z-index: 2; padding: 14px 16px; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+.banner-badge { display: inline-block; width: fit-content; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; padding: 3px 8px; border-radius: var(--radius-full); background: rgba(0,0,0,0.45); color: #fff; margin-bottom: 6px; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.25); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); flex-shrink: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.banner-title { font-weight: 900; font-size: 15px; color: #fff; line-height: 1.2; text-shadow: 0 1px 6px rgba(0,0,0,1); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.banner-subtitle { font-size: 11px; color: rgba(255,255,255,0.82); margin-top: 3px; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,0.8); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+.banner-cta { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 800; padding: 6px 14px; border-radius: var(--radius-full); background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.32); color: #fff; width: fit-content; margin-top: 8px; flex-shrink: 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 .banner-deco { display: none; }
-@keyframes decoFloat { 0%,100% { transform: translateY(-50%) scale(1) rotate(0deg); } 50% { transform: translateY(-56%) scale(1.12) rotate(5deg); } }
-.banner-dot { display: none; }
-.banner-dot.active { display: none; }
 
-/* Scroll hint under banners */
-.banner-scroll-hint {
+/* === DOTS PAGINATION === */
+.banner-dots {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 20px 0;
+  gap: 6px;
+  padding: 10px 0 2px;
 }
-.banner-scroll-bar {
-  width: 80px;
-  height: 3px;
+.banner-dot {
+  height: 6px;
   border-radius: 3px;
-  background: rgba(255,255,255,0.06);
-  overflow: hidden;
-  position: relative;
+  background: rgba(255,255,255,0.18);
+  cursor: pointer;
+  transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background 0.35s ease,
+              transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 6px;
+  transform-origin: center;
 }
-.banner-scroll-fill {
-  position: absolute;
-  top: 0; left: 0;
-  height: 100%;
-  border-radius: 3px;
+.banner-dot.active {
+  width: 22px;
   background: linear-gradient(90deg, #6D28D9, #C084FC);
-  transition: width 0.15s ease, left 0.15s ease;
+  box-shadow: 0 0 8px rgba(192,132,252,0.5);
+}
+.banner-dot:not(.active):hover {
+  background: rgba(255,255,255,0.35);
+  transform: scale(1.2);
 }
 
 /* === GAME CARDS === */
