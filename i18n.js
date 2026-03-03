@@ -55,7 +55,7 @@ var I18n = (function() {
       it: 'Home', pl: 'Strona główna', cs: 'Domů', ja: 'ホーム', ko: '홈',
       zh: '首页', hi: 'होम', ar: 'الرئيسية', th: 'หน้าหลัก', vi: 'Trang chủ',
       id: 'Beranda', ms: 'Utama', ro: 'Acasă', hu: 'Főoldal', bg: 'Начало',
-      be: 'Галоўная', ka: 'მთავარი', hy: 'Գլխdelays', az: 'Ana Səhifə',
+      be: 'Галоўная', ka: 'მთავარი', hy: 'Գլխավոր', az: 'Ana Səhifə',
       sv: 'Hem', no: 'Hjem', da: 'Hjem', nl: 'Home', fi: 'Koti'
     },
     'nav.games': {
@@ -64,7 +64,7 @@ var I18n = (function() {
       it: 'Giochi', pl: 'Gry', cs: 'Hry', ja: 'ゲーム', ko: '게임',
       zh: '游戏', hi: 'गेम्स', ar: 'الألعاب', th: 'เกม', vi: 'Trò chơi',
       id: 'Permainan', ms: 'Permainan', ro: 'Jocuri', hu: 'Játékok', bg: 'Игри',
-      be: 'Гульні', ka: 'თამაშები', hy: 'Խաղեर', az: 'Oyunlar',
+      be: 'Гульні', ka: 'თამაშები', hy: 'Խաղեր', az: 'Oyunlar',
       sv: 'Spel', no: 'Spill', da: 'Spil', nl: 'Spellen', fi: 'Pelit'
     },
     'nav.bonuses': {
@@ -73,16 +73,16 @@ var I18n = (function() {
       it: 'Bonus', pl: 'Bonusy', cs: 'Bonusy', ja: 'ボーナス', ko: '보너스',
       zh: '奖金', hi: 'बोनस', ar: 'المكافآت', th: 'โบนัส', vi: 'Thưởng',
       id: 'Bonus', ms: 'Bonus', ro: 'Bonusuri', hu: 'Bónuszok', bg: 'Бонуси',
-      be: 'Бонусы', ka: 'ბონუსები', hy: 'Բոնdelays', az: 'Bonuslar',
+      be: 'Бонусы', ka: 'ბონუსები', hy: 'Բոնուսներ', az: 'Bonuslar',
       sv: 'Bonusar', no: 'Bonuser', da: 'Bonusser', nl: 'Bonussen', fi: 'Bonukset'
     },
     'nav.more': {
-      ru: 'Ещё', en: 'More', uk: 'Ще', kk: 'Ещё', uz: 'Yana',
+      ru: 'Ещё', en: 'More', uk: 'Ще', kk: 'Тағы', uz: 'Yana',
       tr: 'Daha', de: 'Mehr', fr: 'Plus', es: 'Más', pt: 'Mais',
       it: 'Altro', pl: 'Więcej', cs: 'Více', ja: 'もっと', ko: '더보기',
       zh: '更多', hi: 'अधिक', ar: 'المزيد', th: 'เพิ่มเติม', vi: 'Thêm',
       id: 'Lainnya', ms: 'Lagi', ro: 'Mai mult', hu: 'Több', bg: 'Още',
-      be: 'Яшчэ', ka: 'მეტი', hy: 'Ավdelays', az: 'Daha',
+      be: 'Яшчэ', ka: 'მეტი', hy: 'Ավելին', az: 'Daha',
       sv: 'Mer', no: 'Mer', da: 'Mere', nl: 'Meer', fi: 'Lisää'
     },
 
@@ -96,55 +96,136 @@ var I18n = (function() {
       zh: '免费试玩老虎机', hi: 'फ्री डेमो स्लॉट्स', ar: 'ماكينات سلوت تجريبية مجانية',
       th: 'เล่นสล็อตฟรี', vi: 'Slot demo miễn phí',
       id: 'Slot demo gratis', ms: 'Slot demo percuma', ro: 'Sloturi demo gratuite',
-      hu: 'Ingyenes demo nyerőgépek', bg: 'Безплатни демо слотове',
-      be: 'Бясплатныя дэма-слоты', ka: 'უფასო დემო სლოტები', hy: 'Անvaysays դեdelays',
+      hu: 'Ingyenes demo nyőerőgépek', bg: 'Безплатни демо слотове',
+      be: 'Бясплатныя дэма-слоты', ka: 'უფასო დემო სლოტები', hy: 'Անվճար դեմո սլոտներ',
       az: 'Pulsuz demo slotlar', sv: 'Gratis demoslotar', no: 'Gratis demoslotar',
       da: 'Gratis demoslots', nl: 'Gratis demoslots', fi: 'Ilmaiset demopelit'
     },
 
     /* --- Sections --- */
-    'section.favorites': { ru: 'Избранное', en: 'Favorites', uk: 'Обране', tr: 'Favoriler', de: 'Favoriten', fr: 'Favoris', es: 'Favoritos', pt: 'Favoritos', it: 'Preferiti', pl: 'Ulubione', cs: 'Oblíbené', ja: 'お気に入り', ko: '즐겨찾기', zh: '收藏', hi: 'पसंदीदा', ar: 'المفضلة', th: 'รายการโปรด', vi: 'Yêu thích', id: 'Favorit', kk: 'Таңдаулы', uz: 'Sevimlilar' },
-    'section.recent': { ru: 'Недавние', en: 'Recent', uk: 'Нещодавні', tr: 'Son Oynanlar', de: 'Kürzlich', fr: 'Récents', es: 'Recientes', pt: 'Recentes', it: 'Recenti', pl: 'Ostatnie', cs: 'Nedávné', ja: '最近', ko: '최근', zh: '最近', hi: 'हाल ही', ar: 'الأخيرة', th: 'ล่าสุด', vi: 'Gần đây', id: 'Terbaru', kk: 'Жақындағы', uz: 'Yaqinda' },
-    'section.popular': { ru: 'Популярное', en: 'Popular', uk: 'Популярне', tr: 'Popüler', de: 'Beliebt', fr: 'Populaire', es: 'Popular', pt: 'Popular', it: 'Popolare', pl: 'Popularne', cs: 'Populární', ja: '人気', ko: '인기', zh: '热门', hi: 'लोकप्रिय', ar: 'شائع', th: 'ยอดนิยม', vi: 'Phổ biến', id: 'Populer', kk: 'Танымал', uz: 'Mashhur' },
-    'section.top': { ru: 'Топ слоты', en: 'Top Slots', uk: 'Топ слоти', tr: 'En İyiler', de: 'Top Slots', fr: 'Top Machines', es: 'Top Slots', pt: 'Top Slots', it: 'Top Slot', pl: 'Najlepsze', cs: 'Top Sloty', ja: 'トップ', ko: '탑 슬롯', zh: '顶级老虎机', hi: 'टॉप स्लॉट', ar: 'أفضل السلوت', th: 'สล็อตยอดนิยม', vi: 'Slot hàng đầu', id: 'Slot Teratas', kk: 'Үздік слоттар', uz: 'Top slotlar' },
-    'section.new': { ru: 'Новинки', en: 'New', uk: 'Новинки', tr: 'Yeni', de: 'Neu', fr: 'Nouveau', es: 'Nuevo', pt: 'Novo', it: 'Nuovo', pl: 'Nowości', cs: 'Nové', ja: '新着', ko: '신규', zh: '新品', hi: 'नया', ar: 'جديد', th: 'ใหม่', vi: 'Mới', id: 'Baru', kk: 'Жаңа', uz: 'Yangi' },
-    'section.bonusBuy': { ru: 'Bonus Buy', en: 'Bonus Buy', uk: 'Bonus Buy', tr: 'Bonus Al', de: 'Bonus Kauf', fr: 'Achat Bonus', es: 'Compra Bonus', pt: 'Compra de Bônus', it: 'Compra Bonus', pl: 'Kup Bonus', cs: 'Nákup Bonusu', ja: 'ボーナス購入', ko: '보너스 구매', zh: '购买奖金', hi: 'बोनस खरीदें', ar: 'شراء مكافأة', th: 'ซื้อโบนัส', vi: 'Mua Bonus', id: 'Beli Bonus', kk: 'Bonus сатып алу', uz: 'Bonus sotib olish' },
-    'section.topWins': { ru: 'Топ выигрышей', en: 'Top Wins', uk: 'Топ виграшів', tr: 'En Büyük Kazançlar', de: 'Top Gewinne', fr: 'Top Gains', es: 'Mejores Ganancias', pt: 'Maiores Ganhos' },
-    'section.bestCasinos': { ru: 'Лучшие казино', en: 'Best Casinos', uk: 'Найкращі казино', tr: 'En İyi Casinolar', de: 'Beste Casinos', fr: 'Meilleurs Casinos', es: 'Mejores Casinos', pt: 'Melhores Casinos' },
+    'section.favorites': {
+      ru: 'Избранное', en: 'Favorites', uk: 'Обране', tr: 'Favoriler', de: 'Favoriten', fr: 'Favoris', es: 'Favoritos', pt: 'Favoritos',
+      it: 'Preferiti', pl: 'Ulubione', cs: 'Oblíbené', ja: 'お気に入り', ko: '즐겨찾기', zh: '收藏', hi: 'पसंदीदा', ar: 'المفضلة', th: 'รายการโปรด', vi: 'Yêu thích', id: 'Favorit', kk: 'Таңдаулы', uz: 'Sevimlilar',
+      ms: 'Kegemaran', ro: 'Favorite', hu: 'Kedvencek', bg: 'Любими', be: 'Абранае', ka: 'რჩეულები', hy: 'Ընտրանի', az: 'Sevimlilər', sv: 'Favoriter', no: 'Favoritter', da: 'Favoritter', nl: 'Favorieten', fi: 'Suosikit'
+    },
+    'section.recent': {
+      ru: 'Недавние', en: 'Recent', uk: 'Нещодавні', tr: 'Son Oynanlar', de: 'Kürzlich', fr: 'Récents', es: 'Recientes', pt: 'Recentes',
+      it: 'Recenti', pl: 'Ostatnie', cs: 'Nedávné', ja: '最近', ko: '최근', zh: '最近', hi: 'हाल ही', ar: 'الأخيرة', th: 'ล่าสุด', vi: 'Gần đây', id: 'Terbaru', kk: 'Жақындағы', uz: 'Yaqinda',
+      ms: 'Terkini', ro: 'Recente', hu: 'Legutóbbi', bg: 'Скорошни', be: 'Нядаўнія', ka: 'ბოლო', hy: 'Վերջինները', az: 'Son oynanlar', sv: 'Senaste', no: 'Nylige', da: 'Seneste', nl: 'Recent', fi: 'Viimeisimmät'
+    },
+    'section.popular': {
+      ru: 'Популярное', en: 'Popular', uk: 'Популярне', tr: 'Popüler', de: 'Beliebt', fr: 'Populaire', es: 'Popular', pt: 'Popular',
+      it: 'Popolare', pl: 'Popularne', cs: 'Populární', ja: '人気', ko: '인기', zh: '热门', hi: 'लोकप्रिय', ar: 'شائع', th: 'ยอดนิยม', vi: 'Phổ biến', id: 'Populer', kk: 'Танымал', uz: 'Mashhur',
+      ms: 'Popular', ro: 'Populare', hu: 'Népszerű', bg: 'Популярни', be: 'Папулярнае', ka: 'პოპულარული', hy: 'Պոպուլար', az: 'Populyar', sv: 'Populära', no: 'Populære', da: 'Populære', nl: 'Populair', fi: 'Suositut'
+    },
+    'section.top': {
+      ru: 'Топ слоты', en: 'Top Slots', uk: 'Топ слоти', tr: 'En İyiler', de: 'Top Slots', fr: 'Top Machines', es: 'Top Slots', pt: 'Top Slots',
+      it: 'Top Slot', pl: 'Najlepsze', cs: 'Top Sloty', ja: 'トップ', ko: '탑 슬롯', zh: '顶级老虎机', hi: 'टॉप स्लॉट', ar: 'أفضل السلوت', th: 'สล็อตยอดนิยม', vi: 'Slot hàng đầu', id: 'Slot Teratas', kk: 'Үздік слоттар', uz: 'Top slotlar',
+      ms: 'Slot Terbaik', ro: 'Top Sloturi', hu: 'Top Nyőerőgépek', bg: 'Топ слотове', be: 'Топ слоты', ka: 'ტოპ სლოტები', hy: 'Լավագույն սլոտներ', az: 'Ən yaxşılar', sv: 'Toppslotar', no: 'Toppslots', da: 'Topslots', nl: 'Topslots', fi: 'Huippu'
+    },
+    'section.new': {
+      ru: 'Новинки', en: 'New', uk: 'Новинки', tr: 'Yeni', de: 'Neu', fr: 'Nouveau', es: 'Nuevo', pt: 'Novo',
+      it: 'Nuovo', pl: 'Nowości', cs: 'Nové', ja: '新着', ko: '신규', zh: '新品', hi: 'नया', ar: 'جديد', th: 'ใหม่', vi: 'Mới', id: 'Baru', kk: 'Жаңа', uz: 'Yangi',
+      ms: 'Baharu', ro: 'Noi', hu: 'Új', bg: 'Нови', be: 'Навінкі', ka: 'ახალი', hy: 'Նոր', az: 'Yeni', sv: 'Nya', no: 'Nye', da: 'Nye', nl: 'Nieuw', fi: 'Uudet'
+    },
+    'section.bonusBuy': {
+      ru: 'Bonus Buy', en: 'Bonus Buy', uk: 'Bonus Buy', tr: 'Bonus Al', de: 'Bonus Kauf', fr: 'Achat Bonus', es: 'Compra Bonus', pt: 'Compra de Bônus',
+      it: 'Compra Bonus', pl: 'Kup Bonus', cs: 'Nákup Bonusu', ja: 'ボーナス購入', ko: '보너스 구매', zh: '购买奖金', hi: 'बोनस खरीदें', ar: 'شراء مكافأة', th: 'ซื้อโบนัส', vi: 'Mua Bonus', id: 'Beli Bonus', kk: 'Bonus сатып алу', uz: 'Bonus sotib olish',
+      ms: 'Beli Bonus', ro: 'Cumpără Bonus', hu: 'Bónusz Vásárlás', bg: 'Купи бонус', be: 'Купіць бонус', ka: 'ბონუსის ყიდვა', hy: 'Բոնուս գնել', az: 'Bonus al', sv: 'Köp Bonus', no: 'Kjøp Bonus', da: 'Køb Bonus', nl: 'Bonus Kopen', fi: 'Osta Bonus'
+    },
+    'section.topWins': {
+      ru: 'Топ выигрышей', en: 'Top Wins', uk: 'Топ виграшів', tr: 'En Büyük Kazançlar', de: 'Top Gewinne', fr: 'Top Gains', es: 'Mejores Ganancias', pt: 'Maiores Ganhos',
+      it: 'Migliori Vincite', pl: 'Największe wygrane', cs: 'Nejlepší výhry', ja: 'トップ勝利', ko: '최고 승ри', zh: '最大赢利', hi: 'सर्वश्रेष्ठ जीत', ar: 'أفضل الأرباح', th: 'ชนะสูงสุด', vi: 'Thắng lớn nhất',
+      id: 'Kemenangan Teratas', kk: 'Үздік ұтыстар', uz: 'Eng katta yutuqlar', ka: 'საუკეთესო მოგებები', hy: 'Լավագույն շահումներ', az: 'Ən böyük qazanclar'
+    },
+    'section.bestCasinos': {
+      ru: 'Лучшие казино', en: 'Best Casinos', uk: 'Найкращі казино', tr: 'En İyi Casinolar', de: 'Beste Casinos', fr: 'Meilleurs Casinos', es: 'Mejores Casinos', pt: 'Melhores Casinos',
+      it: 'Migliori Casinò', pl: 'Najlepsze kasyna', cs: 'Nejlepší kasina', ja: 'ベストカジノ', ko: '최고의 카지노', zh: '最佳赌场', hi: 'सर्वश्रेष्ठ कैसीनो', ar: 'أفضل الكازينوهات', th: 'คาสิโนที่ดีที่สุด', vi: 'Casino tốt nhất',
+      id: 'Kasino Terbaik', kk: 'Үздік казинолар', uz: 'Eng yaxshi karinolar', ka: 'საუკეთესო კაზინოები', hy: 'Լավագույն խաղատներ', az: 'Ən yaxşı kasinolar'
+    },
 
     /* --- Profile --- */
-    'profile.guest': { ru: 'Гость', en: 'Guest', uk: 'Гість', tr: 'Misafir', de: 'Gast', fr: 'Invité', es: 'Invitado', pt: 'Convidado', it: 'Ospite', pl: 'Gość', cs: 'Host', ja: 'ゲスト', ko: '게스트', zh: '游客', hi: 'अतिथि', ar: 'ضيف', th: 'ผู้เยี่ยมชม', vi: 'Khách', id: 'Tamu', kk: 'Қонақ', uz: 'Mehmon' },
-    'profile.welcome': { ru: 'Добро пожаловать в SlotX!', en: 'Welcome to SlotX!', uk: 'Ласкаво просимо до SlotX!', tr: "SlotX'e hoş geldiniz!", de: 'Willkommen bei SlotX!', fr: 'Bienvenue sur SlotX !', es: '¡Bienvenido a SlotX!', pt: 'Bem-vindo ao SlotX!' },
-    'profile.games': { ru: 'Игр', en: 'Played', uk: 'Ігор', tr: 'Oyun', de: 'Spiele', fr: 'Joués', es: 'Jugados', pt: 'Jogados' },
-    'profile.favs': { ru: 'Избр.', en: 'Favs', uk: 'Обр.', tr: 'Fav.', de: 'Fav.', fr: 'Fav.', es: 'Fav.', pt: 'Fav.' },
-    'profile.time': { ru: 'Время', en: 'Time', uk: 'Час', tr: 'Süre', de: 'Zeit', fr: 'Temps', es: 'Tiempo', pt: 'Tempo' },
-    'profile.level': { ru: 'Уровень', en: 'Level', uk: 'Рівень', tr: 'Seviye', de: 'Level', fr: 'Niveau', es: 'Nivel', pt: 'Nível' },
-    'profile.soundOn': { ru: 'Звук вкл', en: 'Sound on', uk: 'Звук увімк', tr: 'Ses açık', de: 'Ton an', fr: 'Son activé', es: 'Sonido sí', pt: 'Som ligado' },
-    'profile.soundOff': { ru: 'Звук выкл', en: 'Sound off', uk: 'Звук вимк', tr: 'Ses kapalı', de: 'Ton aus', fr: 'Son désactivé', es: 'Sonido no', pt: 'Som desligado' },
+    'profile.guest': {
+      ru: 'Гость', en: 'Guest', uk: 'Гість', tr: 'Misafir', de: 'Gast', fr: 'Invité', es: 'Invitado', pt: 'Convidado',
+      it: 'Ospite', pl: 'Gość', cs: 'Host', ja: 'ゲスト', ko: '게스트', zh: '游客', hi: 'अतिथि', ar: 'ضيف', th: 'ผู้เยี่ยมชม', vi: 'Khách', id: 'Tamu', kk: 'Қонақ', uz: 'Mehmon',
+      ms: 'Tetamu', ro: 'Oaspete', hu: 'Vendég', bg: 'Гост', be: 'Госць', ka: 'სტუმარი', hy: 'Հյուր', az: 'Qonaq', sv: 'Gäst', no: 'Gjest', da: 'Gæst', nl: 'Gast', fi: 'Vieras'
+    },
+    'profile.welcome': {
+      ru: 'Добро пожаловать в SlotX!', en: 'Welcome to SlotX!', uk: 'Ласкаво просимо до SlotX!', tr: "SlotX'e hoş geldiniz!", de: 'Willkommen bei SlotX!', fr: 'Bienvenue sur SlotX !', es: '¡Bienvenido a SlotX!', pt: 'Bem-vindo ao SlotX!',
+      it: 'Benvenuto su SlotX!', pl: 'Witamy w SlotX!', cs: 'Vítejte v SlotX!', ja: 'SlotXへようこそ！', ko: 'SlotX에 오신 것을 환영합니다!', zh: '欢迎来到SlotX!', hi: 'SlotX में आपकا स्वاगत है!', ar: 'مرحبًا بك في SlotX!', th: 'ยินดีต้อนรับสู่ SlotX!', vi: 'Chào mừng đến SlotX!',
+      id: 'Selamat datang di SlotX!', kk: 'SlotX-қа қош келдіңіз!', uz: 'SlotX-ga xush kelibsiz!', ka: 'SlotX-ზე კეთილი იყოს!', hy: 'Բարով եկած SlotX!', az: 'SlotX-ə xoş gəlmisiniz!'
+    },
+    'profile.games': { ru: 'Игр', en: 'Played', uk: 'Ігор', tr: 'Oyun', de: 'Spiele', fr: 'Joués', es: 'Jugados', pt: 'Jogados', it: 'Giocati', pl: 'Gier', cs: 'Her', ja: 'プレイ', ko: '플레이', zh: '场次', hi: 'खेल', ar: 'لعب', th: 'เล่น', vi: 'Đã chơi' },
+    'profile.favs': { ru: 'Избр.', en: 'Favs', uk: 'Обр.', tr: 'Fav.', de: 'Fav.', fr: 'Fav.', es: 'Fav.', pt: 'Fav.', it: 'Pref.', pl: 'Ulub.', cs: 'Obl.', ja: 'お気に入り', ko: '즐겨찾기', zh: '收藏', hi: 'पसंद', ar: 'مفضل', th: 'ชื่นชอบ', vi: 'Thích' },
+    'profile.time': { ru: 'Время', en: 'Time', uk: 'Час', tr: 'Süre', de: 'Zeit', fr: 'Temps', es: 'Tiempo', pt: 'Tempo', it: 'Tempo', pl: 'Czas', cs: 'Čas', ja: '時間', ko: '시간', zh: '时间', hi: 'समय', ar: 'الوقت', th: 'เวลา', vi: 'Thời gian' },
+    'profile.level': { ru: 'Уровень', en: 'Level', uk: 'Рівень', tr: 'Seviye', de: 'Level', fr: 'Niveau', es: 'Nivel', pt: 'Nível', it: 'Livello', pl: 'Poziom', cs: 'Úroveň', ja: 'レベル', ko: '레벨', zh: '等级', hi: 'लेवल', ar: 'المستوى', th: 'ระดับ', vi: 'Cấp độ' },
+    'profile.soundOn': { ru: 'Звук вкл', en: 'Sound on', uk: 'Звук увімк', tr: 'Ses açık', de: 'Ton an', fr: 'Son activé', es: 'Sonido sí', pt: 'Som ligado', it: 'Suono attivo', pl: 'Dźwięk wł.', cs: 'Zvuk zapnutý', ja: 'サウンドオン', ko: '소리 켜기', zh: '声音开', hi: 'आवाज़ चालू', ar: 'صوت مفعل', th: 'เปิดเสียง', vi: 'Bật âm thanh' },
+    'profile.soundOff': { ru: 'Звук выкл', en: 'Sound off', uk: 'Звук вимк', tr: 'Ses kapalı', de: 'Ton aus', fr: 'Son désactivé', es: 'Sonido no', pt: 'Som desligado', it: 'Suono disattivo', pl: 'Dźwięk wył.', cs: 'Zvuk vypnutý', ja: 'サウンドオフ', ko: '소리 끄기', zh: '声音关', hi: 'आवाज़ बंद', ar: 'صوت معطل', th: 'ปิดเสียง', vi: 'Tắt âm thanh' },
     'profile.playReal': { ru: 'Играйте на реальные!', en: 'Play for real!', uk: 'Грайте на реальні!', tr: 'Gerçek oyna!', de: 'Echt spielen!', fr: 'Jouez pour de vrai !', es: '¡Juega de verdad!', pt: 'Jogue de verdade!' },
     'profile.bonusDeposit': { ru: 'Бонус до 500% на депозит', en: 'Bonus up to 500% on deposit', uk: 'Бонус до 500% на депозит', tr: 'Depozitoya %500 bonus', de: 'Bonus bis 500% auf Einzahlung', fr: 'Bonus jusqu\'à 500% sur le dépôt', es: 'Bono hasta 500% en depósito', pt: 'Bônus até 500% no depósito' },
     'profile.adminPanel': { ru: 'Админ-панель', en: 'Admin Panel', uk: 'Адмін-панель', tr: 'Yönetim Paneli', de: 'Admin-Panel', fr: 'Panneau admin', es: 'Panel de admin', pt: 'Painel admin' },
 
     /* --- Theme --- */
-    'theme.title': { ru: 'Тема', en: 'Theme', uk: 'Тема', tr: 'Tema', de: 'Thema', fr: 'Thème', es: 'Tema', pt: 'Tema', it: 'Tema', pl: 'Motyw', cs: 'Téma', ja: 'テーマ', ko: '테마', zh: '主题', hi: 'थीम', ar: 'السمة', th: 'ธีม', vi: 'Chủ đề', id: 'Tema', kk: 'Тақырып', uz: 'Mavzu' },
-    'theme.dark': { ru: 'Тёмная', en: 'Dark', uk: 'Темна', tr: 'Karanlık', de: 'Dunkel', fr: 'Sombre', es: 'Oscuro', pt: 'Escuro', it: 'Scuro', pl: 'Ciemny', cs: 'Tmavý', ja: 'ダーク', ko: '다크', zh: '深色', hi: 'डार्क', ar: 'داكن', th: 'มืด', vi: 'Tối', id: 'Gelap' },
-    'theme.light': { ru: 'Светлая', en: 'Light', uk: 'Світла', tr: 'Aydınlık', de: 'Hell', fr: 'Clair', es: 'Claro', pt: 'Claro', it: 'Chiaro', pl: 'Jasny', cs: 'Světlý', ja: 'ライト', ko: '라이트', zh: '浅色', hi: 'लाइट', ar: 'فاتح', th: 'สว่าง', vi: 'Sáng', id: 'Terang' },
-    'theme.auto': { ru: 'Авто', en: 'Auto', uk: 'Авто', tr: 'Otomatik', de: 'Auto', fr: 'Auto', es: 'Auto', pt: 'Auto', it: 'Auto', pl: 'Auto', cs: 'Auto', ja: '自動', ko: '자동', zh: '自动', hi: 'ऑटो', ar: 'تلقائي', th: 'อัตโนมัติ', vi: 'Tự động', id: 'Otomatis' },
+    'theme.title': {
+      ru: 'Тема', en: 'Theme', uk: 'Тема', tr: 'Tema', de: 'Thema', fr: 'Thème', es: 'Tema', pt: 'Tema',
+      it: 'Tema', pl: 'Motyw', cs: 'Téma', ja: 'テーマ', ko: '테마', zh: '主题', hi: 'थीम', ar: 'السمة', th: 'ธีม', vi: 'Chủ đề', id: 'Tema', kk: 'Тақырып', uz: 'Mavzu',
+      ms: 'Tema', ro: 'Temă', hu: 'Téma', bg: 'Тема', be: 'Тэма', ka: 'თემა', hy: 'Թեմա', az: 'Tema', sv: 'Tema', no: 'Tema', da: 'Tema', nl: 'Thema', fi: 'Teema'
+    },
+    'theme.dark': {
+      ru: 'Тёмная', en: 'Dark', uk: 'Темна', tr: 'Karanlık', de: 'Dunkel', fr: 'Sombre', es: 'Oscuro', pt: 'Escuro',
+      it: 'Scuro', pl: 'Ciemny', cs: 'Tmavý', ja: 'ダーク', ko: '다크', zh: '深色', hi: 'डاर्क', ar: 'داكن', th: 'มืด', vi: 'Tối', id: 'Gelap',
+      ms: 'Gelap', ro: 'Întunecat', hu: 'Sötét', bg: 'Тъмна', be: 'Цёмная', ka: 'მუქი', hy: 'Մութ', az: 'Qaranlıq', sv: 'Mörk', no: 'Mørk', da: 'Mørk', nl: 'Donker', fi: 'Tumma'
+    },
+    'theme.light': {
+      ru: 'Светлая', en: 'Light', uk: 'Світла', tr: 'Aydınlık', de: 'Hell', fr: 'Clair', es: 'Claro', pt: 'Claro',
+      it: 'Chiaro', pl: 'Jasny', cs: 'Světlý', ja: 'ライト', ko: 'райт', zh: '浅色', hi: 'लाइट', ar: 'فاتح', th: 'สว่าง', vi: 'Sáng', id: 'Terang',
+      ms: 'Terang', ro: 'Luminos', hu: 'Világos', bg: 'Светла', be: 'Светлая', ka: 'ნათელი', hy: 'Լուսավոր', az: 'İşıqlı', sv: 'Ljus', no: 'Lys', da: 'Lys', nl: 'Licht', fi: 'Vaalea'
+    },
+    'theme.auto': {
+      ru: 'Авто', en: 'Auto', uk: 'Авто', tr: 'Otomatik', de: 'Auto', fr: 'Auto', es: 'Auto', pt: 'Auto',
+      it: 'Auto', pl: 'Auto', cs: 'Auto', ja: '自動', ko: '자донг', zh: '自动', hi: 'ऑटो', ar: 'تلقائي', th: 'อัตโนมัติ', vi: 'Tự động', id: 'Otomatis',
+      ms: 'Auto', ro: 'Auto', hu: 'Automatikus', bg: 'Авто', be: 'Аўта', ka: 'ავტო', hy: 'Ավտո', az: 'Avto', sv: 'Auto', no: 'Auto', da: 'Auto', nl: 'Auto', fi: 'Auto'
+    },
 
     /* --- Language --- */
-    'lang.title': { ru: 'Язык', en: 'Language', uk: 'Мова', tr: 'Dil', de: 'Sprache', fr: 'Langue', es: 'Idioma', pt: 'Idioma', it: 'Lingua', pl: 'Język', cs: 'Jazyk', ja: '言語', ko: '언어', zh: '语言', hi: 'भाषा', ar: 'اللغة', th: 'ภาษา', vi: 'Ngôn ngữ', id: 'Bahasa', kk: 'Тіл', uz: 'Til' },
+    'lang.title': {
+      ru: 'Язык', en: 'Language', uk: 'Мова', tr: 'Dil', de: 'Sprache', fr: 'Langue', es: 'Idioma', pt: 'Idioma',
+      it: 'Lingua', pl: 'Język', cs: 'Jazyk', ja: '言語', ko: '언어', zh: '语言', hi: 'भاषा', ar: 'اللغة', th: 'ภาษา', vi: 'Ngôn ngữ', id: 'Bahasa', kk: 'Тіл', uz: 'Til',
+      ms: 'Bahasa', ro: 'Limbă', hu: 'Nyelv', bg: 'Език', be: 'Мова', ka: 'ენა', hy: 'Լեզու', az: 'Dil', sv: 'Språk', no: 'Språk', da: 'Sprog', nl: 'Taal', fi: 'Kieli'
+    },
 
     /* --- History --- */
-    'history.title': { ru: 'История игр', en: 'Game History', uk: 'Історія ігор', tr: 'Oyun Geçmişi', de: 'Spielverlauf', fr: 'Historique', es: 'Historial', pt: 'Histórico', it: 'Cronologia', pl: 'Historia gier', cs: 'Historie her', ja: 'ゲーム履歴', ko: '게임 기록', zh: '游戏记录', hi: 'गेम इतिहास', ar: 'سجل الألعاب', th: 'ประวัติ', vi: 'Lịch sử', id: 'Riwayat', kk: 'Ойын тарихы', uz: "O'yin tarixi" },
-    'history.empty': { ru: 'Пока пусто — запускайте игры!', en: 'Nothing yet — start playing!', uk: 'Поки порожньо — грайте!', tr: 'Henüz boş — oynamaya başla!', de: 'Noch leer — fang an zu spielen!', fr: 'Encore vide — jouez !', es: '¡Vacío — empieza a jugar!', pt: 'Vazio — comece a jogar!' },
-    'history.today': { ru: 'Сегодня', en: 'Today', uk: 'Сьогодні', tr: 'Bugün', de: 'Heute', fr: "Aujourd'hui", es: 'Hoy', pt: 'Hoje' },
-    'history.yesterday': { ru: 'Вчера', en: 'Yesterday', uk: 'Вчора', tr: 'Dün', de: 'Gestern', fr: 'Hier', es: 'Ayer', pt: 'Ontem' },
+    'history.title': {
+      ru: 'История игр', en: 'Game History', uk: 'Історія ігор', tr: 'Oyun Geçmişi', de: 'Spielverlauf', fr: 'Historique', es: 'Historial', pt: 'Histórico',
+      it: 'Cronologia', pl: 'Historia gier', cs: 'Historie her', ja: 'ゲーム履歴', ko: '게им 기록', zh: '游戏记录', hi: 'गेम इतिहаस', ar: 'سجل الألعاب', th: 'ประวัติ', vi: 'Lịch sử', id: 'Riwayat', kk: 'Ойын тарихы', uz: "O'yin tarixi",
+      ms: 'Sejarah permainan', ro: 'Istoric jocuri', hu: 'Játékelőzmények', bg: 'История на игрите', be: 'Гісторыя гульняў', ka: 'თამაშების ისტორია', hy: 'Խաղերու պատմություն', az: 'Oyun tarixçəsi', sv: 'Spelhistorik', no: 'Spillhistorikk', da: 'Spilhistorik', nl: 'Spelgeschiedenis', fi: 'Pelihistoria'
+    },
+    'history.empty': {
+      ru: 'Пока пусто — запускайте игры!', en: 'Nothing yet — start playing!', uk: 'Поки порожньо — грайте!', tr: 'Henüz boş — oynamaya başla!', de: 'Noch leer — fang an zu spielen!', fr: 'Encore vide — jouez !', es: '¡Vacío — empieza a jugar!', pt: 'Vazio — comece a jogar!',
+      it: 'Ancora vuoto — gioca!', pl: 'Jeszcze pusto — graj!', cs: 'Zatím prázdné — hrajte!', ja: 'まだ空です — プレイを始めましょう！', ko: '아직 비어 있습니다 — 플레이하세요!', zh: '还没有记录 — 开始游戏吧！', hi: 'अभी खाली है — खेलना शुरू करें!', ar: 'لا شيء بعد — ابدأ اللعب!', th: 'ยังว่างอยู่ — เริ่มเล่นเลย!', vi: 'Chưa có gì — hãy chơi đi!'
+    },
+    'history.today': {
+      ru: 'Сегодня', en: 'Today', uk: 'Сьогодні', tr: 'Bugün', de: 'Heute', fr: "Aujourd'hui", es: 'Hoy', pt: 'Hoje',
+      it: 'Oggi', pl: 'Dzisiaj', cs: 'Dnes', ja: '今日', ko: '오늘', zh: '今天', hi: 'आज', ar: 'اليوم', th: 'วันนี้', vi: 'Hôm nay'
+    },
+    'history.yesterday': {
+      ru: 'Вчера', en: 'Yesterday', uk: 'Вчора', tr: 'Dün', de: 'Gestern', fr: 'Hier', es: 'Ayer', pt: 'Ontem',
+      it: 'Ieri', pl: 'Wczoraj', cs: 'Včera', ja: '昨日', ko: '어제', zh: '昨天', hi: 'कल', ar: 'أمس', th: 'เมื่อวาน', vi: 'Hôm qua'
+    },
 
     /* --- Achievements --- */
-    'achievements.title': { ru: 'Достижения', en: 'Achievements', uk: 'Досягнення', tr: 'Başarılar', de: 'Erfolge', fr: 'Succès', es: 'Logros', pt: 'Conquistas', it: 'Risultati', pl: 'Osiągnięcia', cs: 'Úspěchy', ja: '実績', ko: '업적', zh: '成就', hi: 'उपलब्धियाँ', ar: 'الإنجازات', th: 'ความสำเร็จ', vi: 'Thành tựu', id: 'Pencapaian', kk: 'Жетістіктер', uz: 'Yutuqlar' },
+    'achievements.title': {
+      ru: 'Достижения', en: 'Achievements', uk: 'Досягнення', tr: 'Başarılar', de: 'Erfolge', fr: 'Succès', es: 'Logros', pt: 'Conquistas',
+      it: 'Risultati', pl: 'Osiągnięcia', cs: 'Úspěchy', ja: '実績', ko: '업적', zh: '成就', hi: 'उपलब्धियँ', ar: 'الإنجازات', th: 'ความสำเร็จ', vi: 'Thành tựu', id: 'Pencapaian', kk: 'Жетістіктер', uz: 'Yutuqlar',
+      ms: 'Pencapaian', ro: 'Realizări', hu: 'Eredmények', bg: 'Постижения', be: 'Дасягненні', ka: 'მიღწევები', hy: 'Նվաճումներ', az: 'Nailiyyətlər', sv: 'Prestationer', no: 'Prestasjoner', da: 'Præstationer', nl: 'Prestaties', fi: 'Saavutukset'
+    },
 
     /* --- Referral --- */
-    'referral.title': { ru: 'Пригласить друга', en: 'Invite a friend', uk: 'Запросити друга', tr: 'Arkadaşını davet et', de: 'Freund einladen', fr: 'Inviter un ami', es: 'Invitar amigo', pt: 'Convidar amigo', it: 'Invita un amico', pl: 'Zaproś znajomego', cs: 'Pozvat přítele', ja: '友達を招待', ko: '친구 초대', zh: '邀请朋友', hi: 'दोस्त को आमंत्रित करें', ar: 'دعوة صديق', th: 'เชิญเพื่อน', vi: 'Mời bạn bè', id: 'Undang teman', kk: 'Досыңды шақыр', uz: "Do'stni taklif qilish" },
+    'referral.title': {
+      ru: 'Пригласить друга', en: 'Invite a friend', uk: 'Запросити друга', tr: 'Arkadaşını davet et', de: 'Freund einladen', fr: 'Inviter un ami', es: 'Invitar amigo', pt: 'Convidar amigo',
+      it: 'Invita un amico', pl: 'Zaproś znajomego', cs: 'Pozvat přítele', ja: '友達を招待', ko: '친구 조대', zh: '邀请朋友', hi: 'दोस्त को आमंत्रित करें', ar: 'دعوة صديق', th: 'เชิญเพื่อน', vi: 'Mời bạn bè', id: 'Undang teman', kk: 'Досыңды шақыр', uz: "Do'stni taklif qilish",
+      ms: 'Jemput kawan', ro: 'Invită un prieten', hu: 'Barát meghívása', bg: 'Покани приятел', be: 'Запрасіць сябра', ka: 'მეგობრის მოწვევა', hy: 'Հրավեր ընկերներ', az: 'Dostunu dəvət et', sv: 'Bjud in en vän', no: 'Inviter en venn', da: 'Inviter en ven', nl: 'Vriend uitnodigen', fi: 'Kutsu ystävä'
+    },
     'referral.desc': { ru: 'Поделитесь SlotX с друзьями', en: 'Share SlotX with friends', uk: 'Поділіться SlotX з друзями', tr: 'SlotX\'i arkadaşlarınla paylaş', de: 'Teile SlotX mit Freunden', fr: 'Partagez SlotX avec vos amis', es: 'Comparte SlotX con amigos', pt: 'Compartilhe SlotX com amigos' },
     'referral.share': { ru: 'Поделиться', en: 'Share', uk: 'Поділитися', tr: 'Paylaş', de: 'Teilen', fr: 'Partager', es: 'Compartir', pt: 'Compartilhar' },
     'referral.copy': { ru: 'Скопировать ссылку', en: 'Copy link', uk: 'Скопіювати посилання', tr: 'Bağlantıyı kopyala', de: 'Link kopieren', fr: 'Copier le lien', es: 'Copiar enlace', pt: 'Copiar link' },
