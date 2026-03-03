@@ -50,13 +50,8 @@ var FirebaseService = (function() {
   var _db = null;
   var _initialized = false;
   var _userId = null;
-  var _listeners = [];
   var _friendListeners = {};
-  var _activityCallbacks = [];
-  var _lastNotifTime = 0;
-  var _notifCooldown = 30000; /* 30 sec between toasts */
-  var _notifCount = 0;
-  var _maxNotifsPerSession = 15;
+  var _friendsData = {}; /* Cached friend status for UI reads */
 
   /* ============================================
      CHECK IF CONFIGURED
@@ -215,7 +210,8 @@ var FirebaseService = (function() {
   }
 
   /* ============================================
-     LISTEN TO FRIENDS — Real-time notifications
+     WATCH FRIENDS — Real-time status for UI display
+     No notifications — only caches data for UI reads
      ============================================ */
   function watchFriends(friendIds) {
     if (!_initialized || !_db) return;
@@ -232,72 +228,26 @@ var FirebaseService = (function() {
     if (_friendListeners[friendId]) return; /* Already watching */
 
     var ref = _db.ref('activity/' + friendId);
-    var isFirst = true; /* Skip first event (current state) */
 
     var handler = ref.on('value', function(snapshot) {
-      if (isFirst) { isFirst = false; return; }
       var data = snapshot.val();
       if (!data) return;
-      _handleFriendUpdate(friendId, data);
+      /* Only cache data for UI — no notifications */
+      _friendsData[friendId] = {
+        id: friendId,
+        name: data.name || 'Друг',
+        status: data.status || 'idle',
+        gameId: data.gameId || '',
+        gameName: data.gameName || '',
+        gameIcon: data.gameIcon || '🎰',
+        lastWin: data.lastWin || null,
+        updatedAt: data.updatedAt || 0
+      };
     }, function(error) {
       console.warn('[Firebase] Watch error for', friendId, error.message);
     });
 
     _friendListeners[friendId] = { ref: ref, handler: handler };
-  }
-
-  function _handleFriendUpdate(friendId, data) {
-    var now = Date.now();
-
-    /* Cooldown between notifications */
-    if (now - _lastNotifTime < _notifCooldown) return;
-    if (_notifCount >= _maxNotifsPerSession) return;
-
-    /* Only notify about recent events (within last 2 minutes) */
-    var updatedAt = data.updatedAt || 0;
-    if (now - updatedAt > 120000) return;
-
-    var friendName = data.name || ('Друг');
-    var gameName = data.gameName || '';
-    var gameIcon = data.gameIcon || '🎰';
-
-    /* Friend started playing */
-    if (data.status === 'playing' && gameName) {
-      _showFriendToast('🎮', friendName + ' играет в ' + gameName + '!');
-    }
-
-    /* Friend won */
-    if (data.lastWin && data.lastWin.amount > 0) {
-      var win = data.lastWin;
-      var winTs = win.ts || 0;
-      /* Only show if win happened recently (within 1 min) */
-      if (now - winTs < 60000) {
-        var cur = window.DataStore ? DataStore.getCurrencySymbol() : '₽';
-        var amt = win.amount.toFixed(0);
-        if (win.mult >= 50) {
-          _showFriendToast('🤑', friendName + ' выиграл ' + amt + ' ' + cur + ' (x' + win.mult + ') в ' + (win.gameName || gameName) + '!');
-        } else if (win.amount >= 500) {
-          _showFriendToast('🔥', friendName + ' выиграл ' + amt + ' ' + cur + ' в ' + (win.gameName || gameName) + '!');
-        } else {
-          _showFriendToast('⚡', friendName + ' выигрывает в ' + (win.gameName || gameName) + '!');
-        }
-      }
-    }
-  }
-
-  function _showFriendToast(icon, text) {
-    _lastNotifTime = Date.now();
-    _notifCount++;
-
-    /* Notify via callbacks */
-    for (var i = 0; i < _activityCallbacks.length; i++) {
-      try { _activityCallbacks[i](icon, text); } catch(e) {}
-    }
-
-    /* Default: use App.showToast */
-    if (_activityCallbacks.length === 0 && window.App) {
-      App.showToast(icon, text);
-    }
   }
 
   function stopWatchingFriends() {
@@ -308,15 +258,20 @@ var FirebaseService = (function() {
       }
     }
     _friendListeners = {};
+    _friendsData = {};
   }
 
   /* ============================================
-     ON ACTIVITY — Register callback for friend updates
+     GET CACHED FRIEND DATA — For UI rendering
      ============================================ */
-  function onFriendActivity(callback) {
-    if (typeof callback === 'function') {
-      _activityCallbacks.push(callback);
+  function getCachedFriendsData() {
+    var result = [];
+    for (var id in _friendsData) {
+      if (_friendsData.hasOwnProperty(id)) {
+        result.push(_friendsData[id]);
+      }
     }
+    return result;
   }
 
   /* ============================================
@@ -372,15 +327,11 @@ var FirebaseService = (function() {
      ============================================ */
   function autoStart() {
     init().then(function(ok) {
-      if (!ok) {
-        console.log('[Firebase] Not available, friend activity will use simulation');
-        return;
-      }
-      /* Start watching friends */
-      var ids = getFriendIds();
-      if (ids.length > 0) {
-        watchFriends(ids);
-        console.log('[Firebase] Watching', ids.length, 'friends');
+      if (!ok) return;
+      console.log('[Firebase] Connected, watching friends (no notifications)');
+      var friends = getFriendIds();
+      if (friends.length > 0) {
+        watchFriends(friends);
       }
     });
   }
@@ -391,7 +342,6 @@ var FirebaseService = (function() {
   function destroy() {
     stopWatchingFriends();
     setIdle();
-    _activityCallbacks = [];
   }
 
   /* ============================================
@@ -414,8 +364,8 @@ var FirebaseService = (function() {
     watchFriends: watchFriends,
     stopWatchingFriends: stopWatchingFriends,
     getFriendsStatus: getFriendsStatus,
+    getCachedFriendsData: getCachedFriendsData,
     getFriendIds: getFriendIds,
-    onFriendActivity: onFriendActivity,
 
     /* Util */
     isReady: function() { return _initialized; },
