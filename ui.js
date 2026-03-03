@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
   /* Banner state */
   var bannerIdx = 0;
   var bannerAutoTimer = null;
+  var bannerScrollLocked = false;
 
   /* Notification state */
   var notifQueue = [];
@@ -370,14 +371,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (bannerAutoTimer) { clearInterval(bannerAutoTimer); bannerAutoTimer = null; }
     bannerIdx = 0;
     var track = $('banner-track'), dots = $('banner-dots'), carousel = $('banner-carousel');
-    track.innerHTML = ''; dots.innerHTML = '';
+    if (!track) return;
+    track.innerHTML = '';
+    if (dots) { dots.innerHTML = ''; dots.style.display = ''; }
     var casinos = DataStore.getActiveCasinos();
+
+    /* Remove old scroll hint if exists */
+    var oldHint = carousel.querySelector('.banner-scroll-hint');
+    if (oldHint) oldHint.remove();
 
     if (casinos.length === 0) { carousel.style.display = 'none'; return; }
     carousel.style.display = '';
-    if (dots) dots.style.display = 'none';
-
-    var decoEmojis = ['🎰','💎','🎁','⚡','🏆','🔥','💰','🃏','🎲'];
 
     for (var i = 0; i < casinos.length; i++) {
       var c = casinos[i];
@@ -387,55 +391,62 @@ document.addEventListener('DOMContentLoaded', function() {
 
       var html = '';
       if (c.bannerImage) html += '<img src="' + esc(c.bannerImage) + '" class="banner-slide-img" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">';
-      html += '<div class="banner-deco">' + decoEmojis[i % decoEmojis.length] + '</div>';
       html += '<div class="banner-slide-content">';
       if (c.badge) html += '<span class="banner-badge">' + esc(c.badge) + '</span>';
       html += '<p class="banner-title">' + esc(c.bannerTitle || c.bonus || c.name) + '</p>';
       html += '<p class="banner-subtitle">' + esc(c.bannerSubtitle || c.name) + '</p>';
-      html += '<div class="banner-cta">Забрать <i class="fa-solid fa-arrow-right" style="font-size:10px;"></i></div>';
+      html += '<div class="banner-cta">\u0417\u0430\u0431\u0440\u0430\u0442\u044c <i class="fa-solid fa-arrow-right" style="font-size:9px;"></i></div>';
       html += '</div>';
       slide.innerHTML = html;
       slide.addEventListener('click', function() { TG.haptic.medium(); });
       track.appendChild(slide);
-
-      var dot = document.createElement('div');
-      dot.className = 'banner-dot' + (i === 0 ? ' active' : '');
-      (function(idx) { dot.addEventListener('click', function(e) { e.stopPropagation(); goToBanner(idx); }); })(i);
-      dots.appendChild(dot);
     }
 
-    /* Scroll hint under banners */
-    var hintEl = document.createElement('div');
-    hintEl.className = 'banner-scroll-hint';
-    hintEl.innerHTML = '<div class="banner-scroll-bar"><div class="banner-scroll-fill" id="banner-scroll-fill"></div></div>';
-    carousel.appendChild(hintEl);
+    /* Build dots */
+    if (dots) {
+      for (var di = 0; di < casinos.length; di++) {
+        var dot = document.createElement('div');
+        dot.className = 'banner-dot' + (di === 0 ? ' active' : '');
+        (function(idx) {
+          dot.addEventListener('click', function(e) {
+            e.stopPropagation();
+            TG.haptic.light();
+            goToBanner(idx);
+            resetBannerAuto();
+          });
+        })(di);
+        dots.appendChild(dot);
+      }
+    }
 
-    /* Update scroll indicator on scroll */
+    /* Sync dots on user scroll */
     track.addEventListener('scroll', function() {
+      if (bannerScrollLocked) return;
+      var slides = track.querySelectorAll('.banner-slide');
+      if (!slides.length) return;
+      var slideW = slides[0].offsetWidth + 12;
+      var nearest = Math.round(track.scrollLeft / slideW);
+      nearest = Math.max(0, Math.min(nearest, slides.length - 1));
+      if (nearest !== bannerIdx) {
+        bannerIdx = nearest;
+        updateDots();
+      }
       var maxScroll = track.scrollWidth - track.clientWidth;
-      if (maxScroll <= 0) return;
-      var pct = track.scrollLeft / maxScroll;
-      var fill = document.getElementById('banner-scroll-fill');
-      if (!fill) return;
-      var barWidth = Math.max(25, (track.clientWidth / track.scrollWidth) * 100);
-      fill.style.width = barWidth + '%';
-      fill.style.left = (pct * (100 - barWidth)) + '%';
-      if (pct > 0.95) carousel.classList.add('scrolled-end');
+      if (maxScroll > 0 && track.scrollLeft >= maxScroll - 10) carousel.classList.add('scrolled-end');
       else carousel.classList.remove('scrolled-end');
     }, { passive: true });
 
-    /* Set initial fill */
-    setTimeout(function() {
-      var maxScroll = track.scrollWidth - track.clientWidth;
-      var fill = document.getElementById('banner-scroll-fill');
-      if (fill && maxScroll > 0) {
-        var barWidth = Math.max(25, (track.clientWidth / track.scrollWidth) * 100);
-        fill.style.width = barWidth + '%';
-        fill.style.left = '0%';
-      }
-    }, 100);
-    /* Start auto-advance after render */
-    setTimeout(startBannerAuto, 1000);
+    /* Start auto after render */
+    setTimeout(startBannerAuto, 1200);
+  }
+
+  function updateDots() {
+    var dotsEl = $('banner-dots');
+    if (!dotsEl) return;
+    var allDots = dotsEl.querySelectorAll('.banner-dot');
+    for (var i = 0; i < allDots.length; i++) {
+      allDots[i].classList.toggle('active', i === bannerIdx);
+    }
   }
 
   function goToBanner(idx) {
@@ -446,31 +457,35 @@ document.addEventListener('DOMContentLoaded', function() {
     var n = slides.length;
     idx = ((idx % n) + n) % n;
     bannerIdx = idx;
-    /* Use manual RAF scroll instead of scroll-behavior:smooth — more reliable in TG WebView */
-    var slideW = slides[0].offsetWidth + 10;
+    updateDots();
+    var slideW = slides[0].offsetWidth + 12;
     var targetLeft = idx * slideW;
+
+    bannerScrollLocked = true;
     var startLeft = track.scrollLeft;
     var diff = targetLeft - startLeft;
-    if (Math.abs(diff) < 2) return;
+    if (Math.abs(diff) < 2) { bannerScrollLocked = false; return; }
     var startTime = null;
-    var duration = 300;
+    var duration = 380;
     function step(ts) {
       if (!startTime) startTime = ts;
       var elapsed = ts - startTime;
       var progress = Math.min(elapsed / duration, 1);
-      /* Ease out cubic */
       var ease = 1 - Math.pow(1 - progress, 3);
       track.scrollLeft = startLeft + diff * ease;
       if (progress < 1) requestAnimationFrame(step);
+      else bannerScrollLocked = false;
     }
     requestAnimationFrame(step);
-    /* Update dots */
-    var dots = $('banner-dots') ? $('banner-dots').querySelectorAll('.banner-dot') : [];
-    for (var di = 0; di < dots.length; di++) dots[di].classList.toggle('active', di === idx);
+  }
+
+  function resetBannerAuto() {
+    if (bannerAutoTimer) clearInterval(bannerAutoTimer);
+    startBannerAuto();
   }
 
   function updateBannerPosition() {
-    /* No-op: banners now use native scroll, no transform needed */
+    /* No-op */
   }
 
   function startBannerAuto() {
@@ -478,37 +493,35 @@ document.addEventListener('DOMContentLoaded', function() {
     bannerAutoTimer = setInterval(function() {
       var track = $('banner-track');
       if (!track) return;
-      /* Don't auto-advance if user is touching */
       var slides = track.querySelectorAll('.banner-slide');
       if (!slides.length) return;
       goToBanner((bannerIdx + 1) % slides.length);
-    }, 4500);
+    }, 4000);
   }
 
   function initBannerSwipe() {
     var track = $('banner-track');
     if (!track) return;
-    /* Pause auto-advance while user is touching */
-    var touching = false;
-    track.addEventListener('touchstart', function() {
-      touching = true;
+    var touchStartX = 0;
+
+    track.addEventListener('touchstart', function(e) {
+      touchStartX = e.touches[0].clientX;
       if (bannerAutoTimer) clearInterval(bannerAutoTimer);
     }, { passive: true });
-    track.addEventListener('touchend', function() {
-      touching = false;
-      /* Snap to nearest slide after touch ends */
+
+    track.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - touchStartX;
       setTimeout(function() {
         var slides = track.querySelectorAll('.banner-slide');
         if (!slides.length) return;
-        var slideW = slides[0].offsetWidth + 10;
+        var slideW = slides[0].offsetWidth + 12;
         var nearest = Math.round(track.scrollLeft / slideW);
         nearest = Math.max(0, Math.min(nearest, slides.length - 1));
         if (nearest !== bannerIdx) goToBanner(nearest);
+        else updateDots();
         startBannerAuto();
-      }, 150);
+      }, 100);
     }, { passive: true });
-    /* Start auto-advance */
-    startBannerAuto();
   }
 
   /* ============================================
