@@ -367,6 +367,8 @@ document.addEventListener('DOMContentLoaded', function() {
      BANNER CAROUSEL
      ============================================ */
   function renderBanners() {
+    if (bannerAutoTimer) { clearInterval(bannerAutoTimer); bannerAutoTimer = null; }
+    bannerIdx = 0;
     var track = $('banner-track'), dots = $('banner-dots'), carousel = $('banner-carousel');
     track.innerHTML = ''; dots.innerHTML = '';
     var casinos = DataStore.getActiveCasinos();
@@ -432,6 +434,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fill.style.left = '0%';
       }
     }, 100);
+    /* Start auto-advance after render */
+    setTimeout(startBannerAuto, 1000);
   }
 
   function goToBanner(idx) {
@@ -442,8 +446,27 @@ document.addEventListener('DOMContentLoaded', function() {
     var n = slides.length;
     idx = ((idx % n) + n) % n;
     bannerIdx = idx;
-    var w = slides[0].offsetWidth + 10; // 10 = gap
-    track.scrollTo({ left: idx * w, behavior: 'smooth' });
+    /* Use manual RAF scroll instead of scroll-behavior:smooth — more reliable in TG WebView */
+    var slideW = slides[0].offsetWidth + 10;
+    var targetLeft = idx * slideW;
+    var startLeft = track.scrollLeft;
+    var diff = targetLeft - startLeft;
+    if (Math.abs(diff) < 2) return;
+    var startTime = null;
+    var duration = 300;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var elapsed = ts - startTime;
+      var progress = Math.min(elapsed / duration, 1);
+      /* Ease out cubic */
+      var ease = 1 - Math.pow(1 - progress, 3);
+      track.scrollLeft = startLeft + diff * ease;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    /* Update dots */
+    var dots = $('banner-dots') ? $('banner-dots').querySelectorAll('.banner-dot') : [];
+    for (var di = 0; di < dots.length; di++) dots[di].classList.toggle('active', di === idx);
   }
 
   function updateBannerPosition() {
@@ -451,11 +474,41 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function startBannerAuto() {
-    /* Auto-advance disabled: users scroll manually */
+    if (bannerAutoTimer) clearInterval(bannerAutoTimer);
+    bannerAutoTimer = setInterval(function() {
+      var track = $('banner-track');
+      if (!track) return;
+      /* Don't auto-advance if user is touching */
+      var slides = track.querySelectorAll('.banner-slide');
+      if (!slides.length) return;
+      goToBanner((bannerIdx + 1) % slides.length);
+    }, 4500);
   }
 
   function initBannerSwipe() {
-    /* Native scroll + snap handles swiping — no custom JS needed */
+    var track = $('banner-track');
+    if (!track) return;
+    /* Pause auto-advance while user is touching */
+    var touching = false;
+    track.addEventListener('touchstart', function() {
+      touching = true;
+      if (bannerAutoTimer) clearInterval(bannerAutoTimer);
+    }, { passive: true });
+    track.addEventListener('touchend', function() {
+      touching = false;
+      /* Snap to nearest slide after touch ends */
+      setTimeout(function() {
+        var slides = track.querySelectorAll('.banner-slide');
+        if (!slides.length) return;
+        var slideW = slides[0].offsetWidth + 10;
+        var nearest = Math.round(track.scrollLeft / slideW);
+        nearest = Math.max(0, Math.min(nearest, slides.length - 1));
+        if (nearest !== bannerIdx) goToBanner(nearest);
+        startBannerAuto();
+      }, 150);
+    }, { passive: true });
+    /* Start auto-advance */
+    startBannerAuto();
   }
 
   /* ============================================
