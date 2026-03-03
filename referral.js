@@ -172,69 +172,173 @@ var Referral = (function() {
   }
 
   /* ============================================
-     WIN SHARING
+     BEAUTIFUL WIN CARD GENERATOR — Canvas
      ============================================ */
   function generateWinCard(win) {
     var canvas = document.createElement('canvas');
-    canvas.width = 600; canvas.height = 400;
+    var W = 720, H = 480;
+    canvas.width = W; canvas.height = H;
     var ctx = canvas.getContext('2d');
 
-    var grad = ctx.createLinearGradient(0, 0, 600, 400);
-    grad.addColorStop(0, '#08051A');
-    grad.addColorStop(0.5, '#2E1065');
-    grad.addColorStop(1, '#4338CA');
-    ctx.fillStyle = grad; ctx.fillRect(0, 0, 600, 400);
+    /* --- Background gradient --- */
+    var grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, '#030510');
+    grad.addColorStop(0.3, '#0C0620');
+    grad.addColorStop(0.6, '#1E0A4B');
+    grad.addColorStop(1, '#2E1065');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
 
-    ctx.globalAlpha = 0.06;
-    ctx.beginPath(); ctx.arc(500, 80, 120, 0, Math.PI * 2);
-    ctx.fillStyle = '#C084FC'; ctx.fill();
-    ctx.beginPath(); ctx.arc(100, 350, 80, 0, Math.PI * 2);
+    /* --- Decorative circles --- */
+    ctx.globalAlpha = 0.08;
+    ctx.beginPath(); ctx.arc(600, 60, 160, 0, Math.PI * 2);
+    ctx.fillStyle = '#7C3AED'; ctx.fill();
+    ctx.beginPath(); ctx.arc(120, 420, 120, 0, Math.PI * 2);
+    ctx.fillStyle = '#4338CA'; ctx.fill();
+    ctx.beginPath(); ctx.arc(360, 240, 200, 0, Math.PI * 2);
     ctx.fillStyle = '#6D28D9'; ctx.fill();
     ctx.globalAlpha = 1;
 
-    ctx.font = 'bold 28px Nunito, sans-serif';
-    ctx.fillStyle = '#fff'; ctx.textAlign = 'left';
-    ctx.fillText('Slot', 30, 50);
-    ctx.fillStyle = '#C084FC';
-    ctx.fillText('X', 95, 50);
+    /* --- Stars/sparkles decoration --- */
+    ctx.globalAlpha = 0.15;
+    var sparkles = [[80,60], [650,100], [100,350], [620,380], [300,50], [500,430], [180,180], [550,250]];
+    for (var si = 0; si < sparkles.length; si++) {
+      _drawStar(ctx, sparkles[si][0], sparkles[si][1], 3 + (si % 3) * 2);
+    }
+    ctx.globalAlpha = 1;
 
-    ctx.font = 'bold 16px Nunito, sans-serif';
-    ctx.fillStyle = '#F97316'; ctx.textAlign = 'center';
-    ctx.fillText('🏆 BIG WIN!', 300, 100);
-
-    var amt = win.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-    var cur = window.DataStore ? DataStore.getCurrencySymbol() : '₽';
-    ctx.font = 'bold 48px Nunito, sans-serif';
+    /* --- Top bar with logo --- */
+    ctx.font = 'bold 24px Nunito, sans-serif';
     ctx.fillStyle = '#fff';
-    ctx.shadowColor = 'rgba(192,132,252,0.4)'; ctx.shadowBlur = 20;
-    ctx.fillText(amt + ' ' + cur, 300, 170);
+    ctx.textAlign = 'left';
+    ctx.fillText('Slot', 30, 42);
+    ctx.fillStyle = '#C084FC';
+    ctx.fillText('X', 82, 42);
+    ctx.font = '600 11px Nunito, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText('DEMO SLOTS', 110, 42);
+
+    /* --- Date --- */
+    ctx.textAlign = 'right';
+    ctx.font = '500 12px Nunito, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    var dt = new Date(win.ts || Date.now());
+    ctx.fillText(dt.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }), W - 30, 42);
+
+    /* --- BIG WIN banner --- */
+    ctx.textAlign = 'center';
+    var isMega = (win.mult >= 100) || (win.amount >= 5000);
+    var isHuge = (win.mult >= 50) || (win.amount >= 1000);
+
+    /* Glow behind text */
+    ctx.shadowColor = isMega ? 'rgba(249,115,22,0.6)' : 'rgba(192,132,252,0.5)';
+    ctx.shadowBlur = 40;
+    ctx.font = 'bold 18px Nunito, sans-serif';
+    ctx.fillStyle = isMega ? '#F97316' : isHuge ? '#C084FC' : '#A78BFA';
+    var winLabel = isMega ? '🔥 MEGA WIN! 🔥' : isHuge ? '🏆 BIG WIN!' : '⭐ WIN!';
+    ctx.fillText(winLabel, W / 2, 100);
     ctx.shadowBlur = 0;
 
+    /* --- Game icon + name --- */
+    ctx.font = '600 20px Nunito, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fillText((win.gameIcon || '🎰') + '  ' + (win.gameName || 'SlotX'), W / 2, 140);
+
+    /* --- Divider line --- */
+    var divGrad = ctx.createLinearGradient(W * 0.2, 0, W * 0.8, 0);
+    divGrad.addColorStop(0, 'transparent');
+    divGrad.addColorStop(0.5, 'rgba(192,132,252,0.3)');
+    divGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = divGrad;
+    ctx.fillRect(W * 0.15, 158, W * 0.7, 1);
+
+    /* --- Main win amount --- */
+    var amt = _fmtMoney(win.amount);
+    var cur = window.DataStore ? DataStore.getCurrencySymbol() : '₽';
+
+    ctx.shadowColor = isMega ? 'rgba(249,115,22,0.5)' : 'rgba(192,132,252,0.4)';
+    ctx.shadowBlur = 30;
+    ctx.font = 'bold 56px Nunito, sans-serif';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(amt + ' ' + cur, W / 2, 225);
+    ctx.shadowBlur = 0;
+
+    /* --- Multiplier --- */
     if (win.mult > 0) {
-      ctx.font = 'bold 24px Nunito, sans-serif';
-      ctx.fillStyle = '#C084FC';
-      ctx.fillText('x' + win.mult, 300, 210);
+      var multColor = isMega ? '#F97316' : '#C084FC';
+      /* Pill background */
+      var multText = 'x' + win.mult;
+      ctx.font = 'bold 28px Nunito, sans-serif';
+      var mw = ctx.measureText(multText).width + 32;
+      _roundRect(ctx, (W - mw) / 2, 248, mw, 40, 20);
+      ctx.fillStyle = isMega ? 'rgba(249,115,22,0.15)' : 'rgba(192,132,252,0.12)';
+      ctx.fill();
+      ctx.strokeStyle = isMega ? 'rgba(249,115,22,0.3)' : 'rgba(192,132,252,0.25)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = multColor;
+      ctx.textAlign = 'center';
+      ctx.fillText(multText, W / 2, 276);
     }
 
-    ctx.font = '600 18px Nunito, sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillText((win.gameIcon || '🎰') + ' ' + (win.gameName || ''), 300, 260);
-
+    /* --- Player info --- */
     var name = (window.TG && TG.userFirstName) ? TG.userFirstName : 'Player';
     ctx.font = '600 14px Nunito, sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.fillText('Игрок: ' + name, 300, 300);
+    ctx.textAlign = 'center';
+    ctx.fillText('👤 Игрок: ' + name, W / 2, 325);
 
-    ctx.fillStyle = 'rgba(109,40,217,0.3)';
-    roundRect(ctx, 150, 330, 300, 44, 22); ctx.fill();
-    ctx.font = 'bold 14px Nunito, sans-serif';
+    /* --- Bottom CTA card --- */
+    _roundRect(ctx, 140, 360, W - 280, 56, 28);
+    var ctaGrad = ctx.createLinearGradient(140, 360, W - 140, 416);
+    ctaGrad.addColorStop(0, '#2E1065');
+    ctaGrad.addColorStop(0.5, '#4338CA');
+    ctaGrad.addColorStop(1, '#6D28D9');
+    ctx.fillStyle = ctaGrad;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(192,132,252,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.font = 'bold 15px Nunito, sans-serif';
     ctx.fillStyle = '#fff';
-    ctx.fillText('🎰 Играй бесплатно в SlotX!', 300, 357);
+    ctx.fillText('🎰 Играй бесплатно в SlotX!', W / 2, 394);
+
+    /* --- Bottom note --- */
+    ctx.font = '500 10px Nunito, sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.fillText('t.me/SlotXDemoBot/app', W / 2, 445);
+
+    /* --- Border frame --- */
+    ctx.strokeStyle = 'rgba(139,92,246,0.15)';
+    ctx.lineWidth = 2;
+    _roundRect(ctx, 6, 6, W - 12, H - 12, 20);
+    ctx.stroke();
 
     return canvas;
   }
 
-  function roundRect(ctx, x, y, w, h, r) {
+  function _drawStar(ctx, x, y, r) {
+    ctx.save();
+    ctx.fillStyle = '#C084FC';
+    ctx.beginPath();
+    for (var i = 0; i < 4; i++) {
+      var a = (i / 4) * Math.PI * 2 - Math.PI / 2;
+      ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+      var a2 = a + Math.PI / 4;
+      ctx.lineTo(x + Math.cos(a2) * r * 0.4, y + Math.sin(a2) * r * 0.4);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function _fmtMoney(n) {
+    return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
+  function _roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
     ctx.lineTo(x + w - r, y);
@@ -248,15 +352,67 @@ var Referral = (function() {
     ctx.closePath();
   }
 
+  /* ============================================
+     BEAUTIFUL SHARE MESSAGES
+     ============================================ */
+
+  /* Share win — with image if possible */
   function shareWin(win) {
     var link = window.Features ? Features.getReferralLink() : 'https://t.me/SlotXDemoBot/app';
-    var amt = win.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    var amt = _fmtMoney(win.amount);
     var cur = window.DataStore ? DataStore.getCurrencySymbol() : '₽';
-    var text = '🏆 Я выиграл ' + amt + ' ' + cur;
-    if (win.mult > 0) text += ' (x' + win.mult + ')';
-    text += ' в ' + (win.gameName || 'SlotX') + '!\n\n';
-    text += '🎁 Играй бесплатно → ' + link;
+    var isMega = (win.mult >= 100) || (win.amount >= 5000);
+    var isHuge = (win.mult >= 50) || (win.amount >= 1000);
 
+    /* Build beautiful text message */
+    var text = '';
+    if (isMega) {
+      text += '🔥🔥🔥 МЕГА ВЫИГРЫШ! 🔥🔥🔥\n\n';
+    } else if (isHuge) {
+      text += '🏆💰 КРУПНЫЙ ВЫИГРЫШ! 💰🏆\n\n';
+    } else {
+      text += '⭐ Мой выигрыш в SlotX! ⭐\n\n';
+    }
+
+    text += '🎰 Игра: ' + (win.gameName || 'SlotX') + '\n';
+    text += '💎 Выигрыш: ' + amt + ' ' + cur + '\n';
+    if (win.mult > 0) text += '⚡ Множитель: x' + win.mult + '\n';
+    text += '\n';
+    text += '━━━━━━━━━━━━━━━━\n';
+    text += '🎁 Попробуй сам — демо-слоты бесплатно!\n';
+    text += '👉 ' + link;
+
+    /* Try to share as image first */
+    _shareWithImage(win, text, link);
+  }
+
+  function _shareWithImage(win, text, link) {
+    /* Generate canvas image */
+    var canvas = generateWinCard(win);
+
+    /* Try Web Share API with file (image) */
+    if (navigator.share && navigator.canShare) {
+      canvas.toBlob(function(blob) {
+        if (!blob) { _shareTextOnly(text, link); return; }
+        var file = new File([blob], 'slotx-win.png', { type: 'image/png' });
+        var shareData = { text: text, files: [file] };
+
+        if (navigator.canShare(shareData)) {
+          navigator.share(shareData).catch(function() {
+            _shareTextOnly(text, link);
+          });
+        } else {
+          _shareTextOnly(text, link);
+        }
+      }, 'image/png');
+      return;
+    }
+
+    /* Fallback: try TG inline share */
+    _shareTextOnly(text, link);
+  }
+
+  function _shareTextOnly(text, link) {
     try {
       var tg = window.Telegram && Telegram.WebApp;
       if (tg && tg.switchInlineQuery) {
@@ -274,61 +430,102 @@ var Referral = (function() {
       var ta = document.createElement('textarea'); ta.value = text;
       document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
     }
-    if (window.App) App.showToast('📋', '✅ Текст скопирован!');
+    if (window.App) App.showToast('📋', '✅ Скопировано!');
   }
 
-  /* ============================================
-     FRIEND ACTIVITY
-     ============================================ */
-  var _activityTimer = null;
-  var _activityShownCount = 0;
-  var _usingRealActivity = false;
+  /* Beautiful referral invite messages */
+  function shareReferralBeautiful() {
+    var link = window.Features ? Features.getReferralLink() : 'https://t.me/SlotXDemoBot/app';
+    var d = window.Features ? Features.getData() : {};
+    var wins = d.wins || [];
+    var bestWin = d.biggestWin || 0;
+    var cur = window.DataStore ? DataStore.getCurrencySymbol() : '₽';
 
+    /* Pick a random invite style */
+    var styles = [];
+
+    styles.push(
+      '🎰✨ Нашёл крутые демо-слоты! ✨🎰\n\n' +
+      '🎮 100+ игр от Pragmatic Play\n' +
+      '💎 Полностью бесплатно\n' +
+      '🏆 Соревнуйся с друзьями\n\n' +
+      '🎁 Секретный бонус для нас обоих!\n' +
+      '👉 ' + link
+    );
+
+    styles.push(
+      '🤫 Пссс... нашёл кое-что интересное!\n\n' +
+      '🎰 SlotX — бесплатные демо-слоты\n' +
+      '⚡ Играй без вложений\n' +
+      '🔥 Реальный азарт, нулевой риск\n\n' +
+      '🎁 Заходи по ссылке — получишь бонус 🎁\n' +
+      '👉 ' + link
+    );
+
+    styles.push(
+      '💥 Зацени — играю в слоты бесплатно!\n\n' +
+      '🎰 Pragmatic Play слоты в демо-режиме\n' +
+      '🌍 49 валют, 100+ игр\n' +
+      '🏆 Топовые хиты: Sweet Bonanza, Gates of Olympus\n\n' +
+      '🎁 Тебе бонус за регистрацию!\n' +
+      '👉 ' + link
+    );
+
+    /* If user has wins, add a brag message */
+    if (bestWin > 500) {
+      styles.push(
+        '🔥 Только что выиграл ' + _fmtMoney(bestWin) + ' ' + cur + ' в SlotX!\n\n' +
+        '🎰 Бесплатные демо-слоты — никакого риска\n' +
+        '💎 Попробуй переплюнуть мой рекорд!\n\n' +
+        '🎁 Бонус при регистрации по моей ссылке:\n' +
+        '👉 ' + link
+      );
+    }
+
+    if (wins.length > 5) {
+      styles.push(
+        '🏆 У меня уже ' + wins.length + ' выигрышей в SlotX!\n\n' +
+        '🎰 Крутые демо-слоты Pragmatic Play\n' +
+        '💰 Рекорд: ' + _fmtMoney(bestWin) + ' ' + cur + '\n' +
+        '⚡ Абсолютно бесплатно\n\n' +
+        '🎁 Заходи — бонус активируется автоматически:\n' +
+        '👉 ' + link
+      );
+    }
+
+    var text = styles[Math.floor(Math.random() * styles.length)];
+
+    /* Try TG native share first */
+    try {
+      var tg = window.Telegram && Telegram.WebApp;
+      if (tg && tg.switchInlineQuery) {
+        tg.switchInlineQuery(text, ['users', 'groups', 'channels']);
+        return;
+      }
+    } catch(e) {}
+
+    if (navigator.share) {
+      navigator.share({ title: 'SlotX — Бесплатные демо-слоты', text: text, url: link }).catch(function(){});
+      return;
+    }
+
+    try { navigator.clipboard.writeText(text); } catch(e) {
+      var ta = document.createElement('textarea'); ta.value = text;
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    if (window.App) App.showToast('📋', '✅ Ссылка скопирована!');
+  }
+
+  /* Friend activity — notifications removed, status display only */
   function startFriendActivity() {
-    if (_activityTimer) return;
-
+    /* Only start Firebase watching for status badges — no toasts */
     if (window.FirebaseService && FirebaseService.isConfigured() && FirebaseService.isReady()) {
       var ids = FirebaseService.getFriendIds();
       if (ids.length > 0) {
-        _usingRealActivity = true;
         FirebaseService.watchFriends(ids);
-        FirebaseService.onFriendActivity(function(icon, text) {
-          if (window.App) App.showToast(icon, text);
-        });
-        return;
       }
     }
-
-    var d = window.Features ? Features.getData() : {};
-    var friends = d.referredUsers || [];
-    if (friends.length === 0) return;
-
-    var delay = 30000 + Math.random() * 30000;
-    _activityTimer = setTimeout(function _tick() {
-      if (_activityShownCount >= 5) return;
-      _showSimulatedNotification(friends);
-      _activityShownCount++;
-      _activityTimer = setTimeout(_tick, 120000 + Math.random() * 180000);
-    }, delay);
   }
-
-  function _showSimulatedNotification(friends) {
-    var games = window.DataStore ? DataStore.getActiveGames() : [];
-    if (games.length === 0 || friends.length === 0) return;
-    var h = simpleHash('friend_' + Date.now());
-    var game = games[h % games.length];
-    var friendIdx = h % friends.length;
-    var friendNum = friendIdx + 1;
-    var actions = [
-      { icon: '🎮', text: 'Друг #' + friendNum + ' играет в ' + game.name + '!' },
-      { icon: '🔥', text: 'Друг #' + friendNum + ' выиграл в ' + game.name + '!' },
-      { icon: '⚡', text: 'Друг #' + friendNum + ' запустил ' + game.name }
-    ];
-    var action = actions[h % actions.length];
-    if (window.App) App.showToast(action.icon, action.text);
-  }
-
-  function isUsingRealActivity() { return _usingRealActivity; }
 
   /* ============================================
      RENDER — Full Referral Section
@@ -372,14 +569,24 @@ var Referral = (function() {
     html += '<button id="btn-ref-copy" class="interactive" style="width:42px;flex-shrink:0;padding:10px;border-radius:10px;background:rgba(109,40,217,0.08);color:#C084FC;font-size:13px;border:1px solid rgba(109,40,217,0.12);font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-link"></i></button>';
     html += '</div>';
 
-    /* --- WIN SHARING --- */
-    var bestWins = window.Features ? Features.getBestWins(3) : [];
+    /* --- WIN SHARING — Best wins with share buttons --- */
+    var _rawBestWins = window.Features ? Features.getBestWins(10) : [];
+    /* Deduplicate: only show best win per unique game */
+    var _seenGames = {};
+    var bestWins = [];
+    for (var _uw = 0; _uw < _rawBestWins.length && bestWins.length < 3; _uw++) {
+      var _wKey = (_rawBestWins[_uw].gameId || '') + '_' + Math.round(_rawBestWins[_uw].amount);
+      if (!_seenGames[_rawBestWins[_uw].gameId || '']) {
+        _seenGames[_rawBestWins[_uw].gameId || ''] = true;
+        bestWins.push(_rawBestWins[_uw]);
+      }
+    }
     if (bestWins.length > 0) {
       html += '<div style="margin:12px 0;">';
       html += '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">📤 Поделиться выигрышем</div>';
       for (var w = 0; w < bestWins.length; w++) {
         var win = bestWins[w];
-        var amt = win.amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        var amt = _fmtMoney(win.amount);
         var cur = window.DataStore ? DataStore.getCurrencySymbol() : '₽';
         var isBig = (win.mult >= 50) || (win.amount >= 500);
         var rowBg = isBig ? 'background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.12);' : 'background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);';
@@ -389,7 +596,7 @@ var Referral = (function() {
         html += '<div style="font-size:11px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(win.gameName || '') + '</div>';
         html += '<div style="font-size:13px;font-weight:900;color:#C084FC;">' + amt + ' ' + esc(cur) + (win.mult > 0 ? ' <span style="color:#F97316;">x' + win.mult + '</span>' : '') + '</div>';
         html += '</div>';
-        html += '<button class="btn-share-win interactive" style="padding:7px 12px;border-radius:10px;background:rgba(109,40,217,0.1);color:#C084FC;font-size:10px;font-weight:700;border:none;font-family:inherit;cursor:pointer;white-space:nowrap;"><i class="fa-solid fa-share-nodes"></i> Шеринг</button>';
+        html += '<button class="btn-share-win interactive" style="padding:7px 12px;border-radius:10px;background:linear-gradient(135deg,rgba(109,40,217,0.15),rgba(67,56,202,0.08));color:#C084FC;font-size:10px;font-weight:700;border:1px solid rgba(139,92,246,0.2);font-family:inherit;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;"><i class="fa-solid fa-share-nodes"></i> Шеринг</button>';
         html += '</div>';
       }
       html += '</div>';
@@ -414,14 +621,12 @@ var Referral = (function() {
       html += '</div>';
     }
 
-    /* (How it works removed) */
-
     container.innerHTML = html;
 
     /* --- Bind events --- */
     var invBtn = container.querySelector('#btn-ref-invite');
     var cpBtn = container.querySelector('#btn-ref-copy');
-    if (invBtn) invBtn.addEventListener('click', function() { TG.haptic.medium(); if (window.Features) Features.shareReferral(); });
+    if (invBtn) invBtn.addEventListener('click', function() { TG.haptic.medium(); shareReferralBeautiful(); });
     if (cpBtn) cpBtn.addEventListener('click', function() { TG.haptic.light(); if (window.Features) Features.copyReferralLink(); });
 
     var wt = container.querySelector('#wheel-teaser');
@@ -447,62 +652,97 @@ var Referral = (function() {
      FRIEND TREE — Compact chips
      ============================================ */
   function renderFriendTree(friends) {
+    var t = window.I18n ? I18n.t : function(k, f) { return f || k; };
+    var cur = window.DataStore ? DataStore.getCurrencySymbol() : '₽';
+    var d = window.Features ? Features.getData() : {};
+    var wins = d.wins || [];
     var html = '<div style="margin:8px 0;">';
-    html += '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">🌳 Друзья (' + friends.length + ')</div>';
+    html += '<div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">🌳 ' + t('referral.friendTree', 'Дерево друзей') + ' (' + friends.length + ')</div>';
 
-    var limit = Math.min(friends.length, 10);
+    var limit = Math.min(friends.length, 15);
     var avatarEmojis = ['🎮', '⭐', '💎', '🔥', '🎯', '🚀', '🌟', '💫', '🎪', '🎲'];
     var bgColors = ['#6D28D9', '#4338CA', '#7C3AED', '#2E1065', '#3730A3', '#4F46E5', '#6366F1', '#8B5CF6'];
+    var lang = window.I18n ? I18n.getLang() : 'ru';
 
-    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
     for (var i = 0; i < limit; i++) {
       var f = friends[i];
       var seed = simpleHash('friend_av_' + (f.id || i));
       var avatar = avatarEmojis[seed % avatarEmojis.length];
       var bgColor = bgColors[seed % bgColors.length];
+      var joinDate = f.ts ? new Date(f.ts) : null;
+      var dateStr = joinDate ? joinDate.toLocaleDateString(lang, { day: 'numeric', month: 'short' }) : '';
 
-      html += '<div class="friend-status" data-friend-id="' + (f.id || '') + '" style="display:flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;border-radius:20px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.04);">';
-      html += '<div style="width:22px;height:22px;border-radius:50%;background:' + bgColor + ';display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">' + avatar + '</div>';
-      html += '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);">#' + (i + 1) + '</span>';
+      /* Find best win for this friend (simulated — based on friend seed) */
+      var friendBestWin = _simulateFriendBestWin(f.id || String(i), seed);
+
+      var isLast = (i === limit - 1) && (friends.length <= limit);
+
+      html += '<div class="friend-status" data-friend-id="' + (f.id || '') + '" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);margin-bottom:4px;">';
+
+      /* Avatar circle */
+      html += '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,' + bgColor + ',rgba(139,92,246,0.3));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:2px solid rgba(139,92,246,0.2);">' + avatar + '</div>';
+
+      /* Info block */
+      html += '<div style="flex:1;min-width:0;">';
+      html += '<div style="display:flex;align-items:center;gap:6px;">';
+      html += '<span style="font-size:12px;font-weight:700;color:var(--text-primary);">' + t('referral.friend', 'Друг') + ' #' + (i + 1) + '</span>';
+      if (dateStr) html += '<span style="font-size:8px;color:var(--text-muted);font-weight:500;">с ' + dateStr + '</span>';
+      html += '</div>';
+
+      /* Best win line */
+      if (friendBestWin) {
+        html += '<div style="display:flex;align-items:center;gap:4px;margin-top:2px;">';
+        html += '<span style="font-size:11px;">' + friendBestWin.icon + '</span>';
+        html += '<span style="font-size:10px;font-weight:600;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(friendBestWin.game) + '</span>';
+        html += '<span style="font-size:10px;font-weight:800;color:#C084FC;white-space:nowrap;margin-left:auto;">' + _fmtMoney(friendBestWin.amount) + ' ' + esc(cur) + '</span>';
+        html += '</div>';
+      } else {
+        html += '<div style="font-size:9px;color:var(--text-muted);margin-top:2px;">🎰 Ещё не играл</div>';
+      }
+
+      html += '</div>';
+
+      /* Status badge — online/offline */
+      html += '<div class="friend-online-badge" data-friend-id="' + (f.id || '') + '" style="text-align:right;flex-shrink:0;">';
+      html += '<div style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);">';
+      html += '<span style="width:6px;height:6px;border-radius:50%;background:var(--text-muted);flex-shrink:0;"></span>';
+      html += '<span style="font-size:9px;font-weight:600;color:var(--text-muted);">Оффлайн</span>';
+      html += '</div></div>';
+
       html += '</div>';
     }
+
     if (friends.length > limit) {
-      html += '<div style="display:flex;align-items:center;padding:4px 10px;border-radius:20px;background:rgba(109,40,217,0.06);border:1px solid rgba(109,40,217,0.1);">';
-      html += '<span style="font-size:10px;font-weight:700;color:#C084FC;">+' + (friends.length - limit) + '</span>';
+      html += '<div style="text-align:center;padding:6px;border-radius:10px;background:rgba(109,40,217,0.04);border:1px solid rgba(109,40,217,0.08);margin-top:4px;">';
+      html += '<span style="font-size:10px;font-weight:700;color:#C084FC;">+ ещё ' + (friends.length - limit) + ' друзей</span>';
       html += '</div>';
     }
-    html += '</div>';
 
     html += '</div>';
     return html;
   }
 
-  /* ============================================
-     HOW IT WORKS — plain text, no emojis
-     ============================================ */
-  function renderHowItWorks() {
-    var html = '<div style="margin:8px 0;padding:10px 12px;border-radius:12px;background:rgba(109,40,217,0.04);border:1px solid rgba(109,40,217,0.08);">';
-    html += '<div style="font-size:9px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Как это работает</div>';
+  /* Simulate a "best win" for a friend based on their ID seed */
+  function _simulateFriendBestWin(friendId, seed) {
+    var games = window.DataStore ? DataStore.getActiveGames() : [];
+    if (games.length === 0) return null;
 
-    html += '<div style="display:flex;flex-direction:column;gap:4px;">';
+    /* 70% chance friend has a notable win */
+    if (seed % 100 > 70) return null;
 
-    html += '<div style="display:flex;align-items:center;gap:6px;">';
-    html += '<span style="width:14px;height:14px;border-radius:50%;background:rgba(109,40,217,0.15);color:#A78BFA;font-size:7px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span>';
-    html += '<span style="font-size:10px;color:var(--text-secondary);">Отправьте ссылку другу</span>';
-    html += '</div>';
+    var gameIdx = seed % games.length;
+    var game = games[gameIdx];
+    var h = simpleHash(friendId + '_bestwin');
 
-    html += '<div style="display:flex;align-items:center;gap:6px;">';
-    html += '<span style="width:14px;height:14px;border-radius:50%;background:rgba(109,40,217,0.15);color:#A78BFA;font-size:7px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span>';
-    html += '<span style="font-size:10px;color:var(--text-secondary);">Друг заходит и получает +50 XP</span>';
-    html += '</div>';
+    /* Generate realistic win amount */
+    var amounts = [45.50, 78.20, 123.00, 256.80, 312.50, 489.70, 567.00, 890.40, 1250.00, 1875.50, 2340.00, 3456.00, 5678.90];
+    var amount = amounts[h % amounts.length];
 
-    html += '<div style="display:flex;align-items:center;gap:6px;">';
-    html += '<span style="width:14px;height:14px;border-radius:50%;background:rgba(109,40,217,0.15);color:#A78BFA;font-size:7px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span>';
-    html += '<span style="font-size:10px;color:var(--text-secondary);">Вы получаете +200 XP и спин колеса</span>';
-    html += '</div>';
-
-    html += '</div></div>';
-    return html;
+    return {
+      game: game.name,
+      icon: game.icon || '🎰',
+      amount: amount
+    };
   }
 
   /* ============================================
@@ -563,18 +803,22 @@ var Referral = (function() {
      FRIEND STATUS — Real-time online badges
      ============================================ */
   function _updateFriendStatuses(container) {
-    if (!window.FirebaseService || !FirebaseService.isReady()) return;
+    if (!window.FirebaseService || !FirebaseService.isReady()) {
+      /* No Firebase — simulate random online/offline for demo */
+      _simulateOnlineStatuses(container);
+      return;
+    }
     var ids = FirebaseService.getFriendIds();
-    if (ids.length === 0) return;
+    if (ids.length === 0) { _simulateOnlineStatuses(container); return; }
 
     FirebaseService.getFriendsStatus(ids).then(function(statuses) {
-      if (!statuses || statuses.length === 0) return;
+      if (!statuses || statuses.length === 0) { _simulateOnlineStatuses(container); return; }
       var statusMap = {};
       for (var i = 0; i < statuses.length; i++) {
         statusMap[statuses[i].id] = statuses[i];
       }
 
-      var badges = container.querySelectorAll('.friend-status');
+      var badges = container.querySelectorAll('.friend-online-badge');
       for (var j = 0; j < badges.length; j++) {
         var fid = badges[j].getAttribute('data-friend-id');
         if (!fid || !statusMap[fid]) continue;
@@ -582,18 +826,58 @@ var Referral = (function() {
         var isRecent = (Date.now() - (s.updatedAt || 0)) < 300000;
 
         if (s.status === 'playing' && isRecent) {
-          badges[j].innerHTML = '<span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;border-radius:50%;background:#22C55E;animation:pulse-dot 1.5s infinite;"></span> ' + esc(s.gameName || 'Играет') + '</span>';
-          badges[j].style.color = '#22C55E';
-        } else if (s.lastWin && s.lastWin.amount > 0 && isRecent) {
-          var wCur = window.DataStore ? DataStore.getCurrencySymbol() : '\u20bd';
-          badges[j].innerHTML = '\ud83c\udfc6 ' + s.lastWin.amount.toFixed(0) + ' ' + wCur;
-          badges[j].style.color = '#F97316';
+          _setBadge(badges[j], 'playing', s.gameName || 'Играет');
         } else if (isRecent) {
-          badges[j].innerHTML = '<span style="display:inline-flex;align-items:center;gap:3px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--text-muted);"></span> Был недавно</span>';
-          badges[j].style.color = 'var(--text-muted)';
+          _setBadge(badges[j], 'online', 'Онлайн');
+        } else {
+          _setBadge(badges[j], 'offline', 'Оффлайн');
         }
       }
-    }).catch(function() {});
+    }).catch(function() { _simulateOnlineStatuses(container); });
+  }
+
+  function _simulateOnlineStatuses(container) {
+    var badges = container.querySelectorAll('.friend-online-badge');
+    for (var j = 0; j < badges.length; j++) {
+      /* Demo: hardcode different statuses so user sees all 3 variants */
+      if (j === 0) {
+        /* First friend — playing a game */
+        var games = window.DataStore ? DataStore.getActiveGames() : [];
+        var gameName = games.length > 0 ? games[0].name : 'Sweet Bonanza';
+        _setBadge(badges[j], 'playing', gameName);
+      } else if (j === 1) {
+        /* Second friend — online */
+        _setBadge(badges[j], 'online', 'Онлайн');
+      } else {
+        /* Third+ friend — offline */
+        _setBadge(badges[j], 'offline', 'Оффлайн');
+      }
+    }
+  }
+
+  function _setBadge(el, status, label) {
+    var dotHtml, textColor, bgColor, borderColor;
+    if (status === 'playing') {
+      dotHtml = '<span style="width:6px;height:6px;border-radius:50%;background:#22C55E;flex-shrink:0;box-shadow:0 0 4px #22C55E;animation:pulse-dot 1.5s infinite;"></span>';
+      textColor = '#22C55E';
+      bgColor = 'rgba(34,197,94,0.08)';
+      borderColor = 'rgba(34,197,94,0.15)';
+    } else if (status === 'online') {
+      dotHtml = '<span style="width:6px;height:6px;border-radius:50%;background:#22C55E;flex-shrink:0;"></span>';
+      textColor = '#22C55E';
+      bgColor = 'rgba(34,197,94,0.06)';
+      borderColor = 'rgba(34,197,94,0.12)';
+    } else {
+      dotHtml = '<span style="width:6px;height:6px;border-radius:50%;background:var(--text-muted);flex-shrink:0;opacity:0.4;"></span>';
+      textColor = 'var(--text-muted)';
+      bgColor = 'rgba(255,255,255,0.03)';
+      borderColor = 'rgba(255,255,255,0.05)';
+    }
+    var truncLabel = label.length > 14 ? label.substring(0, 13) + '…' : label;
+    el.innerHTML = '<div style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;background:' + bgColor + ';border:1px solid ' + borderColor + ';">' +
+      dotHtml +
+      '<span style="font-size:9px;font-weight:600;color:' + textColor + ';white-space:nowrap;">' + esc(truncLabel) + '</span>' +
+      '</div>';
   }
 
   /* ============================================
@@ -624,9 +908,9 @@ var Referral = (function() {
     /* Win sharing */
     shareWin: shareWin,
     generateWinCard: generateWinCard,
+    shareReferralBeautiful: shareReferralBeautiful,
     /* Activity */
     startFriendActivity: startFriendActivity,
-    isUsingRealActivity: isUsingRealActivity,
     /* Render */
     renderFull: renderFull
   };
