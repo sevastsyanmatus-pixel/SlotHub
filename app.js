@@ -449,6 +449,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
   /* === Init === */
   async function init() {
+    /* Clean up fake test referrals (111111, 222222, 333333) from wheel testing */
+    try {
+      var _pd = localStorage.getItem('sh_playerData');
+      if (_pd) {
+        var _parsed = JSON.parse(_pd);
+        var _fakeIds = ['111111', '222222', '333333'];
+        var _changed = false;
+        if (_parsed.referredUsers && _parsed.referredUsers.length > 0) {
+          var _clean = _parsed.referredUsers.filter(function(u) { return _fakeIds.indexOf(String(u.id)) === -1; });
+          if (_clean.length !== _parsed.referredUsers.length) {
+            _parsed.referredUsers = _clean;
+            _parsed.referrals = _clean.length;
+            _changed = true;
+          }
+        }
+        if (_changed) localStorage.setItem('sh_playerData', JSON.stringify(_parsed));
+      }
+      /* Clean up test wheel spins */
+      var _ws = localStorage.getItem('sh_wheelSpins');
+      if (_ws) {
+        var _wsd = JSON.parse(_ws);
+        if (_wsd.available > 0 && (!_parsed || !_parsed.referredUsers || _parsed.referredUsers.length === 0)) {
+          localStorage.removeItem('sh_wheelSpins');
+        }
+      }
+    } catch(e) {}
+
+    /* One-time cleanup: remove stale preview temp URLs from cached casino data */
+    try {
+      var _casinosRaw = localStorage.getItem('sh_casinos');
+      if (_casinosRaw && _casinosRaw.indexOf('preview.miniapps.ai') !== -1) {
+        var _cas = JSON.parse(_casinosRaw);
+        var _casDirty = false;
+        for (var _ci = 0; _ci < _cas.length; _ci++) {
+          if (_cas[_ci].logo && _cas[_ci].logo.indexOf('preview.miniapps.ai') !== -1) { _cas[_ci].logo = ''; _casDirty = true; }
+          if (_cas[_ci].bannerImage && _cas[_ci].bannerImage.indexOf('preview.miniapps.ai') !== -1) { _cas[_ci].bannerImage = ''; _casDirty = true; }
+        }
+        if (_casDirty) localStorage.setItem('sh_casinos', JSON.stringify(_cas));
+      }
+    } catch(e) {}
+
     if (window.SoundFX) SoundFX.init();
     if (window.ThemeManager) ThemeManager.init();
     if (window.I18n) I18n.init();
